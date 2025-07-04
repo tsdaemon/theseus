@@ -1,0 +1,25 @@
+---
+qbittorrent_enabled: false
+qbittorrent_available_externally: false
+
+# directories
+qbittorrent_config_directory: "{{ docker_home }}/qbittorrent/config"
+qbittorrent_download_directory: "{{ downloads_root }}"
+qbittorrent_download_directory_active: "{{ downloads_root }}/.incomplete"
+
+# uid / gid
+qbittorrent_user_id: "{{ ansible_nas_user_id }}"
+qbittorrent_group_id: "{{ ansible_nas_group_id }}"
+
+# network
+qbittorrent_port_http: "8080"
+qbittorrent_port_bt: "6881"
+qbittorrent_hostname: "qbittorrent"
+
+# docker
+qbittorrent_container_name: "qbittorrent"
+qbittorrent_image_name: "linuxserver/qbittorrent"
+qbittorrent_image_version: "latest"
+
+# specs
+qbittorrent_memory: 1g

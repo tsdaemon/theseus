@@ -5,6 +5,9 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "770"
       with_items:
         - "{{ plex_config_directory }}"
         - "{{ plex_logs }}"

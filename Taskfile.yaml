@@ -1,0 +1,25 @@
+version: '3'
+
+env:
+  ANSIBLE_VERBOSITY: 1
+
+tasks:
+  default:
+    desc: Show list of available commands
+    cmds:
+      - task --list
+
+  update:
+    desc: Upgrade dependencies
+    cmds:
+      - ansible-galaxy install -r requirements.yml
+
+  nas:
+    desc: Run NAS playbook
+    cmds:
+      - ansible-playbook -i inventories/theseus/inventory nas.yml -b -K
+
+  tags:
+    desc: Run tags
+    cmds:
+      - ansible-playbook -i inventories/theseus/inventory nas.yml -b -K --tags "{{.CLI_ARGS}}"

@@ -13,8 +13,8 @@ plex_music_directory: "{{ music_root }}"
 plex_audiobooks_directory: "{{ audiobooks_root }}"
 
 # uid / gid
-plex_user_id: "0"
-plex_group_id: "0"
+plex_user_id: "{{ ansible_nas_user_id }}"
+plex_group_id: "{{ ansible_nas_group_id }}"
 
 # If you're paranoid, set permissions to "ro" so Plex won't ever be able to
 # delete your files
