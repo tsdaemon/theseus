@@ -1,8 +1,5 @@
 ---
-- name: Set login banner
-  ansible.builtin.copy:
-    src: motd.txt
-    dest: /etc/motd
+- include_tasks: motd.yaml
 
 - name: Update apt-cache
   ansible.builtin.apt:
@@ -38,8 +35,8 @@
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: directory
-    owner: ansible-nas
-    group: ansible-nas
+    owner: theseus
+    group: users
     mode: "u=rwX,g=rwX,o=rX"
     recurse: false
   loop: "{{ samba_shares }}"

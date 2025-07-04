@@ -5,25 +5,30 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "770"
       with_items:
         - "{{ duplicati_data_directory }}"
 
     - name: Dupicati Docker Container
       community.docker.docker_container:
         name: "{{ duplicati_container_name }}"
-        image: linuxserver/duplicati
+        image: linuxserver/duplicati:latest
         pull: true
         ports:
           - "{{ duplicati_port }}:8200"
         volumes:
           - "{{ duplicati_data_directory }}:/config:rw"
-          - "{{ samba_shares_root }}:/source/shares:{{ duplicati_data_permissions }}"
           - "{{ docker_home }}:/source/docker:{{ duplicati_data_permissions }}"
+          - "/mnt/data/archive:/source/archive:{{ duplicati_data_permissions }}"
           - "/etc/timezone:/etc/timezone:ro"
         env:
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ duplicati_user_id }}"
           PGID: "{{ duplicati_group_id }}"
+          SETTINGS_ENCRYPTION_KEY: "{{ duplicati_encryption_key }}"
+          DUPLICATI__WEBSERVICE_PASSWORD: "{{ duplicati_ui_password }}"
         restart_policy: unless-stopped
         memory: "{{ duplicati_memory }}"
         labels:

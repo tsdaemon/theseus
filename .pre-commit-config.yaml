@@ -1,14 +1,15 @@
 ---
 repos:
-  - repo: https://github.com/ansible-community/ansible-lint.git
-    rev: v6.14.6
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
     hooks:
-      - id: ansible-lint
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: debug-statements
   - repo: https://github.com/adrienverge/yamllint.git
     rev: v1.30.0
     hooks:
       - id: yamllint
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.32.2
-    hooks:
-      - id: markdownlint

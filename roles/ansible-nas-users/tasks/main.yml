@@ -1,15 +1,53 @@
 ---
-- name: Create ansible-nas group
+- name: Ensure unwanted system users are absent
+  ansible.builtin.user:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - uucp
+    - news
+    - lp
+    - games
+    - irc
+
+- name: Ensure unwanted system groups are absent
   ansible.builtin.group:
-    name: ansible-nas
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - fax
+    - voice
+    - uucp
+    - news
+    - lp
+    - games
+    - irc
+    - src
+
+- name: Create users group
+  ansible.builtin.group:
+    name: "{{ ansible_nas_group }}"
     state: present
 
-- name: Create ansible-nas user
+- name: Create user
   ansible.builtin.user:
-    name: ansible-nas
+    name: "{{ ansible_nas_user }}"
     state: present
-    system: yes
     update_password: on_create
     create_home: no
-    group: ansible-nas
+    group: "{{ ansible_nas_group }}"
     shell: /usr/sbin/nologin
+
+- name: Add current user to users group
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: "{{ ansible_nas_group }}"
+    append: yes
+
+- name: Set owner of docker home directory
+  ansible.builtin.file:
+    path: "{{ docker_home }}"
+    owner: "{{ ansible_nas_user }}"
+    group: "{{ ansible_nas_group }}"
+    mode: "750"
+    recurse: true
