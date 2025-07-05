@@ -17,9 +17,4 @@ tasks:
   nas:
     desc: Run NAS playbook
     cmds:
-      - ansible-playbook -i inventories/theseus/inventory nas.yml -b -K
-
-  tags:
-    desc: Run tags
-    cmds:
-      - ansible-playbook -i inventories/theseus/inventory nas.yml -b -K --tags "{{.CLI_ARGS}}"
+      - ansible-playbook -i inventories/theseus/inventory playgrounds/theseus.yml {{if .CLI_ARGS}}--tags "{{.CLI_ARGS}}"{{end}}
