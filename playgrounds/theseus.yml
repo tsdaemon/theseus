@@ -76,3 +76,7 @@
     - role: mariadb
       tags:
         - mariadb
+
+    - role: traefik
+      tags:
+        - traefik
