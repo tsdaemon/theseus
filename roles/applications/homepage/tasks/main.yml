@@ -5,6 +5,9 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
+        mode: '0770'
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
       with_items:
         - "{{ homepage_data_directory }}"
 

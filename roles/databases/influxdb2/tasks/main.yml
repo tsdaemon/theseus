@@ -25,13 +25,6 @@
         ports:
           - "{{ influxdb2_tcp_port }}:8086/tcp"
         restart_policy: unless-stopped
-        labels:
-          traefik.enable: "{{ influxdb2_available_externally | string }}"
-          traefik.http.routers.influxdb2.rule: "Host(`{{ influxdb2_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.influxdb2.tls.certresolver: "letsencrypt"
-          traefik.http.routers.influxdb2.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.influxdb2.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.services.influxdb2.loadbalancer.server.port: "{{ influxdb2_tcp_port }}"
   when: influxdb2_enabled is true
 
 - name: Stop InfluxDB2
