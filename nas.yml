@@ -64,3 +64,11 @@
     - role: plex
       tags:
         - plex
+
+    - role: influxdb2
+      tags:
+        - influxdb2
+
+    - role: mariadb
+      tags:
+        - mariadb

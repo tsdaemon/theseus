@@ -1,0 +1,16 @@
+---
+influxdb2_enabled: false
+influxdb2_available_externally: false
+
+# Directories
+influxdb2_directory: "{{ docker_home }}/influxdb2"
+influxdb2_data_directory: "{{ influxdb2_directory }}/data"
+
+# Networking
+influxdb2_tcp_port: "8086"
+influxdb2_hostname: influxdb2
+
+influxdb2_user_id: "{{ ansible_nas_user_id }}"
+influxdb2_group_id: "{{ ansible_nas_group_id }}"
+
+influxdb2_container_name: influxdb2

@@ -1,0 +1,12 @@
+---
+mariadb_enabled: false
+
+# Directories
+mariadb_config_directory: "{{ docker_home }}/mariadb/config"
+mariadb_data_directory: "{{ docker_home }}/mariadb/data"
+
+# Networking
+mariadb_tcp_port: "3306"
+
+# docker
+mariadb_container_name: mariadb
