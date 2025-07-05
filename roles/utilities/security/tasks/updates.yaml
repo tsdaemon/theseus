@@ -1,0 +1,33 @@
+- name: Install unattended-upgrades package
+  ansible.builtin.apt:
+    name: unattended-upgrades
+    state: present
+    update_cache: yes
+
+- name: Configure periodic updates
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/10periodic
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Download-Upgradeable-Packages "1";
+      APT::Periodic::AutocleanInterval "7";
+      APT::Periodic::Unattended-Upgrade "1";
+    mode: '0644'
+
+- name: Configure unattended upgrades for security updates only
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/50unattended-upgrades
+    content: |
+      Unattended-Upgrade::Allowed-Origins {
+          "${distro_id}:${distro_codename}";
+          "${distro_id}:${distro_codename}-security";
+          "${distro_id}ESM:${distro_codename}";
+          //"${distro_id}:${distro_codename}-updates";
+      };
+    mode: '0644'
+
+- name: Enable unattended-upgrades service
+  ansible.builtin.service:
+    name: unattended-upgrades
+    state: started
+    enabled: yes

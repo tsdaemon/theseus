@@ -1,0 +1,5 @@
+- name: Configure SSH Security Settings
+  import_tasks: ssh.yaml
+
+- name: Configure Unattended Upgrades
+  import_tasks: updates.yaml

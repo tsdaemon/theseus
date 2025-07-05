@@ -33,6 +33,10 @@
       tags:
         - mail
 
+    - role: security
+      tags:
+        - security
+
     ###
     ### Ansible-NAS Roles
     ###
