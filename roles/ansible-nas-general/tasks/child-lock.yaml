@@ -1,0 +1,33 @@
+- name: Disable systemd’s short-press power handler
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/logind.conf
+    regexp: '^#?HandlePowerKey='
+    line: 'HandlePowerKey=ignore'
+    state: present
+
+- name: Reload systemd-logind so it picks up the change
+  ansible.builtin.systemd:
+    name: systemd-logind
+    state: reloaded
+
+- name: Create the homeassistant user
+  ansible.builtin.user:
+    name: homeassistant
+    shell: /bin/bash
+
+- name: Add authorized_keys for homeassistant
+  ansible.builtin.authorized_key:
+    user: homeassistant
+    state: present
+    key: "{{ homeassistant_ssh_pub_key }}"
+
+- name: Create sudoers rule to allow shutdown without password
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/allow_shutdown
+    line: "homeassistant ALL=(ALL) NOPASSWD: /sbin/shutdown"
+    state: present
+    create: yes
+    mode: '0440'
+    owner: root
+    group: root
+    validate: 'visudo -cf %s'
