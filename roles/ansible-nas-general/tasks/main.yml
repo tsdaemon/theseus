@@ -1,6 +1,4 @@
 ---
-- include_tasks: motd.yaml
-
 - name: Update apt-cache
   ansible.builtin.apt:
     update_cache: yes
@@ -40,3 +38,6 @@
     mode: "u=rwX,g=rwX,o=rX"
     recurse: false
   loop: "{{ samba_shares }}"
+
+- include_tasks: motd.yaml
+- include_tasks: child-lock.yaml
