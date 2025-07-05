@@ -1,0 +1,36 @@
+---
+- name: Start MariaDB
+  block:
+    - name: Create MariaDB Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "770"
+      with_items:
+        - "{{ mariadb_config_directory }}"
+        - "{{ mariadb_data_directory }}"
+
+    - name: Create MariaDB Docker Container
+      community.docker.docker_container:
+        name: "{{ mariadb_container_name }}"
+        image: mariadb:latest
+        pull: true
+        volumes:
+          - "{{ mariadb_data_directory }}:/var/lib/mysql:rw"
+          - "{{ mariadb_config_directory }}:/etc/mysql:rw"
+        ports:
+          - "{{ mariadb_tcp_port }}:3306"
+        restart_policy: unless-stopped
+        env:
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "true"
+  when: mariadb_enabled is true
+
+- name: Stop MariaDB
+  block:
+    - name: Stop MariaDB
+      community.docker.docker_container:
+        name: "{{ mariadb_container_name }}"
+        state: absent
+  when: mariadb_enabled is false
