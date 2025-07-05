@@ -1,0 +1,5 @@
+msmtp_gmail_user: "homestehnii@gmail.com"
+msmtp_gmail_from: "Your NAS server"
+msmtp_logfile: "/var/log/msmtp.log"
+mail_group_users:
+  - "{{ ansible_nas_user }}"

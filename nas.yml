@@ -28,6 +28,10 @@
         - docker
         - skip_ansible_lint
 
+    - role: mail
+      tags:
+        - mail
+
     ###
     ### Ansible-NAS Roles
     ###
