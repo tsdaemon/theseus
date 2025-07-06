@@ -1,10 +1,9 @@
 ---
+- name: Import variables
+  include_vars: defaults/promtail.yml
 
 - name: Start Promtail
   block:
-    - name: Import variables
-      include_vars: defaults/promtail.yml
-
     - name: Create Promtail Directories
       ansible.builtin.file:
         path: "{{ item }}"

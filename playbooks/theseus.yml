@@ -104,6 +104,11 @@
         - stats
         - o11y
 
+    - role: netdata
+      tags:
+        - netdata
+        - o11y
+
     ###
     ### Applications
     ###
