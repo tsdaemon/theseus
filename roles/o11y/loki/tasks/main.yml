@@ -2,6 +2,9 @@
 - name: Minio
   import_tasks: minio.yml
 
+- name: Promtail
+  import_tasks: promtail.yml
+
 - name: Start Loki
   block:
     - name: Create Loki Directories

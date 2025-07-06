@@ -104,11 +104,6 @@
         - stats
         - o11y
 
-    - role: promtail
-      tags:
-        - promtail
-        - o11y
-
     ###
     ### Applications
     ###

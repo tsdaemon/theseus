@@ -19,9 +19,6 @@
         name: "{{ loki_minio_container_name }}"
         image: "{{ loki_minio_image_name }}:{{ loki_minio_image_version }}"
         pull: true
-        ports:
-          - "{{ loki_minio_api_port }}:9000"
-          - "{{ loki_minio_console_port }}:{{ loki_minio_console_port }}"
         command: 'server /data --console-address ":{{ loki_minio_console_port }}"'
         volumes:
           - "{{ loki_minio_data_directory }}/data:/data"
