@@ -87,6 +87,11 @@
         - traefik
         - services
 
+    - role: crowdsec
+      tags:
+        - crowdsec
+        - services
+
     ###
     ### Observability
     ###
