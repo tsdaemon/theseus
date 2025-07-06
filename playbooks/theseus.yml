@@ -37,6 +37,10 @@
       tags:
         - security
 
+    - role: disk
+      tags:
+        - disk
+
     ###
     ### Ansible-NAS Roles
     ###
