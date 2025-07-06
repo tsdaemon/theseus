@@ -11,7 +11,7 @@
           - "{{ stats_prometheus_smartctl_port }}:9902"
         restart_policy: unless-stopped
         memory: "{{ stats_prometheus_smartctl_memory }}"
-        user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
+        user: "0:0"
         networks:
           - name: "{{ o11y_network_name }}"
 
@@ -30,7 +30,7 @@
           - "/dev:/dev:ro"
         restart_policy: unless-stopped
         memory: "{{ stats_hddtemp_memory }}"
-        user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
+        user: "0:0"
         networks:
           - name: "{{ o11y_network_name }}"
 

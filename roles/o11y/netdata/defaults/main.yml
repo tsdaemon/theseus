@@ -2,6 +2,8 @@
 netdata_enabled: false
 netdata_available_externally: false
 
+netdata_config_directory: "{{ docker_home }}/netdata/config"
+
 # network
 netdata_hostname: "netdata"
 netdata_port: "19999"

@@ -17,11 +17,6 @@
         dest: "{{ stats_telegraf_config_directory }}/telegraf.conf"
       register: telegraf_config
 
-    - name: Get Docker daemon uid
-      ansible.builtin.command: stat -c '%g' /var/run/docker.sock
-      register: docker_uid
-      changed_when: false
-
     - name: Telegraf Docker Container
       community.docker.docker_container:
         name: "{{ stats_telegraf_container_name }}"
@@ -42,6 +37,7 @@
           - "/sys:/hostfs/sys:ro"
           - "/var:/hostfs/var:ro"
           - "/run:/hostfs/run:ro"
+        groups: "{{ telegraf_group_ids }}"
         env:
           HOST_ETC: "/hostfs/etc"
           HOST_PROC: "/hostfs/proc"

@@ -6,6 +6,16 @@
         name: docker
       register: docker_group
 
+    - name: Create Netdata Config Directory
+      ansible.builtin.file:
+        path: "{{ netdata_config_directory }}"
+        state: directory
+
+    - name: Copy Netdata Config
+      ansible.builtin.copy:
+        src: netdata.conf
+        dest: "{{ netdata_config_directory }}/netdata.conf"
+
     - name: Netdata Docker Container
       community.docker.docker_container:
         name: "{{ netdata_container_name }}"
@@ -13,16 +23,29 @@
         hostname: "{{ ansible_nas_hostname }}.{{ ansible_nas_domain }}"
         state: started
         pull: true
-        ports:
-          - "{{ netdata_port }}:19999"
+        network_mode: host
+        pid_mode: host
         volumes:
+          - "{{ netdata_config_directory }}:/etc/netdata"
+          - "netdatalib:/var/lib/netdata"
+          - "netdatacache:/var/cache/netdata"
+          - "/:/host/root:ro,rslave"
+          - "/etc/passwd:/host/etc/passwd:ro"
+          - "/etc/group:/host/etc/group:ro"
+          - "/etc/localtime:/etc/localtime:ro"
           - "/proc:/host/proc:ro"
           - "/sys:/host/sys:ro"
+          - "/etc/os-release:/host/etc/os-release:ro"
+          - "/var/log:/host/var/log:ro"
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
+          - "/run/dbus:/run/dbus:ro"
         env:
-          PGID: "{{ docker_group.gid }}"
+          NETDATA_CLAIM_TOKEN: "{{ netdata_claim_token }}"
+          NETDATA_CLAIM_URL: "{{ netdata_claim_url }}"
+          NETDATA_CLAIM_ROOMS: "{{ netdata_claim_rooms }}"
         capabilities:
           - SYS_PTRACE
+          - SYS_ADMIN
         security_opts:
           - apparmor:unconfined
         restart_policy: unless-stopped

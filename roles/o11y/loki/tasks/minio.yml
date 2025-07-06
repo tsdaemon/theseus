@@ -1,9 +1,9 @@
 ---
+- name: Import variables
+  include_vars: defaults/minio.yml
+
 - name: Start Minio
   block:
-    - name: Import variables
-      include_vars: defaults/minio.yml
-
     - name: Create Minio Directories
       ansible.builtin.file:
         path: "{{ item }}"
