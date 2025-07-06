@@ -1,0 +1,42 @@
+---
+- name: Update apt-cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  register: result
+  until: result is succeeded
+
+- name: Upgrade all packages # noqa package-latest
+  ansible.builtin.apt:
+    upgrade: yes
+    state: latest
+  when: keep_packages_updated
+  tags:
+    - skip_ansible_lint
+
+- name: Install some packages
+  ansible.builtin.apt:
+    name: "{{ ansible_nas_extra_packages }}"
+    state: present
+  register: result
+  until: result is succeeded
+
+- name: "Set hostname to {{ ansible_nas_hostname }}"
+  ansible.builtin.hostname:
+    name: "{{ ansible_nas_hostname }}"
+
+- name: "Set timezone to {{ ansible_nas_timezone }}"
+  community.general.timezone:
+    name: "{{ ansible_nas_timezone }}"
+
+- name: "Permission share directories"
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: theseus
+    group: users
+    mode: "u=rwX,g=rwX,o=rX"
+    recurse: false
+  loop: "{{ samba_shares }}"
+
+- include_tasks: motd.yaml
