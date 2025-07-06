@@ -1,3 +1,17 @@
+
+[http]
+
+  [http.middlewares]
+    {% if crowdsec_enabled %}
+    [http.middlewares.my-crowdsec-bouncer-traefik-plugin]
+
+      [http.middlewares.my-crowdsec-bouncer-traefik-plugin.plugin]
+
+        [http.middlewares.my-crowdsec-bouncer-traefik-plugin.plugin.crowdsec-bouncer-traefik-plugin]
+          CrowdsecLapiKey = "40796d93c2958f9e58345514e67740e5"
+          Enabled = "true"
+    {% endif %}
+
 [entryPoints]
   [entryPoints.web]
     address = ":{{ traefik_port_http }}"
@@ -47,3 +61,11 @@
 
 [metrics]
   [metrics.prometheus]
+
+{% if crowdsec_enabled %}
+[experimental.plugins.crowdsec-bouncer-traefik-plugin]
+  moduleName = "github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin"
+  version = "v1.4.4"
+{% endif %}
+
+[accessLog]
