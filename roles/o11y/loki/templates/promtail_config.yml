@@ -7,7 +7,7 @@ positions:
   filename: /data/positions.yml
 
 clients:
-  - url: {{ promtail_loki_url }}
+  - url: {{ loki_url }}
     tenant_id: 1
 
 scrape_configs:

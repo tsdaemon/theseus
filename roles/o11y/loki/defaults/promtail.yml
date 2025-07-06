@@ -1,0 +1,17 @@
+---
+# directories
+loki_promtail_data_directory: "{{ docker_home }}/loki/promtail"
+
+# network
+loki_promtail_port: "9080"
+
+# docker
+loki_promtail_container_name: "loki-promtail"
+loki_promtail_image_name: "grafana/promtail"
+loki_promtail_image_version: "latest"
+
+# specs
+loki_promtail_memory: "1g"
+
+# config
+loki_url: http://loki:{{ loki_http_port }}/loki/api/v1/push
