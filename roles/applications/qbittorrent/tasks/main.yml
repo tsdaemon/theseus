@@ -37,7 +37,13 @@
           traefik.http.routers.qbittorrent.tls.certresolver: "letsencrypt"
           traefik.http.routers.qbittorrent.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.qbittorrent.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.qbittorrent.middlewares: "auth@file"
           traefik.http.services.qbittorrent.loadbalancer.server.port: "8080"
+          homepage.group: Media
+          homepage.name: qBittorrent
+          homepage.icon: qbittorrent
+          homepage.href: https://{{ ansible_nas_domain }}
+          homepage.description: Torrent client
   when: qbittorrent_enabled is true
 
 - name: Stop qbittorrent

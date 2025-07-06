@@ -92,6 +92,11 @@
         - crowdsec
         - services
 
+    - role: homepage
+      tags:
+        - homepage
+        - services
+
     ###
     ### Observability
     ###

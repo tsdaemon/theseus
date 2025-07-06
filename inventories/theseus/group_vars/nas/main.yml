@@ -1,0 +1,116 @@
+keep_packages_updated: true
+
+ansible_nas_hostname: theseus
+ansible_nas_timezone: Europe/Kyiv
+ansible_nas_email: tsdaemon@gmail.com
+ansible_nas_domain: t6n.app
+ansible_nas_user: theseus
+ansible_nas_user_id: "1001"
+ansible_nas_group: users
+ansible_nas_group_id: "100"
+
+docker_home: /appdata
+docker_network_name: "main"
+
+# Samba
+samba_shares_root: /mnt/data/data/media
+movies_root: "{{ samba_shares_root }}/movies"
+tv_root: "{{ samba_shares_root }}/tv"
+books_root: "{{ samba_shares_root }}/books"
+comics_root: "{{ samba_shares_root }}/comics"
+samba_server_string: Theseus
+samba_guest_account: "{{ ansible_nas_user }}"
+downloads_root: "/mnt/data/data"
+
+# Shares you want published over Samba.
+samba_shares:
+  - name: movies
+    comment: "Movies"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ movies_root }}"
+
+  - name: tv
+    comment: "TV Episodes"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ tv_root }}"
+
+  - name: books
+    comment: "Books"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ books_root }}"
+
+  - name: comics
+    comment: "Comics"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ comics_root }}"
+
+# Homepage
+homepage_enabled: true
+homepage_available_externally: true
+homepage_router_url: "http://192.168.0.1/"
+homepage_homeassistant_url: "http://homeassistant.local"
+
+# Duplicati
+duplicati_enabled: true
+duplicati_available_externally: true
+duplicati_hostname: dpl
+
+# qbittorrent
+qbittorrent_enabled: true
+qbittorrent_available_externally: true
+qbittorrent_hostname: qb
+qbittorrent_download_directory_active: "{{ downloads_root }}/media/incomplete"
+
+# plex
+plex_enabled: true
+plex_available_externally: true
+plex_hostname: plex
+plex_config_directory: "/mnt/data/data/plex"
+
+# influxdb2
+influxdb2_enabled: true
+influxdb2_data_directory: "/mnt/data/data/influxdb2"
+
+# mariadb
+mariadb_enabled: true
+mariadb_data_directory: "/mnt/data/data/mariadb"
+
+# traefik
+traefik_enabled: true
+traefik_dns_provider: porkbun
+traefik_basic_auth_enabled: true
+
+# crowdsec
+crowdsec_enabled: false
+crowdsec_data_directory: "/mnt/data/data/crowdsec"
+
+# o11y
+loki_enabled: true
+stats_enabled: true
+
+stats_grafana_available_externally: true
+loki_data_directory: "/mnt/data/data/loki"
+loki_minio_data_directory: "/mnt/data/data/loki/minio"
+loki_promtail_data_directory: "/mnt/data/data/loki/promtail"
+stats_prometheus_data_directory: "/mnt/data/data/stats/prometheus"
+stats_grafana_data_directory: "/mnt/data/data/stats/grafana"
+stats_telegraf_influxdb_port: "8186"
+telegraf_group_ids:
+  - 987
+
+netdata_enabled: false
+netdata_claim_token: "HjAD-r4SQXKz-FzaU2OxuCzZ8kA_uWpTRpgfO-sB-0GmR8z96_AZbuE-deXORBC9LkMegAVHZcZJp8mFBnWEa8kzzTY0Ggxa_k_0-gEWazPiCNaVEIhcFDBdwxr3e5qh92Cmv2U"
+netdata_claim_rooms: "07487960-50b7-4f28-b9ff-70980ebe3832"
+netdata_claim_url: "https://app.netdata.cloud"
