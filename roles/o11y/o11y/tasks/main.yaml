@@ -1,0 +1,3 @@
+- name: Create network
+  community.docker.docker_network:
+    name: "{{ o11y_network_name }}"
