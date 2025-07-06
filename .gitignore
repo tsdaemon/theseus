@@ -3,19 +3,8 @@ site
 .vagrant
 *.retry
 *.log
-inventories
+secrets.yaml
 .cache
 roles/bertvv.samba
 roles/geerlingguy.docker
 roles/geerlingguy.nfs
-website/.docusaurus
-website/node_modules
-
-# Vim
-[._]sw[a-p]
-
-# Session
-Session.vim
-
-# IntelliJ
-/.idea/

@@ -32,5 +32,8 @@ traefik_environment_variables:
 # traefik_acme_server: "https://acme-staging-v02.api.letsencrypt.org/directory" # staging
 traefik_acme_server: "https://acme-v02.api.letsencrypt.org/directory" # production
 
+traefik_basic_auth_enabled: false
+traefik_basic_auth_users: ""
+
 # specs
 traefik_memory: 1g

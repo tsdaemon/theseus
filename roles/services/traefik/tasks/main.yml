@@ -3,9 +3,12 @@
   block:
     - name: Create Traefik Directories
       ansible.builtin.file:
-        path: "{{ traefik_data_directory }}"
+        path: "{{ item }}"
         state: directory
         mode: '0755'
+      with_items:
+        - "{{ traefik_data_directory }}"
+        - "{{ traefik_data_directory }}/dynamic"
 
     - name: Create letsencrypt directories
       ansible.builtin.file:
@@ -17,6 +20,15 @@
       ansible.builtin.template:
         src: traefik.toml
         dest: "{{ traefik_data_directory }}/traefik.toml"
+        mode: '0644'
+      register: template_config
+
+    - name: Dynamic auth
+      ansible.builtin.template:
+        src: auth.yaml
+        dest: "{{ traefik_data_directory }}/dynamic/auth.yaml"
+        mode: '0644'
+      when: traefik_basic_auth_enabled
 
     - name: Traefik Docker Container
       community.docker.docker_container:
@@ -25,12 +37,13 @@
         pull: true
         network_mode: host
         volumes:
-          - "{{ traefik_data_directory }}/traefik.toml:/etc/traefik/traefik.toml:ro"
+          - "{{ traefik_data_directory }}:/etc/traefik:ro"
           - "{{ traefik_data_directory }}/letsencrypt:/letsencrypt:rw"
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
         env: "{{ traefik_environment_variables }}"
         restart_policy: unless-stopped
         memory: "{{ traefik_memory }}"
+        recreate: "{{ template_config is changed }}"
         labels:
           homepage.group: Networking
           homepage.name: Traefik
