@@ -1,0 +1,38 @@
+- name: Ensure dependencies for WS-Discovery
+  apt:
+    name:
+      - python3-pip
+      - wsdd
+    state: present
+    update_cache: yes
+
+- name: Deploy wsdd systemd unit
+  template:
+    src: wsdd.service
+    dest: /etc/systemd/system/wsdd.service
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Reload systemd
+  command: systemctl daemon-reload
+
+- name: Enable & start wsdd service
+  systemd:
+    name: wsdd
+    enabled: yes
+    state: started
+
+- name: Allow WS-Discovery ports in UFW
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: udp
+  loop:
+    - 3702
+    - 5355
+  when: ansible_facts.services['ufw'] is defined
+
+- name: Reload UFW to apply rules
+  command: ufw reload
+  when: ansible_facts.services['ufw'] is defined

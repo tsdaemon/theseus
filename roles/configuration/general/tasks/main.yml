@@ -33,9 +33,9 @@
   ansible.builtin.file:
     path: "{{ item.path }}"
     state: directory
-    owner: theseus
-    group: users
-    mode: "u=rwX,g=rwX,o=rX"
+    owner: "{{ ansible_nas_user }}"
+    group: "{{ ansible_nas_group }}"
+    mode: "0750"
     recurse: false
   loop: "{{ samba_shares }}"
 

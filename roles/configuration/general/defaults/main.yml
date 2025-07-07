@@ -9,10 +9,12 @@ keep_packages_updated: false
 ansible_nas_extra_packages:
   - smartmontools
   - htop
+  - btop
   - zfsutils-linux
   - bonnie++
   - unzip
   - lm-sensors
+  - mc
 
 # Sets the timezone for your Ansible NAS
 # You can find a list here https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
