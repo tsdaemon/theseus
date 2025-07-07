@@ -1,6 +1,7 @@
 ---
 # directories
-loki_promtail_data_directory: "{{ docker_home }}/loki/promtail"
+loki_promtail_data_directory: "{{ docker_home }}/loki/promtail/data"
+loki_promtail_config_directory: "{{ docker_home }}/loki/promtail/config"
 
 # network
 loki_promtail_port: "9080"
