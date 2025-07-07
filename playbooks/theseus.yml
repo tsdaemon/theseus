@@ -137,3 +137,8 @@
       tags:
         - plex
         - applications
+
+    - role: immich
+      tags:
+        - immich
+        - applications
