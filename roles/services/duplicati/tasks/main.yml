@@ -22,6 +22,7 @@
           - "{{ duplicati_data_directory }}:/config:rw"
           - "{{ docker_home }}:/source/docker:{{ duplicati_data_permissions }}"
           - "/mnt/data/archive:/source/archive:{{ duplicati_data_permissions }}"
+          - "{{ photo_root }}:/source/photo:{{ duplicati_data_permissions }}"
           - "/etc/timezone:/etc/timezone:ro"
         env:
           TZ: "{{ ansible_nas_timezone }}"

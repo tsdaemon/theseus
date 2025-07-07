@@ -1,3 +1,4 @@
+---
 keep_packages_updated: true
 
 ansible_nas_hostname: theseus
@@ -88,6 +89,11 @@ homepage_homeassistant_url: "http://homeassistant.local"
 duplicati_enabled: true
 duplicati_available_externally: true
 duplicati_hostname: dpl
+
+# Immich
+immich_enabled: true
+immich_available_externally: true
+immich_host: im
 
 # qbittorrent
 qbittorrent_enabled: true

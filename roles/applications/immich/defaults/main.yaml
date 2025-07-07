@@ -1,0 +1,19 @@
+# enable or disable the application
+immich_enabled: false
+immich_available_externally: false
+
+immich_host: "immich"
+
+# directories
+immich_directory: "{{ docker_home }}/immich"
+immich_config_directory: "{{ immich_directory }}/config"
+immich_data_directory: "{{ photo_root }}"
+immich_database_directory: "{{ immich_directory }}/database"
+
+# configuration
+immich_version: "release"
+immich_port: 2283
+
+# database
+immich_db_username: "{{ ansible_nas_user }}"
+immich_db_database_name: "{{ ansible_nas_user }}"

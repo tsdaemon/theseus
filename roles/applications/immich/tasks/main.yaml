@@ -1,0 +1,41 @@
+---
+- name: Start Immich
+  block:
+    - name: Create Immich directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "0770"
+      loop:
+        - "{{ immich_config_directory }}"
+        - "{{ immich_data_directory }}"
+        - "{{ immich_database_directory }}"
+
+    - name: Create docker-compose.yaml
+      template:
+        src: docker-compose.yaml
+        dest: "{{ immich_directory }}/docker-compose.yaml"
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "0640"
+
+    - name: Create env
+      template:
+        src: env
+        dest: "{{ immich_directory }}/.env"
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "0640"
+
+    - name: Start Immich
+      community.docker.docker_compose_v2:
+        project_src: "{{ immich_directory }}"
+  when: immich_enabled
+
+- name: Stop Immich
+  community.docker.docker_compose_v2:
+    project_src: "{{ immich_directory }}"
+    state: stopped
+  when: not immich_enabled
