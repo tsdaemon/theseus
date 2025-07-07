@@ -1,0 +1,10 @@
+[Unit]
+Description=Web Services Discovery for Samba
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/wsdd -n {{ samba_server_string | upper }}
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

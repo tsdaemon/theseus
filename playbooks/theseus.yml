@@ -17,6 +17,12 @@
         - skip_ansible_lint
         - configuration
 
+    - role: wsdd
+      tags:
+        - wsdd
+        - samba
+        - configuration
+
     - role: geerlingguy.nfs
       tags:
         - nfs

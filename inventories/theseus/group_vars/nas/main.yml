@@ -14,13 +14,19 @@ docker_network_name: "main"
 
 # Samba
 samba_shares_root: /mnt/data/data/media
+samba_server_string: theseus
+samba_map_to_guest: "Bad user"
+samba_guest_account: "{{ ansible_nas_user }}"
+samba_manage_directories: false
+samba_server_max_protocol: SMB3
+samba_server_min_protocol: SMB2
+
 movies_root: "{{ samba_shares_root }}/movies"
 tv_root: "{{ samba_shares_root }}/tv"
 books_root: "{{ samba_shares_root }}/books"
 comics_root: "{{ samba_shares_root }}/comics"
-samba_server_string: Theseus
-samba_guest_account: "{{ ansible_nas_user }}"
-downloads_root: "/mnt/data/data"
+photo_root: "{{ samba_shares_root }}/photo"
+archive_root: "/mnt/data/archive"
 
 # Shares you want published over Samba.
 samba_shares:
@@ -55,6 +61,22 @@ samba_shares:
     writable: yes
     browseable: yes
     path: "{{ comics_root }}"
+
+  - name: photos
+    comment: "Photos"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ photo_root }}"
+
+  - name: archive
+    comment: "Archive"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ archive_root }}"
 
 # Homepage
 homepage_enabled: true
