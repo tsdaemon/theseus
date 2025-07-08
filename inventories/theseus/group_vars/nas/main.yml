@@ -79,65 +79,76 @@ samba_shares:
     browseable: yes
     path: "{{ archive_root }}"
 
-# Homepage
-homepage_enabled: true
-homepage_available_externally: true
-homepage_router_url: "http://192.168.0.1/"
-homepage_homeassistant_url: "http://homeassistant.local"
+# Applications
 
-# Duplicati
-duplicati_enabled: true
-duplicati_available_externally: true
-duplicati_hostname: dpl
-
-# Immich
+## immich
 immich_enabled: true
 immich_available_externally: true
 immich_host: im
 
-# qbittorrent
+## qbittorrent
 qbittorrent_enabled: true
 qbittorrent_available_externally: true
 qbittorrent_hostname: qb
 qbittorrent_download_directory_active: "{{ downloads_root }}/media/incomplete"
 
-# plex
+## plex
 plex_enabled: true
 plex_available_externally: true
 plex_hostname: plex
 plex_config_directory: "/mnt/data/data/plex"
 
-# influxdb2
+# Storage
+
+## influxdb2
 influxdb2_enabled: true
 influxdb2_data_directory: "/mnt/data/data/influxdb2"
 
-# mariadb
+## mariadb
 mariadb_enabled: true
 mariadb_data_directory: "/mnt/data/data/mariadb"
 
-# traefik
+# Services
+
+## traefik
 traefik_enabled: true
 traefik_dns_provider: porkbun
 traefik_basic_auth_enabled: true
 
-# crowdsec
+## crowdsec
 crowdsec_enabled: false
 crowdsec_data_directory: "/mnt/data/data/crowdsec"
 
-# o11y
-loki_enabled: true
-stats_enabled: true
+## homepage
+homepage_enabled: true
+homepage_available_externally: true
+homepage_router_url: "http://192.168.0.1/"
+homepage_homeassistant_url: "http://homeassistant.local"
 
-stats_grafana_available_externally: true
+## duplicati
+duplicati_enabled: true
+duplicati_available_externally: true
+duplicati_hostname: dpl
+
+# o11y
+
+## loki
+loki_enabled: true
 loki_data_directory: "/mnt/data/data/loki"
 loki_minio_data_directory: "/mnt/data/data/loki/minio"
 loki_promtail_data_directory: "/mnt/data/data/loki/promtail"
+
+## stats
+stats_enabled: true
+stats_internet_speed_test_enabled: true
+stats_grafana_available_externally: true
 stats_prometheus_data_directory: "/mnt/data/data/stats/prometheus"
 stats_grafana_data_directory: "/mnt/data/data/stats/grafana"
 stats_telegraf_influxdb_port: "8186"
 telegraf_group_ids:
   - 987
 
+## netdata
 netdata_enabled: false
 netdata_claim_token: "HjAD-r4SQXKz-FzaU2OxuCzZ8kA_uWpTRpgfO-sB-0GmR8z96_AZbuE-deXORBC9LkMegAVHZcZJp8mFBnWEa8kzzTY0Ggxa_k_0-gEWazPiCNaVEIhcFDBdwxr3e5qh92Cmv2U"
 netdata_claim_rooms: "07487960-50b7-4f28-b9ff-70980ebe3832"

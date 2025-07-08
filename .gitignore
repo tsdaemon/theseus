@@ -5,6 +5,6 @@ site
 *.log
 secrets.yaml
 .cache
-roles/bertvv.samba
-roles/geerlingguy.docker
-roles/geerlingguy.nfs
+bertvv.samba
+geerlingguy.docker
+geerlingguy.nfs
