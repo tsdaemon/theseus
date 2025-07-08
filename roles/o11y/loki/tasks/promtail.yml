@@ -8,6 +8,9 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
+        mode: "0770"
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
       with_items:
         - "{{ loki_promtail_config_directory }}"
         - "{{ loki_promtail_data_directory }}"
@@ -29,6 +32,7 @@
           - "/var/run/docker.sock:/var/run/docker.sock"
         restart_policy: unless-stopped
         memory: "{{ loki_promtail_memory }}"
+        user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
         networks:
           - name: "{{ o11y_network_name }}"
   when: loki_enabled is true
