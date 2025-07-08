@@ -26,8 +26,8 @@
           - "/etc/timezone:/etc/timezone:ro"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-          PUID: "{{ ansible_nas_user_id }}"
-          PGID: "{{ ansible_nas_group_id }}"
+          PUID: "0"
+          PGID: "0"
           SETTINGS_ENCRYPTION_KEY: "{{ duplicati_encryption_key }}"
           DUPLICATI__WEBSERVICE_PASSWORD: "{{ duplicati_ui_password }}"
         restart_policy: unless-stopped
