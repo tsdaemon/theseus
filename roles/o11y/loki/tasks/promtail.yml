@@ -1,7 +1,4 @@
 ---
-- name: Import variables
-  include_vars: defaults/promtail.yml
-
 - name: Start Promtail
   block:
     - name: Create Promtail Directories

@@ -1,0 +1,49 @@
+---
+stash_enabled: false
+stash_available_externally: false
+
+# directories
+stash_data_directory: "{{ docker_home }}/stash"
+stash_config_directory: "{{ stash_data_directory }}/config"
+stash_data_content_directory: "{{ stash_data_directory }}/data"
+stash_metadata_directory: "{{ stash_data_directory }}/metadata"
+stash_cache_directory: "{{ stash_data_directory }}/cache"
+stash_blobs_directory: "{{ stash_data_directory }}/blobs"
+stash_generated_directory: "{{ stash_data_directory }}/generated"
+
+# uid / gid
+stash_user_id: "{{ ansible_nas_user_id }}"
+stash_group_id: "{{ ansible_nas_group_id }}"
+
+# network
+stash_port: "9999"
+stash_hostname: "stash"
+
+# docker
+stash_container_name: "stash"
+stash_image_name: "stashapp/stash"
+stash_image_version: "latest"
+
+# specs
+stash_memory: 2g
+
+# qbittorrent
+stash_qbittorrent_available_externally: false
+
+# directories
+stash_qbittorrent_config_directory: "{{ stash_data_directory }}/qbittorrent/config"
+stash_qbittorrent_download_directory: "{{ stash_data_content_directory }}"
+stash_qbittorrent_download_directory_active: "{{ stash_data_content_directory }}/.incomplete"
+
+# network
+stash_qbittorrent_port_http: "9980"
+stash_qbittorrent_port_bt: "51413"
+stash_qbittorrent_hostname: "stash-qbittorrent"
+
+# docker
+stash_qbittorrent_container_name: "stash-qbittorrent"
+stash_qbittorrent_image_name: "linuxserver/qbittorrent"
+stash_qbittorrent_image_version: "latest"
+
+# specs
+stash_qbittorrent_memory: 1g

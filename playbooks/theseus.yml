@@ -142,3 +142,8 @@
       tags:
         - immich
         - applications
+
+    - role: stash
+      tags:
+        - stash
+        - applications

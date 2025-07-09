@@ -22,3 +22,41 @@ loki_memory: "1g"
 # config
 loki_log_retention: 672h
 loki_log_level: warn
+
+# minio
+# directories
+loki_minio_data_directory: "{{ docker_home }}/loki/minio"
+
+# env
+loki_minio_admin_username: admin
+
+# network
+loki_minio_api_port: "9000"
+loki_minio_console_port: "9009"
+
+# docker
+loki_minio_container_name: "loki-minio"
+loki_minio_image_name: "minio/minio"
+loki_minio_image_version: "latest"
+
+# specs
+loki_minio_memory: "1g"
+
+# promtail
+# directories
+loki_promtail_data_directory: "{{ docker_home }}/loki/promtail/data"
+loki_promtail_config_directory: "{{ docker_home }}/loki/promtail/config"
+
+# network
+loki_promtail_port: "9080"
+
+# docker
+loki_promtail_container_name: "loki-promtail"
+loki_promtail_image_name: "grafana/promtail"
+loki_promtail_image_version: "latest"
+
+# specs
+loki_promtail_memory: "1g"
+
+# config
+loki_url: http://loki:{{ loki_http_port }}/loki/api/v1/push
