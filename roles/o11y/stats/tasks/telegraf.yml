@@ -37,7 +37,8 @@
           - "/sys:/hostfs/sys:ro"
           - "/var:/hostfs/var:ro"
           - "/run:/hostfs/run:ro"
-        groups: "{{ telegraf_group_ids }}"
+        groups:
+          - "{{ docker_group_id }}"
         env:
           HOST_ETC: "/hostfs/etc"
           HOST_PROC: "/hostfs/proc"

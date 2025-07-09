@@ -12,6 +12,7 @@ ansible_nas_group_id: "100"
 
 docker_home: /appdata
 docker_network_name: "main"
+docker_group_id: 987
 
 # Samba
 samba_shares_root: /mnt/data/data/media
@@ -145,8 +146,6 @@ stats_grafana_available_externally: true
 stats_prometheus_data_directory: "/mnt/data/data/stats/prometheus"
 stats_grafana_data_directory: "/mnt/data/data/stats/grafana"
 stats_telegraf_influxdb_port: "8186"
-telegraf_group_ids:
-  - 987
 
 ## netdata
 netdata_enabled: false
