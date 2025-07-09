@@ -23,6 +23,7 @@ samba_manage_directories: false
 samba_server_max_protocol: SMB3
 samba_server_min_protocol: SMB2
 
+downloads_root: "/mnt/data/data/media"
 movies_root: "{{ samba_shares_root }}/movies"
 tv_root: "{{ samba_shares_root }}/tv"
 books_root: "{{ samba_shares_root }}/books"
@@ -98,6 +99,17 @@ plex_enabled: true
 plex_available_externally: true
 plex_hostname: plex
 plex_config_directory: "/mnt/data/data/plex"
+
+## stash
+stash_enabled: true
+stash_available_externally: true
+stash_hostname: stash
+stash_data_content_directory: "/mnt/data/private/stash/content"
+stash_blobs_directory: "/mnt/data/private/stash/blobs"
+stash_generated_directory: "/mnt/data/private/stash/generated"
+
+stash_qbittorrent_available_externally: true
+stash_qbittorrent_hostname: qb-stash
 
 # Storage
 
