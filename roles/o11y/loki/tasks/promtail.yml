@@ -33,14 +33,14 @@
         restart_policy: unless-stopped
         memory: "{{ loki_promtail_memory }}"
         user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
+        groups:
+          - "{{ docker_group_id }}"
         networks:
           - name: "{{ o11y_network_name }}"
   when: loki_enabled is true
 
 - name: Stop promtail
-  block:
-    - name: Stop promtail
-      community.docker.docker_container:
-        name: "{{ loki_promtail_container_name }}"
-        state: absent
+  community.docker.docker_container:
+    name: "{{ loki_promtail_container_name }}"
+    state: absent
   when: loki_enabled is false
