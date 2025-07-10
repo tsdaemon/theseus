@@ -1,7 +1,7 @@
 ---
 keep_packages_updated: true
 
-ansible_nas_hostname: theseus
+ansible_nas_hostname: t5s
 ansible_nas_timezone: Europe/Kyiv
 ansible_nas_email: tsdaemon@gmail.com
 ansible_nas_domain: t6n.app
@@ -23,7 +23,7 @@ samba_manage_directories: false
 samba_server_max_protocol: SMB3
 samba_server_min_protocol: SMB2
 
-downloads_root: "/mnt/data/data/media"
+downloads_root: "/mnt/data/data"
 movies_root: "{{ samba_shares_root }}/movies"
 tv_root: "{{ samba_shares_root }}/tv"
 books_root: "{{ samba_shares_root }}/books"
@@ -92,6 +92,7 @@ immich_host: im
 qbittorrent_enabled: true
 qbittorrent_available_externally: true
 qbittorrent_hostname: qb
+qbittorrent_download_directory: "/mnt/data/data"
 qbittorrent_download_directory_active: "{{ downloads_root }}/media/incomplete"
 
 ## plex
