@@ -20,19 +20,19 @@ scrape_configs:
   - job_name: "telegraf"
     static_configs:
       - targets: [
-                    "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stats_telegraf_port }}",
+                    "{{ ansible_nas_ip }}:{{ stats_telegraf_port }}",
                  ]
 
   - job_name: "smartctl"
     static_configs:
       - targets: [
-                    "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stats_prometheus_smartctl_port }}"
+                    "{{ ansible_nas_ip }}:{{ stats_prometheus_smartctl_port }}"
                  ]
 
   - job_name: "traefik"
     static_configs:
       - targets: [
-                    "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8083"
+                    "{{ ansible_nas_ip }}:8083"
                  ]
 
 {% if stats_internet_speed_test_enabled %}
@@ -41,6 +41,6 @@ scrape_configs:
     scrape_timeout: 5m
     static_configs:
       - targets: [
-                    "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stats_speedtest_exporter_port }}"
+                    "{{ ansible_nas_ip }}:{{ stats_speedtest_exporter_port }}"
                  ]
 {% endif %}
