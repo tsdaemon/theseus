@@ -163,16 +163,34 @@ homepage_widgets_yaml:
       format: # optional, Intl.NumberFormat options
         maximumFractionDigits: 1
 homepage_services_yaml:
-  - Networking:
+  - External:
       - Router:
           icon: asus-router
           href: "http://192.168.0.1/"
           description: Asus Router
-  - Services:
       - Home Assistant:
           icon: home-assistant.png
           href: "http://192.168.0.100/"
           description: Home Assistant
+homepage_settings_yaml:
+  title: "Theseus Homepage"
+  language: "en-GB"
+  showStats: true
+  layout:
+    - Media:
+    - Services:
+    - Networking:
+    - Monitoring:
+    - External:
+  maxGroupColumns: 8
+  useEqualHeights: true
+  statusStyle: "dot"
+  quicklaunch:
+    searchDescriptions: true
+    hideInternetSearch: true
+    showSearchSuggestions: true
+    hideVisitURL: true
+    provider: google
 
 ## duplicati
 duplicati_enabled: true
