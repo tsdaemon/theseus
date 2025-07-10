@@ -40,6 +40,10 @@ services:
       - "homepage.icon=immich.png"
       - "homepage.href=https://{{ immich_host }}.{{ ansible_nas_domain }}"
       - "homepage.description=Photo and video management"
+      - "homepage.widget.type=immich"
+      - "homepage.widget.url=https://{{ immich_host }}.{{ ansible_nas_domain }}"
+      - "homepage.widget.key={{ immich_api_key }}"
+      - "homepage.widget.version=2"
     user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
     healthcheck:
       disable: false

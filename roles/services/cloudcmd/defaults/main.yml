@@ -6,7 +6,7 @@ cloudcmd_available_externally: false
 # directories
 cloudcmd_config_directory: "{{ docker_home }}/cloudcmd/config"
 cloudcmd_volumes:
-  - "{{ docker_home }}:/applciation_config:rw"
+  - "{{ docker_home }}:/application_config:rw"
   - "{{ downloads_root }}:/downloads:rw"
   - "{{ cloudcmd_config_directory }}:/config:rw"
 

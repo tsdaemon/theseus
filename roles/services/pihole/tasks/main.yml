@@ -58,6 +58,10 @@
           homepage.icon: pi-hole
           homepage.href: "http://{{ ansible_nas_ip }}:{{ pihole_web_port }}/admin"
           homepage.description: DNS sinkhole and ad blocker
+          homepage.widget.type: pihole
+          homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ pihole_web_port }}"
+          homepage.widget.version: 6
+          homepage.widget.key: "{{ pihole_webpassword }}"
 
     - name: Remove resolv.conf
       ansible.builtin.file:

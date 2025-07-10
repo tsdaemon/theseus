@@ -5,8 +5,8 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-        owner: "{{ ansible_nas_user_id }}"
-        group: "{{ ansible_nas_group_id }}"
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
         mode: "0770"
         recurse: yes
       changed_when: false
@@ -67,9 +67,13 @@
           homepage.icon: grafana
           homepage.href: "http://grafana.{{ ansible_nas_domain }}"
           homepage.description: Dashboards and centralized observability.
+          homepage.widget.type: grafana
+          homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ stats_grafana_port }}"
+          homepage.widget.username: "{{ stats_grafana_username }}"
+          homepage.widget.password: "{{ stats_grafana_password }}"
         networks:
           - name: "{{ o11y_network_name }}"
-  when: stats_enabled is true
+  when: stats_enabled
 
 - name: Stop Grafana
   block:
@@ -77,4 +81,4 @@
       community.docker.docker_container:
         name: "{{ stats_grafana_container_name }}"
         state: absent
-  when: stats_enabled is false
+  when: not stats_enabled

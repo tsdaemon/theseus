@@ -141,8 +141,38 @@ crowdsec_data_directory: "/mnt/data/data/crowdsec"
 ## homepage
 homepage_enabled: true
 homepage_available_externally: true
-homepage_router_url: "http://192.168.0.1/"
-homepage_homeassistant_url: "http://homeassistant.local"
+homepage_bookmarks_yaml:
+homepage_widgets_yaml:
+  - greeting:
+      text_size: xl
+      text: Theseus
+  - resources:
+      cpu: true
+      memory: true
+      cputemp: true
+      uptime: true
+      units: metric # only used by cpu temp
+      refresh: 60000 # optional, in ms
+  - openmeteo:
+      label: Lviv # optional
+      latitude: 49.839683
+      longitude: 24.029717
+      timezone: Europe/Kyiv # optional
+      units: metric # or imperial
+      cache: 5 # Time in minutes to cache API responses, to stay within limits
+      format: # optional, Intl.NumberFormat options
+        maximumFractionDigits: 1
+homepage_services_yaml:
+  - Networking:
+      - Router:
+          icon: asus-router
+          href: "http://192.168.0.1/"
+          description: Asus Router
+  - Services:
+      - Home Assistant:
+          icon: home-assistant.png
+          href: "http://192.168.0.100/"
+          description: Home Assistant
 
 ## duplicati
 duplicati_enabled: true
