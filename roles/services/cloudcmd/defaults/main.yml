@@ -4,12 +4,11 @@ cloudcmd_enabled: false
 cloudcmd_available_externally: false
 
 # directories
-cloudcmd_data_directory: "{{ docker_home }}/cloudcmd/config"
-cloudcmd_browse_directory: "/"
-
-# uid / gid
-cloudcmd_user_id: "0"
-cloudcmd_group_id: "0"
+cloudcmd_config_directory: "{{ docker_home }}/cloudcmd/config"
+cloudcmd_volumes:
+  - "{{ docker_home }}:/applciation_config:rw"
+  - "{{ downloads_root }}:/downloads:rw"
+  - "{{ cloudcmd_config_directory }}:/config:rw"
 
 # network
 cloudcmd_hostname: "cloudcmd"
