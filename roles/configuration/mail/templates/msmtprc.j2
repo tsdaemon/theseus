@@ -5,8 +5,8 @@ tls_trust_file /etc/ssl/certs/ca-certificates.crt
 logfile        {{ msmtp_logfile }}
 
 account default
-host           smtp.gmail.com
-port           587
-user           {{ msmtp_gmail_user }}
-password       {{ msmtp_gmail_app_password }}
-from           {{ msmtp_gmail_from }}
+host           {{ ansible_nas_smtp_hostname }}
+port           {{ ansible_nas_smtp_port }}
+user           {{ ansible_nas_smtp_username }}
+password       {{ ansible_nas_smtp_password }}
+from           {{ ansible_nas_from_address }}

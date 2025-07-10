@@ -1,6 +1,14 @@
 ---
-msmtp_gmail_user: "homestehnii@gmail.com"
-msmtp_gmail_from: "Your NAS server"
+# Email settings
+ansible_nas_from_address: "ansible-nas@{{ ansible_nas_domain }}"
+ansible_nas_from_name: "Ansible-NAS"
+ansible_nas_smtp_hostname: "smtp.example.com"
+ansible_nas_smtp_port: "587"
+ansible_nas_smtp_username: "ansible-nas@{{ ansible_nas_domain }}"
+ansible_nas_smtp_password: "password"
+
+# msmtp settings
 msmtp_logfile: "/var/log/msmtp.log"
+
 mail_group_users:
   - "{{ ansible_nas_user }}"

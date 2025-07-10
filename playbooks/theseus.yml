@@ -115,6 +115,11 @@
         - pihole
         - services
 
+    - role: wireguard
+      tags:
+        - wireguard
+        - services
+
     ###
     ### Observability
     ###

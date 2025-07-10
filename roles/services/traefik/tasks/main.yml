@@ -48,10 +48,10 @@
           homepage.group: Networking
           homepage.name: Traefik
           homepage.icon: traefik
-          homepage.href: "http://{{ ansible_nas_hostname }}:{{ traefik_port_ui }}"
+          homepage.href: "http://{{ ansible_nas_ip }}:{{ traefik_port_ui }}"
           homepage.description: Reverse Proxy
           homepage.widget.type: traefik
-          homepage.widget.url: "http://{{ ansible_nas_hostname }}:{{ traefik_port_ui }}"
+          homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ traefik_port_ui }}"
 
     - name: Set letsencrypt permissions
       ansible.builtin.file:
