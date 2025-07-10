@@ -44,10 +44,10 @@
           homepage.group: Monitoring
           homepage.name: Prometheus
           homepage.icon: prometheus
-          homepage.href: "http://{{ ansible_nas_hostname }}:{{ stats_prometheus_port }}"
+          homepage.href: "http://{{ ansible_nas_ip }}:{{ stats_prometheus_port }}"
           homepage.description: Metrics and alerting
           homepage.widget.type: prometheus
-          homepage.widget.url: "http://{{ ansible_nas_hostname }}:{{ stats_prometheus_port }}"
+          homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ stats_prometheus_port }}"
         networks:
           - name: "{{ o11y_network_name }}"
   when: stats_enabled is true

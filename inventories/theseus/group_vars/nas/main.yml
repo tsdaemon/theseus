@@ -10,6 +10,11 @@ ansible_nas_user_id: "1001"
 ansible_nas_group: users
 ansible_nas_group_id: "100"
 
+ansible_nas_from_address: "theseus@mail.t6n.app"
+ansible_nas_from_name: "Theseus NAS"
+ansible_nas_smtp_hostname: "smtp.eu.mailgun.org"
+ansible_nas_smtp_username: "theseus@mail.t6n.app"
+
 docker_home: /appdata
 docker_network_name: "main"
 docker_group_id: 987
@@ -152,6 +157,10 @@ cloudcmd_port: "7373"
 pihole_enabled: true
 pihole_dns1: "8.8.8.8"
 pihole_dns2: "1.1.1.1"
+
+## wireguard
+wireguard_enabled: true
+wireguard_available_externally: false
 
 # o11y
 

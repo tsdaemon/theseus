@@ -56,7 +56,7 @@
           homepage.group: Networking
           homepage.name: Pi-hole
           homepage.icon: pi-hole
-          homepage.href: "http://{{ ansible_nas_hostname }}:{{ pihole_web_port }}/admin"
+          homepage.href: "http://{{ ansible_nas_ip }}:{{ pihole_web_port }}/admin"
           homepage.description: DNS sinkhole and ad blocker
 
     - name: Remove resolv.conf

@@ -1,0 +1,33 @@
+---
+- name: Start WireGuard
+  block:
+    - name: Create WireGuard Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "770"
+      with_items:
+        - "{{ wireguard_directory }}"
+        - "{{ wireguard_config_directory }}"
+
+    - name: Create docker-compose.yaml
+      template:
+        src: docker-compose.yaml
+        dest: "{{ wireguard_directory }}/docker-compose.yaml"
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "0640"
+
+    - name: Start WireGuard
+      community.docker.docker_compose_v2:
+        project_src: "{{ wireguard_directory }}"
+
+  when: wireguard_enabled
+
+- name: Stop WireGuard
+  community.docker.docker_compose_v2:
+    project_src: "{{ wireguard_directory }}"
+    state: stopped
+  when: not wireguard_enabled

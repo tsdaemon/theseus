@@ -32,7 +32,7 @@
           homepage.group: Services
           homepage.name: Cloudcmd
           homepage.icon: cloudcmd.png
-          homepage.href: "http://{{ ansible_nas_hostname }}:{{ cloudcmd_port }}"
+          homepage.href: "http://{{ ansible_nas_ip }}:{{ cloudcmd_port }}"
           homepage.description: File manager
   when: cloudcmd_enabled is true
 

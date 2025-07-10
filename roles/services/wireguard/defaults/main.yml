@@ -1,0 +1,17 @@
+---
+wireguard_enabled: false
+wireguard_available_externally: false
+
+# directories
+wireguard_directory: "{{ docker_home }}/wireguard"
+wireguard_config_directory: "{{ wireguard_directory }}/config"
+
+# network
+wireguard_hostname: "wireguard"
+wireguard_port: "51820"
+wireguard_ui_port: "51821"
+
+# docker
+wireguard_container_name: "wireguard-easy"
+wireguard_image_name: "ghcr.io/wg-easy/wg-easy"
+wireguard_image_version: "15"
