@@ -108,6 +108,11 @@
         - cloudcmd
         - services
 
+    - role: pihole
+      tags:
+        - pihole
+        - services
+
     ###
     ### Observability
     ###

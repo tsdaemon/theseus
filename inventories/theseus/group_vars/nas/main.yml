@@ -148,6 +148,11 @@ duplicati_hostname: dpl
 cloudcmd_enabled: true
 cloudcmd_port: "7373"
 
+## pihole
+pihole_enabled: true
+pihole_dns1: "8.8.8.8"
+pihole_dns2: "1.1.1.1"
+
 # o11y
 
 ## loki

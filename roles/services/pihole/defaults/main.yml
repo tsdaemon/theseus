@@ -1,0 +1,25 @@
+---
+pihole_enabled: false
+pihole_available_externally: false
+
+# directories
+pihole_config_directory: "{{ docker_home }}/pihole/config"
+pihole_dnsmasq_directory: "{{ docker_home }}/pihole/dnsmasq.d"
+
+# network
+pihole_hostname: "pihole"
+pihole_web_port: "8089"
+pihole_dns_port: "53"
+
+# docker
+pihole_container_name: "pihole"
+pihole_image_name: "pihole/pihole"
+pihole_image_version: "latest"
+
+# specs
+pihole_memory: "512m"
+
+# Pi-hole specific settings
+pihole_webpassword: "admin"  # Change this to your desired admin password
+pihole_dns1: "8.8.8.8"  # Primary DNS server
+pihole_dns2: "8.8.4.4"  # Secondary DNS server
