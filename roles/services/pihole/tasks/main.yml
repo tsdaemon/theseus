@@ -1,0 +1,89 @@
+---
+- name: Start Pi-hole
+  block:
+    - name: Disable systemd-resolved
+      ansible.builtin.systemd:
+        name: systemd-resolved
+        enabled: false
+        state: stopped
+        masked: true
+
+    - name: Create Pi-hole Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "770"
+      with_items:
+        - "{{ pihole_config_directory }}"
+        - "{{ pihole_dnsmasq_directory }}"
+
+    - name: Create Pi-hole Docker Container
+      community.docker.docker_container:
+        name: "{{ pihole_container_name }}"
+        image: "{{ pihole_image_name }}:{{ pihole_image_version }}"
+        pull: true
+        volumes:
+          - "{{ pihole_config_directory }}:/etc/pihole:rw"
+          - "{{ pihole_dnsmasq_directory }}:/etc/dnsmasq.d:rw"
+        ports:
+          - "{{ pihole_dns_port }}:53/tcp"
+          - "{{ pihole_dns_port }}:53/udp"
+          - "{{ pihole_web_port }}:80/tcp"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+          FTLCONF_webserver_api_password: "{{ pihole_webpassword }}"
+          FTLCONF_dns_listeningMode: "all"
+          FTLCONF_dns_upstreams: "{{ pihole_dns1 }};{{ pihole_dns2 }}"
+        dns_servers:
+          - "{{ pihole_dns1 }}"
+          - "{{ pihole_dns2 }}"
+        capabilities:
+          - NET_BIND_SERVICE
+          - NET_ADMIN
+          - SYS_TIME
+          - SYS_NICE
+        restart_policy: unless-stopped
+        memory: "{{ pihole_memory }}"
+        labels:
+          traefik.enable: "{{ pihole_available_externally | string }}"
+          traefik.http.routers.pihole.rule: "Host(`{{ pihole_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.pihole.tls.certresolver: "letsencrypt"
+          traefik.http.routers.pihole.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.pihole.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.services.pihole.loadbalancer.server.port: "80"
+          homepage.group: Network
+          homepage.name: Pi-hole
+          homepage.icon: pi-hole
+          homepage.href: "http://{{ ansible_nas_hostname }}.local:{{ pihole_web_port }}/admin"
+          homepage.description: DNS sinkhole and ad blocker
+
+    - name: Remove resolv.conf
+      ansible.builtin.file:
+        path: "/etc/resolv.conf"
+        state: absent
+
+    - name: Create resolv.conf to itself
+      ansible.builtin.copy:
+        dest: "/etc/resolv.conf"
+        content: |
+          nameserver {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
+        mode: "0644"
+  when: pihole_enabled is true
+
+- name: Stop Pi-hole
+  block:
+    - name: Stop Pi-hole
+      community.docker.docker_container:
+        name: "{{ pihole_container_name }}"
+        state: absent
+
+    - name: Create resolv.conf to public DNS servers
+      ansible.builtin.copy:
+        dest: "/etc/resolv.conf"
+        content: |
+          nameserver {{ pihole_dns1 }}
+          nameserver {{ pihole_dns2 }}
+        mode: "0644"
+  when: pihole_enabled is false

@@ -49,5 +49,5 @@
     path: "{{ docker_home }}"
     owner: "{{ ansible_nas_user }}"
     group: "{{ ansible_nas_group }}"
-    mode: "750"
-    recurse: true
+    mode: "770"
+    recurse: false
