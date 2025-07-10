@@ -44,7 +44,10 @@
           homepage.icon: qbittorrent
           homepage.href: https://{{ qbittorrent_hostname }}.{{ ansible_nas_domain }}
           homepage.description: Torrent client
-  when: qbittorrent_enabled is true
+          homepage.widget.type: qbittorrent
+          homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ qbittorrent_port_http }}"
+          homepage.widget.enableLeechProgress: "true"
+  when: qbittorrent_enabled
 
 - name: Stop qbittorrent
   block:
@@ -52,4 +55,4 @@
       community.docker.docker_container:
         name: "{{ qbittorrent_container_name }}"
         state: absent
-  when: qbittorrent_enabled is false
+  when: not qbittorrent_enabled

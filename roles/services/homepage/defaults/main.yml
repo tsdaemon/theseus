@@ -28,28 +28,9 @@ homepage_settings_yaml:
   showStats: true
 
 homepage_services_yaml:
-  - Networking:
-      - Router:
-          icon: asus-router
-          href: "{{ homepage_router_url }}"
-          description: Asus Router
-  - Smart Home:
-      - Home Assistant:
-          icon: home-assistant.png
-          href: "{{ homepage_homeassistant_url }}"
-          description: Home Assistant
+
 
 homepage_widgets_yaml:
-  - greeting:
-      text_size: xl
-      text: Theseus
-  - resources:
-      cpu: true
-      memory: true
-      cputemp: true
-      uptime: true
-      units: metric # only used by cpu temp
-      refresh: 60000 # optional, in ms
 
 homepage_bookmarks_yaml:
 
