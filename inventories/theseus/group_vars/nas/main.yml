@@ -1,7 +1,7 @@
 ---
 keep_packages_updated: true
 
-ansible_nas_hostname: t5s
+ansible_nas_hostname: theseus
 ansible_nas_timezone: Europe/Kyiv
 ansible_nas_email: tsdaemon@gmail.com
 ansible_nas_domain: t6n.app
@@ -143,6 +143,10 @@ homepage_homeassistant_url: "http://homeassistant.local"
 duplicati_enabled: true
 duplicati_available_externally: true
 duplicati_hostname: dpl
+
+## cloudcmd
+cloudcmd_enabled: true
+cloudcmd_port: "7373"
 
 # o11y
 

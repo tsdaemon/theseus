@@ -103,6 +103,11 @@
         - homepage
         - services
 
+    - role: cloudcmd
+      tags:
+        - cloudcmd
+        - services
+
     ###
     ### Observability
     ###
