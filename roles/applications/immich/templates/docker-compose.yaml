@@ -38,7 +38,7 @@ services:
       - "homepage.group=Media"
       - "homepage.name=Immich"
       - "homepage.icon=immich.png"
-      - "homepage.href=https://{{ immich_host }}.{{ ansible_nas_domain }}"
+      - "homepage.href={% if immich_available_externally %}https://{{ immich_host }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ immich_port }}{% endif %}"
       - "homepage.description=Photo and video management"
       - "homepage.widget.type=immich"
       - "homepage.widget.url=https://{{ immich_host }}.{{ ansible_nas_domain }}"
