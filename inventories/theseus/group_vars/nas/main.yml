@@ -15,12 +15,14 @@ ansible_nas_from_name: "Theseus NAS"
 ansible_nas_smtp_hostname: "smtp.eu.mailgun.org"
 ansible_nas_smtp_username: "theseus@mail.t6n.app"
 
+ansible_nas_data_root: "/mnt/data"
+
 docker_home: /appdata
 docker_network_name: "main"
 docker_group_id: 987
 
 # Samba
-samba_shares_root: /mnt/data/data/media
+samba_shares_root: "{{ ansible_nas_data_root }}/data/media"
 samba_server_string: theseus
 samba_map_to_guest: "Bad user"
 samba_guest_account: "{{ ansible_nas_user }}"
@@ -28,13 +30,13 @@ samba_manage_directories: false
 samba_server_max_protocol: SMB3
 samba_server_min_protocol: SMB2
 
-downloads_root: "/mnt/data/data"
-movies_root: "{{ samba_shares_root }}/movies"
-tv_root: "{{ samba_shares_root }}/tv"
-books_root: "{{ samba_shares_root }}/books"
-comics_root: "{{ samba_shares_root }}/comics"
-photo_root: "{{ samba_shares_root }}/photo"
-archive_root: "/mnt/data/archive"
+media_root: "{{ samba_shares_root }}"
+movies_root: "{{ media_root }}/movies"
+tv_root: "{{ media_root }}/tv"
+books_root: "{{ media_root }}/books"
+comics_root: "{{ media_root }}/comics"
+photo_root: "{{ media_root }}/photo"
+archive_root: "{{ ansible_nas_data_root }}/archive"
 
 # Shares you want published over Samba.
 samba_shares:
@@ -97,22 +99,22 @@ immich_host: im
 qbittorrent_enabled: true
 qbittorrent_available_externally: false
 qbittorrent_hostname: qb
-qbittorrent_download_directory: "/mnt/data/data"
-qbittorrent_download_directory_active: "{{ downloads_root }}/media/incomplete"
+qbittorrent_download_directory: "{{ ansible_nas_data_root }}/data"
+qbittorrent_download_directory_active: "{{ media_root }}/incomplete"
 
 ## plex
 plex_enabled: true
 plex_available_externally: false
 plex_hostname: plex
-plex_config_directory: "/mnt/data/data/plex"
+plex_config_directory: "{{ ansible_nas_data_root }}/data/plex"
 
 ## stash
 stash_enabled: true
 stash_available_externally: false
 stash_hostname: stash
-stash_data_content_directory: "/mnt/data/private/stash/content"
-stash_blobs_directory: "/mnt/data/private/stash/blobs"
-stash_generated_directory: "/mnt/data/private/stash/generated"
+stash_data_content_directory: "{{ ansible_nas_data_root }}/private/stash/content"
+stash_blobs_directory: "{{ ansible_nas_data_root }}/private/stash/blobs"
+stash_generated_directory: "{{ ansible_nas_data_root }}/private/stash/generated"
 
 stash_qbittorrent_available_externally: false
 stash_qbittorrent_hostname: qb-stash
@@ -121,11 +123,11 @@ stash_qbittorrent_hostname: qb-stash
 
 ## influxdb2
 influxdb2_enabled: true
-influxdb2_data_directory: "/mnt/data/data/influxdb2"
+influxdb2_data_directory: "{{ ansible_nas_data_root }}/data/influxdb2"
 
 ## mariadb
 mariadb_enabled: true
-mariadb_data_directory: "/mnt/data/data/mariadb"
+mariadb_data_directory: "{{ ansible_nas_data_root }}/data/mariadb"
 
 # Services
 
@@ -136,7 +138,7 @@ traefik_basic_auth_enabled: true
 
 ## crowdsec
 crowdsec_enabled: false
-crowdsec_data_directory: "/mnt/data/data/crowdsec"
+crowdsec_data_directory: "{{ ansible_nas_data_root }}/data/crowdsec"
 
 ## homepage
 homepage_enabled: true
@@ -214,16 +216,16 @@ wireguard_available_externally: false
 
 ## loki
 loki_enabled: true
-loki_data_directory: "/mnt/data/data/loki"
-loki_minio_data_directory: "/mnt/data/data/loki/minio"
-loki_promtail_data_directory: "/mnt/data/data/loki/promtail"
+loki_data_directory: "{{ ansible_nas_data_root }}/data/loki"
+loki_minio_data_directory: "{{ ansible_nas_data_root }}/data/loki/minio"
+loki_promtail_data_directory: "{{ ansible_nas_data_root }}/data/loki/promtail"
 
 ## stats
 stats_enabled: true
 stats_grafana_available_externally: false
 stats_internet_speed_test_enabled: true
-stats_prometheus_data_directory: "/mnt/data/data/stats/prometheus"
-stats_grafana_data_directory: "/mnt/data/data/stats/grafana"
+stats_prometheus_data_directory: "{{ ansible_nas_data_root }}/data/stats/prometheus"
+stats_grafana_data_directory: "{{ ansible_nas_data_root }}/data/stats/grafana"
 stats_telegraf_influxdb_port: "8186"
 
 ## netdata
