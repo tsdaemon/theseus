@@ -33,4 +33,4 @@ homepage_widgets_yaml:
 
 homepage_bookmarks_yaml:
 
-homepage_allowed_hosts: "{{ ansible_nas_domain }}"
+homepage_allowed_hosts: "{{ ansible_nas_ip }}:{{ homepage_port }},{{ ansible_nas_domain }}"

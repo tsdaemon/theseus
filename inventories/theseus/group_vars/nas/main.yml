@@ -95,26 +95,26 @@ immich_host: im
 
 ## qbittorrent
 qbittorrent_enabled: true
-qbittorrent_available_externally: true
+qbittorrent_available_externally: false
 qbittorrent_hostname: qb
 qbittorrent_download_directory: "/mnt/data/data"
 qbittorrent_download_directory_active: "{{ downloads_root }}/media/incomplete"
 
 ## plex
 plex_enabled: true
-plex_available_externally: true
+plex_available_externally: false
 plex_hostname: plex
 plex_config_directory: "/mnt/data/data/plex"
 
 ## stash
 stash_enabled: true
-stash_available_externally: true
+stash_available_externally: false
 stash_hostname: stash
 stash_data_content_directory: "/mnt/data/private/stash/content"
 stash_blobs_directory: "/mnt/data/private/stash/blobs"
 stash_generated_directory: "/mnt/data/private/stash/generated"
 
-stash_qbittorrent_available_externally: true
+stash_qbittorrent_available_externally: false
 stash_qbittorrent_hostname: qb-stash
 
 # Storage
@@ -140,7 +140,7 @@ crowdsec_data_directory: "/mnt/data/data/crowdsec"
 
 ## homepage
 homepage_enabled: true
-homepage_available_externally: true
+homepage_available_externally: false
 homepage_bookmarks_yaml:
 homepage_widgets_yaml:
   - greeting:
@@ -194,7 +194,7 @@ homepage_settings_yaml:
 
 ## duplicati
 duplicati_enabled: true
-duplicati_available_externally: true
+duplicati_available_externally: false
 duplicati_hostname: dpl
 
 ## cloudcmd
@@ -220,8 +220,8 @@ loki_promtail_data_directory: "/mnt/data/data/loki/promtail"
 
 ## stats
 stats_enabled: true
+stats_grafana_available_externally: false
 stats_internet_speed_test_enabled: true
-stats_grafana_available_externally: true
 stats_prometheus_data_directory: "/mnt/data/data/stats/prometheus"
 stats_grafana_data_directory: "/mnt/data/data/stats/grafana"
 stats_telegraf_influxdb_port: "8186"
