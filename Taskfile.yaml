@@ -14,7 +14,7 @@ tasks:
     cmds:
       - ansible-galaxy install -r requirements.yml
 
-  main:
+  theseus:
     desc: Run Thesesus playbook
     cmds:
       - ansible-playbook -i inventories/theseus/inventory playbooks/theseus.yml {{if .CLI_ARGS}}--tags "{{.CLI_ARGS}}"{{end}}
