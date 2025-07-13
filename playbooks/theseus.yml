@@ -1,6 +1,6 @@
 ---
 - name: Setup Theseus
-  hosts: all
+  hosts: theseus
   become: true
   vars:
     ansible_nas_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
