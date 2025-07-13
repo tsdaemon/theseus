@@ -14,6 +14,3 @@ theseus ansible_host=192.168.0.7 ansible_user=anatolii ansible_connection=ssh
 
 [gpus]
 #tolik-pc ansible_host=localhost ansible_connection=local
-
-[ha]
-homeassistant ansible_host=192.168.0.100 ansible_user=root ansible_connection=ssh
