@@ -1,0 +1,9 @@
+n8n_enabled: false
+n8n_available_externally: false
+
+n8n_folder: "{{ docker_home }}/n8n"
+n8n_data_folder: "{{ n8n_folder }}/data"
+n8n_local_files_folder: "{{ n8n_folder }}/local"
+
+n8n_hostname: n8n
+n8n_port: 5678

@@ -1,0 +1,32 @@
+---
+- name: Start N8N
+  block:
+    - name: Create N8N directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "0770"
+      loop:
+        - "{{ n8n_data_folder }}"
+        - "{{ n8n_local_files_folder }}"
+
+    - name: Create docker-compose.yaml
+      template:
+        src: docker-compose.yaml
+        dest: "{{ n8n_folder }}/docker-compose.yaml"
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "0640"
+
+    - name: Start N8N
+      community.docker.docker_compose_v2:
+        project_src: "{{ n8n_folder }}"
+  when: n8n_enabled
+
+- name: Stop N8N
+  community.docker.docker_compose_v2:
+    project_src: "{{ n8n_folder }}"
+    state: stopped
+  when: not n8n_enabled

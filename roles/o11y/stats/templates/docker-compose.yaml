@@ -1,0 +1,165 @@
+version: "3.8"
+
+name: "stats"
+
+services:
+  smartctl-exporter:
+    container_name: "{{ stats_smartctl_container_name }}"
+    image: "{{ stats_smartctl_docker_image_name }}:{{ stats_smartctl_docker_image_version }}"
+    privileged: true
+    ports:
+      - "{{ stats_prometheus_smartctl_port }}:9902"
+    restart: unless-stopped
+    mem_limit: "{{ stats_prometheus_smartctl_memory }}"
+    user: "0:0"
+    networks:
+      - "{{ o11y_network_name }}"
+
+  hddtemp-exporter:
+    container_name: "{{ stats_hddtemp_docker_container_name }}"
+    image: "{{ stats_hddtemp_docker_image_name }}:{{ stats_hddtemp_docker_image_tag }}"
+    privileged: true
+    ports:
+      - "{{ stats_hddtemp_port }}:7634"
+    environment:
+      HDDTEMP_ARGS: "-q -d -F /dev/sd*"
+      TZ: "{{ ansible_nas_timezone }}"
+    volumes:
+      - "/dev:/dev:ro"
+    restart: unless-stopped
+    mem_limit: "{{ stats_hddtemp_memory }}"
+    user: "0:0"
+    networks:
+      - "{{ o11y_network_name }}"
+
+  speedtest-exporter:
+    container_name: "{{ stats_speedtest_container_name }}"
+    image: "{{ stats_speedtest_docker_image_name }}:{{ stats_speedtest_docker_image_version }}"
+    ports:
+      - "{{ stats_speedtest_exporter_port }}:9798"
+    restart: unless-stopped
+    mem_limit: "{{ stats_speedtest_exporter_memory }}"
+    user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
+    networks:
+      - "{{ o11y_network_name }}"
+    volumes:
+      - speedtest_config:/config
+
+  grafana:
+    container_name: "{{ stats_grafana_container_name }}"
+    image: "{{ stats_grafana_image_name }}:{{ stats_grafana_image_version }}"
+    pull_policy: always
+    volumes:
+      - "{{ stats_grafana_data_directory }}:/var/lib/grafana:rw"
+      - "{{ stats_grafana_config_directory }}/provisioning:/etc/grafana/provisioning:ro"
+      - "{{ stats_grafana_config_directory }}/dashboards:/etc/dashboards:ro"
+    ports:
+      - "{{ stats_grafana_port }}:3000"
+    environment:
+      GF_PLUGINS_ENABLE_ALPHA: "true"
+      GF_UNIFIED_ALERTING_ENABLED: "true"
+    restart: unless-stopped
+    mem_limit: 1g
+    user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.grafana.rule: "Host(`{{ stats_grafana_domain }}.{{ ansible_nas_local_domain }}`) "
+      traefik.http.routers.grafana.entrypoints: "web_local"
+      traefik.http.services.grafana.loadbalancer.server.port: "3000"
+{% if stats_grafana_available_externally %}
+      traefik.http.routers.grafana-external.rule: "Host(`{{ stats_grafana_domain }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.grafana-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.grafana-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.grafana-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.grafana-external.entrypoints: "web,websecure"
+      traefik.http.routers.grafana-external.service: "grafana"
+{% endif %}
+      homepage.group: Monitoring
+      homepage.name: Grafana
+      homepage.icon: grafana
+      homepage.href: "{% if stats_grafana_available_externally %}https://{{ stats_grafana_domain }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ stats_grafana_port }}{% endif %}"
+      homepage.description: Dashboards and centralized observability.
+      homepage.widget.type: grafana
+      homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ stats_grafana_port }}"
+      homepage.widget.username: "{{ stats_grafana_username }}"
+      homepage.widget.password: "{{ stats_grafana_password }}"
+    networks:
+      - "{{ o11y_network_name }}"
+
+  prometheus:
+    container_name: "{{ stats_prometheus_container_name }}"
+    image: "{{ stats_prometheus_image_name }}:{{ stats_prometheus_image_version }}"
+    pull_policy: always
+    volumes:
+      - "{{ stats_prometheus_config_directory }}/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+      - "{{ stats_prometheus_data_directory }}:/prometheus:rw"
+      - "/etc/timezone:/etc/timezone:ro"
+    ports:
+      - "{{ stats_prometheus_port }}:9090"
+    restart: unless-stopped
+    mem_limit: "{{ stats_prometheus_memory }}"
+    user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
+    command: "--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.retention.size={{ stats_prometheus_retention_size }} --storage.tsdb.retention.time={{ stats_prometheus_retention_time }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.prometheus.rule: "Host(`{{ stats_prometheus_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.prometheus.entrypoints: "web_local"
+      traefik.http.services.prometheus.loadbalancer.server.port: "9090"
+{% if stats_prometheus_available_externally %}
+      traefik.http.routers.prometheus-external.rule: "Host(`{{ stats_prometheus_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.prometheus-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.prometheus-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.prometheus-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.prometheus-external.entrypoints: "web,websecure"
+      traefik.http.routers.prometheus-external.service: "prometheus"
+{% endif %}
+      homepage.group: Monitoring
+      homepage.name: Prometheus
+      homepage.icon: prometheus
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ stats_prometheus_port }}"
+      homepage.description: Metrics and alerting
+      homepage.widget.type: prometheus
+      homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ stats_prometheus_port }}"
+    networks:
+      - "{{ o11y_network_name }}"
+
+
+  telegraf:
+    container_name: "{{ stats_telegraf_container_name }}"
+    image: "{{ stats_telegraf_image_name }}:{{ stats_telegraf_image_version }}"
+    pull_policy: always
+    privileged: true
+    ipc: host
+    ports:
+      - "{{ stats_telegraf_influxdb_port }}:8086"
+      - "{{ stats_telegraf_port }}:9273"
+    user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
+    volumes:
+      - "{{ stats_telegraf_config_directory }}:/etc/telegraf/:ro"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/:/hostfs:ro"
+      - "/etc:/hostfs/etc:ro"
+      - "/proc:/hostfs/proc:ro"
+      - "/sys:/hostfs/sys:ro"
+      - "/var:/hostfs/var:ro"
+      - "/run:/hostfs/run:ro"
+    group_add:
+      - "{{ docker_group_id }}"
+    environment:
+      HOST_ETC: "/hostfs/etc"
+      HOST_PROC: "/hostfs/proc"
+      HOST_SYS: "/hostfs/sys"
+      HOST_VAR: "/hostfs/var"
+      HOST_RUN: "/hostfs/run"
+      HOST_MOUNT_PREFIX: "/hostfs"
+    restart: unless-stopped
+    mem_limit: 1g
+    networks:
+      - "{{ o11y_network_name }}"
+
+networks:
+  "{{ o11y_network_name }}":
+    external: true
+
+volumes:
+  speedtest_config:

@@ -1,0 +1,51 @@
+---
+name: pihole
+
+services:
+  pihole:
+    image: "{{ pihole_image_name }}:{{ pihole_image_version }}"
+    container_name: "{{ pihole_container_name }}"
+    restart: unless-stopped
+    mem_limit: "{{ pihole_memory }}"
+    volumes:
+      - "{{ pihole_config_directory }}:/etc/pihole:rw"
+      - "{{ pihole_dnsmasq_directory }}:/etc/dnsmasq.d:rw"
+    ports:
+      - "{{ pihole_dns_port }}:53/tcp"
+      - "{{ pihole_dns_port }}:53/udp"
+      - "{{ pihole_web_port }}:80/tcp"
+    environment:
+      TZ: "{{ ansible_nas_timezone }}"
+      FTLCONF_webserver_api_password: "{{ pihole_webpassword }}"
+      FTLCONF_dns_listeningMode: "all"
+      FTLCONF_dns_upstreams: "{{ pihole_dns1 }};{{ pihole_dns2 }}"
+      FTLCONF_dns_domainNeeded: "true"
+      FTLCONF_misc_dnsmasq_lines: "address=/{{ ansible_nas_hostname }}/{{ ansible_nas_ip }};address=/.{{ ansible_nas_hostname }}/{{ ansible_nas_ip }}"
+    cap_add:
+      - NET_BIND_SERVICE
+      - NET_ADMIN
+      - SYS_TIME
+      - SYS_NICE
+    user: "0:0"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.pihole.rule: "Host(`{{ pihole_hostname }}.{{ ansible_nas_hostname }}`)"
+      traefik.http.routers.pihole.entrypoints: "web_local"
+      traefik.http.services.pihole.loadbalancer.server.port: "80"
+{% if pihole_available_externally %}
+      traefik.http.routers.pihole-external.rule: "Host(`{{ pihole_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.pihole-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.pihole-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.pihole-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.pihole-external.entrypoints: "web,websecure"
+      traefik.http.routers.pihole-external.service: "pihole"
+{% endif %}
+      homepage.group: Networking
+      homepage.name: Pi-hole
+      homepage.icon: pi-hole
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ pihole_web_port }}/admin"
+      homepage.description: DNS sinkhole and ad blocker
+      homepage.widget.type: pihole
+      homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ pihole_web_port }}"
+      homepage.widget.version: 6
+      homepage.widget.key: "{{ pihole_webpassword }}"

@@ -1,15 +1,18 @@
 ---
 stats_enabled: false
-stats_internet_speed_test_enabled: false
 stats_prometheus_available_externally: false
 stats_grafana_available_externally: false
 
+stats_grafana_domain: "grafana"
+stats_prometheus_domain: "prometheus"
+
 # directories
-stats_telegraf_config_directory: "{{ docker_home }}/stats/telegraf/config"
-stats_prometheus_data_directory: "{{ docker_home }}/stats/prometheus/data"
-stats_prometheus_config_directory: "{{ docker_home }}/stats/prometheus/config"
-stats_grafana_data_directory: "{{ docker_home }}/stats/grafana/data"
-stats_grafana_config_directory: "{{ docker_home }}/stats/grafana/config"
+stats_directory: "{{ docker_home }}/stats"
+stats_telegraf_config_directory: "{{ stats_directory }}/telegraf/config"
+stats_prometheus_data_directory: "{{ stats_directory }}/prometheus/data"
+stats_prometheus_config_directory: "{{ stats_directory }}/prometheus/config"
+stats_grafana_data_directory: "{{ stats_directory }}/grafana/data"
+stats_grafana_config_directory: "{{ stats_directory }}/grafana/config"
 
 # network
 stats_prometheus_port: "9090"

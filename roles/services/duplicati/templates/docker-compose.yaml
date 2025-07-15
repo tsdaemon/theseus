@@ -1,0 +1,42 @@
+---
+name: duplicati
+
+services:
+  duplicati:
+    container_name: "{{ duplicati_container_name }}"
+    image: linuxserver/duplicati:latest
+    pull_policy: always
+    ports:
+      - "{{ duplicati_port }}:8200"
+    volumes:
+      - "{{ duplicati_config_directory }}:/config:rw"
+      - "{{ docker_home }}:/source/docker:{{ duplicati_data_permissions }}"
+      - "/mnt/data/archive:/source/archive:{{ duplicati_data_permissions }}"
+      - "{{ photo_root }}:/source/photo:{{ duplicati_data_permissions }}"
+      - "/etc/timezone:/etc/timezone:ro"
+    environment:
+      TZ: "{{ ansible_nas_timezone }}"
+      PUID: "0"
+      PGID: "0"
+      SETTINGS_ENCRYPTION_KEY: "{{ duplicati_encryption_key }}"
+      DUPLICATI__WEBSERVICE_PASSWORD: "{{ duplicati_ui_password }}"
+    restart: unless-stopped
+    mem_limit: "{{ duplicati_memory }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.duplicati.rule: "Host(`{{ duplicati_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.duplicati.entrypoints: "web_local"
+      traefik.http.services.duplicati.loadbalancer.server.port: "8200"
+{% if duplicati_available_externally %}
+      traefik.http.routers.duplicati-external.rule: "Host(`{{ duplicati_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.duplicati-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.duplicati-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.duplicati-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.duplicati-external.entrypoints: "web,websecure"
+      traefik.http.routers.duplicati-external.service: "duplicati"
+{% endif %}
+      homepage.group: Services
+      homepage.name: Duplicati
+      homepage.icon: duplicati.png
+      homepage.href: "{% if duplicati_available_externally %}https://{{ duplicati_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ duplicati_port }}{% endif %}"
+      homepage.description: Backup client

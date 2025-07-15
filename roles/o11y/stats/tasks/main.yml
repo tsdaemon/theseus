@@ -1,5 +1,70 @@
 ---
-- ansible.builtin.import_tasks: prometheus.yml
-- ansible.builtin.import_tasks: telegraf.yml
-- ansible.builtin.import_tasks: exporters.yml
-- ansible.builtin.import_tasks: grafana.yml
+- name: Start Stats stack
+  block:
+    - name: Create Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "0770"
+        recurse: yes
+      with_items:
+        - "{{ stats_directory }}"
+        - "{{ stats_prometheus_data_directory }}"
+        - "{{ stats_prometheus_config_directory }}"
+        - "{{ stats_telegraf_config_directory }}"
+        - "{{ stats_grafana_data_directory }}"
+        - "{{ stats_grafana_config_directory }}"
+        - "{{ stats_grafana_config_directory }}/dashboards"
+        - "{{ stats_grafana_config_directory }}/provisioning/datasources"
+        - "{{ stats_grafana_config_directory }}/provisioning/dashboards"
+
+    - name: Template Grafana data source
+      ansible.builtin.template:
+        src: datasources/ansible-nas.yml
+        dest: "{{ stats_grafana_config_directory }}/provisioning/datasources/ansible-nas.yml"
+
+    - name: Copy Grafana dashboards configuration
+      ansible.builtin.copy:
+        src: dashboards/ansible-nas.yml
+        dest: "{{ stats_grafana_config_directory }}/provisioning/dashboards/ansible-nas.yml"
+
+    - name: Copy Grafana Ansible-NAS dashboard
+      ansible.builtin.copy:
+        src: dashboards/ansible-nas-overview.json
+        dest: "{{ stats_grafana_config_directory }}/dashboards/ansible-nas-overview.json"
+
+    - name: Copy Grafana WireGuard dashboard
+      ansible.builtin.copy:
+        src: dashboards/wireguard.json
+        dest: "{{ stats_grafana_config_directory }}/dashboards/wireguard.json"
+      when: wireguard_enabled
+
+    - name: Template Prometheus config
+      ansible.builtin.template:
+        src: prometheus.yml.j2
+        dest: "{{ stats_prometheus_config_directory }}/prometheus.yml"
+      register: prometheus_config
+
+    - name: Template telegraf.conf
+      ansible.builtin.template:
+        src: telegraf.conf.j2
+        dest: "{{ stats_telegraf_config_directory }}/telegraf.conf"
+      register: telegraf_config
+
+    - name: Template docker-compose.yml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ stats_directory }}/docker-compose.yml"
+
+    - name: Start Stats stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ stats_directory }}"
+  when: stats_enabled
+
+- name: Stop Stats stack
+  community.docker.docker_compose_v2:
+    project_src: "{{ stats_directory }}"
+    state: stopped
+  when: not stats_enabled

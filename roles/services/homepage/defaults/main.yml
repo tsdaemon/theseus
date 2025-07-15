@@ -4,7 +4,8 @@ homepage_enabled: false
 homepage_available_externally: false
 
 # directories
-homepage_data_directory: "{{ docker_home }}/homepage"
+homepage_directory: "{{ docker_home }}/homepage"
+homepage_config_directory: "{{ homepage_directory }}/config"
 
 # network
 homepage_port: "11111"
@@ -33,4 +34,4 @@ homepage_widgets_yaml:
 
 homepage_bookmarks_yaml:
 
-homepage_allowed_hosts: "{{ ansible_nas_ip }}:{{ homepage_port }},{{ ansible_nas_domain }}"
+homepage_allowed_hosts: "{{ ansible_nas_ip }}:{{ homepage_port }},{{ ansible_nas_domain }},{{ ansible_nas_local_domain }}"

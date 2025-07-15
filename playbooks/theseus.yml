@@ -95,10 +95,10 @@
         - traefik
         - services
 
-    - role: crowdsec
-      tags:
-        - crowdsec
-        - services
+    # - role: crowdsec
+    #   tags:
+    #     - crowdsec
+    #     - services
 
     - role: homepage
       tags:
@@ -120,6 +120,11 @@
         - wireguard
         - services
 
+    - role: portainer
+      tags:
+        - portainer
+        - services
+
     ###
     ### Observability
     ###
@@ -137,10 +142,10 @@
         - stats
         - o11y
 
-    - role: netdata
-      tags:
-        - netdata
-        - o11y
+    # - role: netdata
+    #   tags:
+    #     - netdata
+    #     - o11y
 
     ###
     ### Applications
@@ -163,4 +168,9 @@
     - role: stash
       tags:
         - stash
+        - applications
+
+    - role: n8n
+      tags:
+        - n8n
         - applications

@@ -18,7 +18,7 @@
         dest: "{{ wireguard_directory }}/docker-compose.yaml"
         owner: "{{ ansible_nas_user }}"
         group: "{{ ansible_nas_group }}"
-        mode: "0640"
+        mode: "0440"
 
     - name: Start WireGuard
       community.docker.docker_compose_v2:

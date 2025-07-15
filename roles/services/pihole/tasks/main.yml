@@ -16,52 +16,19 @@
         group: "{{ ansible_nas_group }}"
         mode: "770"
       with_items:
+        - "{{ pihole_directory }}"
         - "{{ pihole_config_directory }}"
         - "{{ pihole_dnsmasq_directory }}"
 
-    - name: Create Pi-hole Docker Container
-      community.docker.docker_container:
-        name: "{{ pihole_container_name }}"
-        image: "{{ pihole_image_name }}:{{ pihole_image_version }}"
-        pull: true
-        volumes:
-          - "{{ pihole_config_directory }}:/etc/pihole:rw"
-          - "{{ pihole_dnsmasq_directory }}:/etc/dnsmasq.d:rw"
-        ports:
-          - "{{ pihole_dns_port }}:53/tcp"
-          - "{{ pihole_dns_port }}:53/udp"
-          - "{{ pihole_web_port }}:80/tcp"
-        env:
-          TZ: "{{ ansible_nas_timezone }}"
-          FTLCONF_webserver_api_password: "{{ pihole_webpassword }}"
-          FTLCONF_dns_listeningMode: "all"
-          FTLCONF_dns_upstreams: "{{ pihole_dns1 }};{{ pihole_dns2 }}"
-          FTLCONF_dns_hosts: "{{ ansible_nas_ip }} {{ ansible_nas_domain }}"  # redirect locally to nas domain
-          FTLCONF_dns_domainNeeded: "true"
-          FTLCONF_misc_dnsmasq_lines: "address=/{{ ansible_nas_domain }}/{{ ansible_nas_ip }};address=/.{{ ansible_nas_domain }}/{{ ansible_nas_ip }}"  # and wildcard
-        capabilities:
-          - NET_BIND_SERVICE
-          - NET_ADMIN
-          - SYS_TIME
-          - SYS_NICE
-        restart_policy: unless-stopped
-        memory: "{{ pihole_memory }}"
-        labels:
-          traefik.enable: "{{ pihole_available_externally | string }}"
-          traefik.http.routers.pihole.rule: "Host(`{{ pihole_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.pihole.tls.certresolver: "letsencrypt"
-          traefik.http.routers.pihole.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.pihole.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.services.pihole.loadbalancer.server.port: "80"
-          homepage.group: Networking
-          homepage.name: Pi-hole
-          homepage.icon: pi-hole
-          homepage.href: "http://{{ ansible_nas_ip }}:{{ pihole_web_port }}/admin"
-          homepage.description: DNS sinkhole and ad blocker
-          homepage.widget.type: pihole
-          homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ pihole_web_port }}"
-          homepage.widget.version: 6
-          homepage.widget.key: "{{ pihole_webpassword }}"
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ pihole_directory }}/docker-compose.yaml"
+        mode: "0440"
+
+    - name: Start Pi-hole
+      community.docker.docker_compose_v2:
+        project_src: "{{ pihole_directory }}"
 
     - name: Remove resolv.conf
       ansible.builtin.file:
@@ -74,14 +41,14 @@
         content: |
           nameserver {{ ansible_nas_ip }}
         mode: "0644"
-  when: pihole_enabled is true
+  when: pihole_enabled
 
 - name: Stop Pi-hole
   block:
     - name: Stop Pi-hole
-      community.docker.docker_container:
-        name: "{{ pihole_container_name }}"
-        state: absent
+      community.docker.docker_compose_v2:
+        project_src: "{{ pihole_directory }}"
+        state: stopped
 
     - name: Create resolv.conf to public DNS servers
       ansible.builtin.copy:
@@ -90,4 +57,4 @@
           nameserver {{ pihole_dns1 }}
           nameserver {{ pihole_dns2 }}
         mode: "0644"
-  when: pihole_enabled is false
+  when: not pihole_enabled

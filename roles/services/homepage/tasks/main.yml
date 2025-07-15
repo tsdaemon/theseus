@@ -9,12 +9,13 @@
         owner: "{{ ansible_nas_user }}"
         group: "{{ ansible_nas_group }}"
       with_items:
-        - "{{ homepage_data_directory }}"
+        - "{{ homepage_directory }}"
+        - "{{ homepage_config_directory }}"
 
     - name: Template config files
       ansible.builtin.template:
         src: "{{ item }}"
-        dest: "{{ homepage_data_directory }}/{{ item }}"
+        dest: "{{ homepage_config_directory }}/{{ item }}"
       with_items:
         - bookmarks.yaml
         - docker.yaml
@@ -23,36 +24,21 @@
         - widgets.yaml
       register: homepage_config
 
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ homepage_directory }}/docker-compose.yaml"
+        mode: '0440'
+
     - name: Create Homepage Docker Container
-      community.docker.docker_container:
-        name: "{{ homepage_container_name }}"
-        image: "{{ homepage_image_name }}:{{ homepage_image_tag }}"
-        pull: true
-        volumes:
-          - "{{ homepage_data_directory }}:/app/config"
-          - "/var/run/docker.sock:/var/run/docker.sock"
-        env:
-          TZ: "{{ ansible_nas_timezone }}"
-          HOMEPAGE_ALLOWED_HOSTS: "{{ homepage_allowed_hosts }}"
-        ports:
-          - "{{ homepage_port }}:3000"
-        restart_policy: unless-stopped
-        restart: "{{ homepage_config is changed }}"
-        memory: "{{ homepage_memory }}"
-        labels:
-          traefik.enable: "{{ homepage_available_externally | string }}"
-          traefik.http.routers.homepage.rule: "Host(`{{ ansible_nas_domain }}`)"
-          traefik.http.routers.homepage.tls.certresolver: "letsencrypt"
-          traefik.http.routers.homepage.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.homepage.tls.domains[0].sans: "{{ ansible_nas_domain }}"
-          traefik.http.routers.homepage.middlewares: "auth@file"
-          traefik.http.services.homepage.loadbalancer.server.port: "3000"
-  when: homepage_enabled is true
+      community.docker.docker_compose_v2:
+        project_src: "{{ homepage_directory }}"
+  when: homepage_enabled
 
 - name: Stop Homepage
   block:
     - name: Stop Homepage
-      community.docker.docker_container:
-        name: "{{ homepage_container_name }}"
-        state: absent
-  when: homepage_enabled is false
+      community.docker.docker_compose_v2:
+        project_src: "{{ homepage_directory }}"
+        state: stopped
+  when: not homepage_enabled

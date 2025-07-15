@@ -1,0 +1,43 @@
+---
+name: "plex"
+
+services:
+  plex:
+    container_name: "{{ plex_container_name }}"
+    image: "{{ plex_image_name }}:{{ plex_image_version }}"
+    pull_policy: always
+    volumes:
+      - "{{ plex_config_directory }}:/config:rw"
+      - "{{ plex_logs }}:/opt/plex/Library/Application Support/Plex Media Server/Logs:rw"
+      - "{{ plex_movies_directory }}:/movies:{{ plex_movies_permissions }}"
+      - "{{ plex_tv_directory }}:/tv:{{ plex_tv_permissions }}"
+    network_mode: "host"
+    devices: "{{ plex_devices | default(omit) }}"
+    environment:
+      TZ: "{{ ansible_nas_timezone }}"
+      PUID: "{{ plex_user_id }}"
+      PGID: "{{ plex_group_id }}"
+      VERSION: "{{ plex_version }}"
+    restart: unless-stopped
+    mem_limit: "{{ plex_memory }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.plex.rule: "Host(`{{ plex_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.plex.entrypoints: "web_local"
+      traefik.http.services.plex.loadbalancer.server.port: "32400"
+{% if plex_available_externally %}
+      traefik.http.routers.plex-external.rule: "Host(`{{ plex_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.plex-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.plex-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.plex-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.plex-external.entrypoints: "web,websecure"
+      traefik.http.routers.plex-external.service: "plex"
+{% endif %}
+      homepage.group: Media
+      homepage.name: Plex
+      homepage.icon: plex
+      homepage.href: "{% if plex_available_externally %}https://{{ plex_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:32400{% endif %}"
+      homepage.description: Media server
+      homepage.widget.type: plex
+      homepage.widget.url: "http://{{ ansible_nas_ip }}:32400"
+      homepage.widget.key: "{{ plex_token }}"

@@ -1,0 +1,38 @@
+---
+name: portainer
+
+services:
+  portainer:
+    image: "{{ portainer_image_name }}:{{ portainer_image_version }}"
+    container_name: "{{ portainer_container_name }}"
+    pull_policy: always
+    volumes:
+      - "{{ portainer_data_directory }}:/data:rw"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    ports:
+      - "{{ portainer_port }}:9000"
+    restart: unless-stopped
+    mem_limit: "{{ portainer_memory }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.portainer.rule: "Host(`{{ portainer_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.portainer.entrypoints: "web_local"
+      traefik.http.services.portainer.loadbalancer.server.port: "9000"
+{% if portainer_available_externally %}
+      traefik.http.routers.portainer-external.rule: "Host(`{{ portainer_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.portainer-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.portainer-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.portainer-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.portainer-external.entrypoints: "web,websecure"
+      traefik.http.routers.portainer-external.service: "portainer"
+{% endif %}
+      homepage.group: Services
+      homepage.name: Portainer
+      homepage.icon: portainer.png
+      homepage.href: "{% if portainer_available_externally %}https://{{ portainer_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ portainer_port }}{% endif %}"
+      homepage.description: Container management
+      homepage.widget.type: portainer
+      homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ portainer_port }}"
+      homepage.widget.env: "3"
+      homepage.widget.key: "{{ portainer_access_token }}"

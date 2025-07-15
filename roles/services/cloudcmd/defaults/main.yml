@@ -4,7 +4,8 @@ cloudcmd_enabled: false
 cloudcmd_available_externally: false
 
 # directories
-cloudcmd_config_directory: "{{ docker_home }}/cloudcmd/config"
+cloudcmd_directory: "{{ docker_home }}/cloudcmd"
+cloudcmd_config_directory: "{{ cloudcmd_directory }}/config"
 cloudcmd_volumes:
   - "{{ docker_home }}:/application_config:rw"
   - "{{ ansible_nas_data_root }}:/data:rw"
