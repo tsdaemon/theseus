@@ -2,10 +2,16 @@ name: n8n
 
 services:
   n8n:
+    container_name: "{{ n8n_container_name }}"
     image: docker.n8n.io/n8nio/n8n
+    pull_policy: always
     restart: always
     ports:
       - "{{ n8n_port }}:5678"
+    volumes:
+      - "{{ n8n_data_folder }}:/home/node/.n8n"
+      - "{{ n8n_local_files_folder }}:/files"
+    user: "node:{{ ansible_nas_group_id }}"
     labels:
       traefik.enable: "true"
       traefik.http.routers.n8n.rule: "Host(`{{ n8n_hostname }}.{{ ansible_nas_local_domain }}`)"
@@ -25,12 +31,11 @@ services:
       homepage.href: "{% if n8n_available_externally %}https://{{ n8n_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ n8n_port }}{% endif %}"
       homepage.description: "Workflow automation"
     environment:
+      N8N_ENCRYPTION_KEY: "{{ n8n_encryption_key }}"
+      N8N_SECURE_COOKIE: "false"
       N8N_HOST: "{% if n8n_available_externally %}https://{{ n8n_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ n8n_port }}{% endif %}"
       N8N_PORT: 5678
       N8N_PROTOCOL: "{% if n8n_available_externally %}https{% else %}http{% endif %}"
       NODE_ENV: development
       WEBHOOK_URL: "{% if n8n_available_externally %}https://{{ n8n_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ n8n_port }}{% endif %}/"
       GENERIC_TIMEZONE: {{ ansible_nas_timezone }}
-    volumes:
-      - "{{ n8n_data_folder }}:/home/node/.n8n"
-      - "{{ n8n_local_files_folder }}:/files"

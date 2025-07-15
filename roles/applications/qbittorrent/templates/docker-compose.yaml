@@ -33,7 +33,7 @@ services:
       traefik.http.routers.qbittorrent-external.service: "qbittorrent"
       traefik.http.routers.qbittorrent-external.middlewares: "auth@file"
 {% endif %}
-      homepage.group: Media
+      homepage.group: Applications
       homepage.name: qBittorrent
       homepage.icon: qbittorrent
       homepage.href: "{% if qbittorrent_available_externally %}https://{{ qbittorrent_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ qbittorrent_port_http }}{% endif %}"
