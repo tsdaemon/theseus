@@ -1,0 +1,29 @@
+---
+- name: Start Ollama
+  block:
+    - name: Create ollama directory
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      with_items:
+        - "{{ ollama_folder }}"
+        - "{{ ollama_data_folder }}"
+        - "{{ ollama_webui_folder }}"
+
+    - name: Create docker-compose.yaml
+      template:
+        src: docker-compose.yaml
+        dest: "{{ ollama_folder }}/docker-compose.yaml"
+        mode: "0640"
+
+    - name: Start Ollama
+      community.docker.docker_compose_v2:
+        project_src: "{{ ollama_folder }}"
+  when: ollama_enabled
+
+- name: Stop Ollama
+  community.docker.docker_compose_v2:
+    project_src: "{{ ollama_folder }}"
+    state: stopped
+  when: not ollama_enabled

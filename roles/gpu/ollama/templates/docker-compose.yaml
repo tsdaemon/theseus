@@ -1,0 +1,29 @@
+name: ollama
+
+services:
+  ollama:
+    container_name: ollama
+    image: ollama/ollama:latest
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
+    volumes:
+      - "{{ ollama_data_folder }}:/root/.ollama"
+    restart: always
+    ports:
+      - "{{ ollama_port }}:11434"
+  ollama-webui:
+    container_name: ollama-webui
+    image: ghcr.io/open-webui/open-webui:main
+    restart: always
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:{{ ollama_port }}
+    ports:
+      - "{{ ollama_webui_port }}:8080"
+    volumes:
+      - "{{ ollama_webui_folder }}:/app/backend/data"

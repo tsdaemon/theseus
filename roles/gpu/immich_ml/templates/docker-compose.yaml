@@ -1,0 +1,22 @@
+name: immich_remote_ml
+
+services:
+  immich-machine-learning:
+    container_name: immich_machine_learning
+    image: ghcr.io/immich-app/immich-machine-learning:{{ immich_ml_version }}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
+    volumes:
+      - model-cache:/cache
+    restart: always
+    ports:
+      - "{{ immich_ml_port }}:3003"
+
+volumes:
+  model-cache:

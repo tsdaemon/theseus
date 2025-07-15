@@ -1,0 +1,7 @@
+ollama_enabled: false
+ollama_folder: "{{ docker_home }}/ollama"
+ollama_data_folder: "{{ ollama_folder }}/data"
+ollama_port: 11434
+
+ollama_webui_folder: "{{ docker_home }}/webui"
+ollama_webui_port: 3000

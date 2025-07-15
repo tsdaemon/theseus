@@ -1,0 +1,4 @@
+immich_ml_enabled: false
+immich_ml_folder: "{{ docker_home }}/immich_ml"
+immich_ml_version: "release-cuda"
+immich_ml_port: 3003

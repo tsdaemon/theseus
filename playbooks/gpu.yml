@@ -1,0 +1,19 @@
+---
+- name: Setup remote GPU nodes
+  hosts: gpu
+  become: true
+  tasks:
+    - name: Create docker home
+      file:
+        path: "{{ docker_home }}"
+        state: directory
+        mode: '0755'
+
+  roles:
+    - role: immich_ml
+      tags:
+        - immich
+
+    - role: ollama
+      tags:
+        - ollama
