@@ -1,6 +1,4 @@
 ---
-- include_tasks: qbittorrent.yaml
-
 - name: Start Stash
   block:
     - name: Create Stash Directories
@@ -11,47 +9,31 @@
         group: "{{ ansible_nas_group }}"
         mode: "770"
       with_items:
+        - "{{ stash_directory }}"
         - "{{ stash_config_directory }}"
         - "{{ stash_data_content_directory }}"
         - "{{ stash_metadata_directory }}"
         - "{{ stash_cache_directory }}"
         - "{{ stash_blobs_directory }}"
         - "{{ stash_generated_directory }}"
+        - "{{ stash_qbittorrent_config_directory }}"
+        - "{{ stash_qbittorrent_download_directory }}"
+        - "{{ stash_qbittorrent_download_directory_active }}"
 
-    - name: Create Stash Docker Container
-      community.docker.docker_container:
-        name: "{{ stash_container_name }}"
-        image: "{{ stash_image_name }}:{{ stash_image_version }}"
-        pull: true
-        volumes:
-          - "/etc/localtime:/etc/localtime:ro"
-          - "{{ stash_config_directory }}:/root/.stash:rw"
-          - "{{ stash_data_content_directory }}:/data:rw"
-          - "{{ stash_metadata_directory }}:/metadata:rw"
-          - "{{ stash_cache_directory }}:/cache:rw"
-          - "{{ stash_blobs_directory }}:/blobs:rw"
-          - "{{ stash_generated_directory }}:/generated:rw"
-        ports:
-          - "{{ stash_port }}:9999"
-        env:
-          STASH_STASH: "/data/"
-          STASH_GENERATED: "/generated/"
-          STASH_METADATA: "/metadata/"
-          STASH_CACHE: "/cache/"
-          STASH_PORT: "9999"
-        restart_policy: unless-stopped
-        memory: "{{ stash_memory }}"
-        labels:
-          traefik.enable: "{{ stash_available_externally | string }}"
-          traefik.http.routers.stash.rule: "Host(`{{ stash_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.stash.tls.certresolver: "letsencrypt"
-          traefik.http.routers.stash.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.stash.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.services.stash.loadbalancer.server.port: "9999"
-  when: stash_enabled is true
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ stash_directory }}/docker-compose.yaml"
+        mode: '0440'
+
+    - name: Start Stash
+      community.docker.docker_compose_v2:
+        project_src: "{{ stash_directory }}"
+
+  when: stash_enabled
 
 - name: Stop Stash
-  community.docker.docker_container:
-    name: "{{ stash_container_name }}"
-    state: absent
-  when: stash_enabled is false
+  community.docker.docker_compose_v2:
+    project_src: "{{ stash_directory }}"
+    state: stopped
+  when: not stash_enabled

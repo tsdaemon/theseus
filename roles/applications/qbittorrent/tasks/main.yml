@@ -9,55 +9,24 @@
         group: "{{ ansible_nas_group }}"
         mode: "770"
       with_items:
+        - "{{ qbittorrent_directory }}"
         - "{{ qbittorrent_config_directory }}"
         - "{{ qbittorrent_download_directory }}"
         - "{{ qbittorrent_download_directory_active }}"
 
-    - name: Create qbittorrent Docker Container
-      community.docker.docker_container:
-        name: "{{ qbittorrent_container_name }}"
-        image: "{{ qbittorrent_image_name }}:{{ qbittorrent_image_version }}"
-        pull: true
-        volumes:
-          - "{{ qbittorrent_download_directory }}:/downloads:rw"
-          - "{{ qbittorrent_config_directory }}:/config:rw"
-        ports:
-          - "{{ qbittorrent_port_http }}:8080"
-          - "{{ qbittorrent_port_bt }}:6881"
-          - "{{ qbittorrent_port_bt }}:6881/udp"
-        env:
-          TZ: "{{ ansible_nas_timezone }}"
-          PUID: "{{ qbittorrent_user_id }}"
-          PGID: "{{ qbittorrent_group_id }}"
-        restart_policy: unless-stopped
-        memory: "{{ qbittorrent_memory }}"
-        labels:
-          traefik.enable: "{{ qbittorrent_available_externally | string }}"
-          traefik.http.routers.qbittorrent.rule: "Host(`{{ qbittorrent_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.qbittorrent.tls.certresolver: "letsencrypt"
-          traefik.http.routers.qbittorrent.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.qbittorrent.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.qbittorrent.middlewares: "auth@file"
-          traefik.http.services.qbittorrent.loadbalancer.server.port: "8080"
-          homepage.group: Media
-          homepage.name: qBittorrent
-          homepage.icon: qbittorrent
-          homepage.href: >-
-            {% if qbittorrent_available_externally %}
-              https://{{ qbittorrent_hostname }}.{{ ansible_nas_domain }}
-            {% else %}
-              http://{{ ansible_nas_ip }}:{{ qbittorrent_port_http }}
-            {% endif %}
-          homepage.description: Torrent client
-          homepage.widget.type: qbittorrent
-          homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ qbittorrent_port_http }}"
-          homepage.widget.enableLeechProgress: "true"
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ qbittorrent_directory }}/docker-compose.yaml"
+        mode: '0440'
+
+    - name: Start qbittorrent
+      community.docker.docker_compose_v2:
+        project_src: "{{ qbittorrent_directory }}"
   when: qbittorrent_enabled
 
 - name: Stop qbittorrent
-  block:
-    - name: Stop qbittorrent
-      community.docker.docker_container:
-        name: "{{ qbittorrent_container_name }}"
-        state: absent
+  community.docker.docker_compose_v2:
+    project_src: "{{ qbittorrent_directory }}"
+    state: stopped
   when: not qbittorrent_enabled

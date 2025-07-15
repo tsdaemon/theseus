@@ -1,0 +1,32 @@
+---
+name: homepage
+
+services:
+  homepage:
+    container_name: "{{ homepage_container_name }}"
+    image: "{{ homepage_image_name }}:{{ homepage_image_tag }}"
+    pull_policy: always
+    volumes:
+      - "{{ homepage_config_directory }}:/app/config"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      TZ: "{{ ansible_nas_timezone }}"
+      HOMEPAGE_ALLOWED_HOSTS: "{{ homepage_allowed_hosts }}"
+    ports:
+      - "{{ homepage_port }}:3000"
+    restart: unless-stopped
+    mem_limit: "{{ homepage_memory }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.homepage.rule: "Host(`{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.homepage.entrypoints: "web_local"
+      traefik.http.services.homepage.loadbalancer.server.port: "3000"
+{% if homepage_available_externally %}
+      traefik.http.routers.homepage-external.rule: "Host(`{{ ansible_nas_domain }}`)"
+      traefik.http.routers.homepage-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.homepage-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.homepage-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.homepage-external.entrypoints: "web,websecure"
+      traefik.http.routers.homepage-external.service: "homepage"
+      traefik.http.routers.homepage-external.middlewares: "auth@file"
+{% endif %}

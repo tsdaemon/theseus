@@ -1,13 +1,7 @@
 ---
-- name: Minio
-  import_tasks: minio.yml
-
-- name: Promtail
-  import_tasks: promtail.yml
-
 - name: Start Loki
   block:
-    - name: Create Loki Directories
+    - name: Create Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -17,6 +11,9 @@
       with_items:
         - "{{ loki_data_directory }}"
         - "{{ loki_config_directory }}"
+        - "{{ loki_minio_data_directory }}/data"
+        - "{{ loki_promtail_data_directory }}"
+        - "{{ loki_promtail_config_directory }}"
 
     - name: Create Minio buckets for Loki
       ansible.builtin.file:
@@ -35,29 +32,21 @@
         dest: "{{ loki_config_directory }}/config.yml"
       register: loki_config
 
-    - name: Create loki Docker Container
-      community.docker.docker_container:
-        name: "{{ loki_container_name }}"
-        image: "{{ loki_image_name }}:{{ loki_image_version }}"
-        pull: true
-        command: "-config.file=/etc/loki/config.yml"
-        ports:
-          - "{{ loki_http_port }}:3100"
-          - 7946
-          - 9095
-        volumes:
-          - "{{ loki_config_directory }}/config.yml:/etc/loki/config.yml"
-          - "{{ loki_data_directory }}:/loki"
-        restart_policy: unless-stopped
-        memory: "{{ loki_memory }}"
-        restart: "{{ loki_config is changed }}"
-        labels:
-          prometheus.io/scrape: "true"
-          prometheus.io/port: "3100"
-          prometheus.io/path: "/metrics"
-        networks:
-          - name: "{{ o11y_network_name }}"
-        user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
+    - name: Template Promtail config
+      ansible.builtin.template:
+        src: promtail_config.yml
+        dest: "{{ loki_promtail_config_directory }}/config.yml"
+      register: promtail_config
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ loki_directory }}/docker-compose.yaml"
+        mode: '0440'
+
+    - name: Start Loki
+      community.docker.docker_compose_v2:
+        project_src: "{{ loki_directory }}"
 
     - name: Template Grafana Loki data source
       ansible.builtin.template:
@@ -65,12 +54,10 @@
         dest: "{{ stats_grafana_config_directory }}/provisioning/datasources/loki.yml"
         owner: "472"
       notify: restart grafana
-  when: loki_enabled is true
+  when: loki_enabled
 
 - name: Stop loki
-  block:
-    - name: Stop loki
-      community.docker.docker_container:
-        name: "{{ loki_container_name }}"
-        state: absent
-  when: loki_enabled is false
+  community.docker.docker_compose_v2:
+    project_src: "{{ loki_directory }}"
+    state: stopped
+  when: not loki_enabled

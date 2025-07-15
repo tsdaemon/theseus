@@ -1,0 +1,65 @@
+services:
+  loki:
+    container_name: "{{ loki_container_name }}"
+    image: "{{ loki_image_name }}:{{ loki_image_version }}"
+    pull_policy: always
+    command: "-config.file=/etc/loki/config.yml"
+    ports:
+      - "{{ loki_http_port }}:3100"
+      - "7946:7946"
+      - "9095:9095"
+    volumes:
+      - "{{ loki_config_directory }}/config.yml:/etc/loki/config.yml"
+      - "{{ loki_data_directory }}:/loki"
+    restart: unless-stopped
+    mem_limit: "{{ loki_memory }}"
+    labels:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "3100"
+      prometheus.io/path: "/metrics"
+    networks:
+      - "{{ o11y_network_name }}"
+    user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
+
+  minio:
+    container_name: "{{ loki_minio_container_name }}"
+    image: "{{ loki_minio_image_name }}:{{ loki_minio_image_version }}"
+    pull_policy: always
+    command: 'server /data --console-address ":{{ loki_minio_console_port }}"'
+    volumes:
+      - "{{ loki_minio_data_directory }}/data:/data"
+    environment:
+      MINIO_ROOT_USER: "{{ loki_minio_admin_username }}"
+      MINIO_ROOT_PASSWORD: "{{ loki_minio_admin_password }}"
+      MINIO_PROMETHEUS_AUTH_TYPE: public
+    restart: unless-stopped
+    mem_limit: "{{ loki_minio_memory }}"
+    user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
+    networks:
+      - "{{ o11y_network_name }}"
+
+  promtail:
+    container_name: "{{ loki_promtail_container_name }}"
+    image: "{{ loki_promtail_image_name }}:{{ loki_promtail_image_version }}"
+    pull_policy: always
+    command: "-config.file=/etc/promtail/config.yml"
+    volumes:
+      - "{{ loki_promtail_config_directory }}/config.yml:/etc/promtail/config.yml"
+      - "{{ loki_promtail_data_directory }}:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/var/log/journal/:/var/log/journal/"
+      - "/run/log/journal/:/run/log/journal/"
+      - "/etc/machine-id:/etc/machine-id"
+    restart: unless-stopped
+    mem_limit: "{{ loki_promtail_memory }}"
+    user: "0:0"
+    group_add:
+      - "{{ docker_group_id }}"
+    networks:
+      - "{{ o11y_network_name }}"
+    ports:
+      - "{{ loki_promtail_port }}:9080"
+
+networks:
+  "{{ o11y_network_name }}":
+    external: true

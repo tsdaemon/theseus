@@ -1,0 +1,72 @@
+---
+name: "stash"
+
+services:
+  qbittorrent:
+    container_name: "{{ stash_qbittorrent_container_name }}"
+    image: "{{ stash_qbittorrent_image_name }}:{{ stash_qbittorrent_image_version }}"
+    pull_policy: always
+    volumes:
+      - "{{ stash_qbittorrent_download_directory }}:/downloads:rw"
+      - "{{ stash_qbittorrent_config_directory }}:/config:rw"
+    ports:
+      - "{{ stash_qbittorrent_port_http }}:8080"
+      - "{{ stash_qbittorrent_port_bt }}:6881"
+      - "{{ stash_qbittorrent_port_bt }}:6881/udp"
+    environment:
+      TZ: "{{ ansible_nas_timezone }}"
+      PUID: "{{ ansible_nas_user_id }}"
+      PGID: "{{ ansible_nas_group_id }}"
+    restart: unless-stopped
+    mem_limit: "{{ stash_qbittorrent_memory }}"
+    labels:
+      traefik.http.routers.stash-qbittorrent.rule: "Host(`{{ stash_qbittorrent_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.stash-qbittorrent.middlewares: "auth@file"
+      traefik.http.routers.stash-qbittorrent.entrypoints: "web_local"
+      traefik.http.services.stash-qbittorrent.loadbalancer.server.port: "8080"
+{% if stash_qbittorrent_available_externally %}
+      traefik.http.routers.stash-qbittorrent-external.rule: "Host(`{{ stash_qbittorrent_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.stash-qbittorrent-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.stash-qbittorrent-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.stash-qbittorrent-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.stash-qbittorrent-external.entrypoints: "web,websecure"
+      traefik.http.routers.stash-qbittorrent-external.service: "stash-qbittorrent"
+      traefik.http.routers.stash-qbittorrent-external.middlewares: "auth@file"
+{% endif %}
+      homepage.group: Applications
+
+  stash:
+    container_name: "{{ stash_container_name }}"
+    image: "{{ stash_image_name }}:{{ stash_image_version }}"
+    pull_policy: always
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "{{ stash_config_directory }}:/root/.stash:rw"
+      - "{{ stash_data_content_directory }}:/data:rw"
+      - "{{ stash_metadata_directory }}:/metadata:rw"
+      - "{{ stash_cache_directory }}:/cache:rw"
+      - "{{ stash_blobs_directory }}:/blobs:rw"
+      - "{{ stash_generated_directory }}:/generated:rw"
+    ports:
+      - "{{ stash_port }}:9999"
+    environment:
+      STASH_STASH: "/data/"
+      STASH_GENERATED: "/generated/"
+      STASH_METADATA: "/metadata/"
+      STASH_CACHE: "/cache/"
+      STASH_PORT: "9999"
+    restart: unless-stopped
+    mem_limit: "{{ stash_memory }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.stash.rule: "Host(`{{ stash_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.stash.entrypoints: "web_local"
+      traefik.http.services.stash.loadbalancer.server.port: "9999"
+{% if stash_available_externally %}
+      traefik.http.routers.stash-external.rule: "Host(`{{ stash_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.stash-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.stash-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.stash-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.stash-external.entrypoints: "web,websecure"
+      traefik.http.routers.stash-external.service: "stash"
+{% endif %}

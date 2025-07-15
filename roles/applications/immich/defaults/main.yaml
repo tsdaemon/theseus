@@ -2,7 +2,7 @@
 immich_enabled: false
 immich_available_externally: false
 
-immich_host: "immich"
+immich_hostname: "immich"
 
 # directories
 immich_directory: "{{ docker_home }}/immich"

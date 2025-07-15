@@ -3,8 +3,9 @@
 loki_enabled: false
 
 # directories
-loki_config_directory: "{{ docker_home }}/loki/config"
-loki_data_directory: "{{ docker_home }}/loki/data"
+loki_directory: "{{ docker_home }}/loki"
+loki_config_directory: "{{ loki_directory }}/config"
+loki_data_directory: "{{ loki_directory }}/data"
 
 # network
 loki_hostname: "loki"
@@ -25,7 +26,7 @@ loki_log_level: warn
 
 # minio
 # directories
-loki_minio_data_directory: "{{ docker_home }}/loki/minio"
+loki_minio_data_directory: "{{ loki_directory }}/minio"
 
 # env
 loki_minio_admin_username: admin
@@ -44,8 +45,8 @@ loki_minio_memory: "1g"
 
 # promtail
 # directories
-loki_promtail_data_directory: "{{ docker_home }}/loki/promtail/data"
-loki_promtail_config_directory: "{{ docker_home }}/loki/promtail/config"
+loki_promtail_data_directory: "{{ loki_directory }}/promtail/data"
+loki_promtail_config_directory: "{{ loki_directory }}/promtail/config"
 
 # network
 loki_promtail_port: "9080"

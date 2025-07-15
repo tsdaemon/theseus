@@ -5,6 +5,7 @@ ansible_nas_hostname: theseus
 ansible_nas_timezone: Europe/Kyiv
 ansible_nas_email: tsdaemon@gmail.com
 ansible_nas_domain: t6n.app
+ansible_nas_local_domain: theseus
 ansible_nas_user: theseus
 ansible_nas_user_id: "1001"
 ansible_nas_group: users
@@ -91,10 +92,13 @@ samba_shares:
 
 # Applications
 
+## n8n
+n8n_enabled: true
+
 ## immich
 immich_enabled: true
 immich_available_externally: true
-immich_host: im
+immich_hostname: im
 
 ## qbittorrent
 qbittorrent_enabled: true
@@ -211,7 +215,9 @@ pihole_dns2: "1.1.1.1"
 
 ## wireguard
 wireguard_enabled: true
-wireguard_available_externally: false
+
+## portainer
+portainer_enabled: true
 
 # o11y
 

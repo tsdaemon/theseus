@@ -14,6 +14,16 @@ tasks:
     cmds:
       - ansible-galaxy install -r requirements.yml
 
+  role:
+    desc: Create role
+    cmds:
+      - mkdir -p roles/{{.CLI_ARGS}}
+      - mkdir -p roles/{{.CLI_ARGS}}/tasks
+      - mkdir -p roles/{{.CLI_ARGS}}/templates
+      - mkdir -p roles/{{.CLI_ARGS}}/defaults
+      - touch roles/{{.CLI_ARGS}}/tasks/main.yaml
+      - touch roles/{{.CLI_ARGS}}/defaults/main.yaml
+
   theseus:
     desc: Run Thesesus playbook
     cmds:

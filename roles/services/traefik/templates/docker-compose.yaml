@@ -1,0 +1,38 @@
+---
+name: traefik
+
+services:
+  traefik:
+    container_name: "{{ traefik_container_name }}"
+    image: "{{ traefik_image_name }}:{{ traefik_image_version }}"
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - "{{ traefik_config_directory }}:/etc/traefik:ro"
+      - "{{ traefik_letsencrypt_directory }}:/letsencrypt:rw"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    environment:
+{% for key, value in traefik_environment_variables.items() %}
+      {{ key }}: {{ value }}
+{% endfor %}
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.traefik.rule: "Host(`{{ traefik_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.services.traefik.loadbalancer.server.port: "8083"
+      traefik.http.routers.traefik.entrypoints: "web_local"
+      traefik.http.routers.traefik.service: "traefik"
+{% if traefik_available_externally %}
+      traefik.http.routers.traefik-external.rule: "Host(`{{ traefik_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.traefik-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.traefik-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.traefik-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.traefik-external.entrypoints: "web,websecure"
+      traefik.http.routers.traefik-external.service: "traefik"
+{% endif %}
+      homepage.group: Networking
+      homepage.name: Traefik
+      homepage.icon: traefik
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ traefik_port_ui }}"
+      homepage.description: Reverse Proxy
+      homepage.widget.type: traefik
+      homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ traefik_port_ui }}"

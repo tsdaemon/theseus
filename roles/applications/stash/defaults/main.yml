@@ -3,13 +3,13 @@ stash_enabled: false
 stash_available_externally: false
 
 # directories
-stash_data_directory: "{{ docker_home }}/stash"
-stash_config_directory: "{{ stash_data_directory }}/config"
-stash_data_content_directory: "{{ stash_data_directory }}/data"
-stash_metadata_directory: "{{ stash_data_directory }}/metadata"
-stash_cache_directory: "{{ stash_data_directory }}/cache"
-stash_blobs_directory: "{{ stash_data_directory }}/blobs"
-stash_generated_directory: "{{ stash_data_directory }}/generated"
+stash_directory: "{{ docker_home }}/stash"
+stash_config_directory: "{{ stash_directory }}/config"
+stash_data_content_directory: "{{ stash_directory }}/data"
+stash_metadata_directory: "{{ stash_directory }}/metadata"
+stash_cache_directory: "{{ stash_directory }}/cache"
+stash_blobs_directory: "{{ stash_directory }}/blobs"
+stash_generated_directory: "{{ stash_directory }}/generated"
 
 # uid / gid
 stash_user_id: "{{ ansible_nas_user_id }}"
@@ -31,7 +31,7 @@ stash_memory: 2g
 stash_qbittorrent_available_externally: false
 
 # directories
-stash_qbittorrent_config_directory: "{{ stash_data_directory }}/qbittorrent/config"
+stash_qbittorrent_config_directory: "{{ stash_directory }}/qbittorrent/config"
 stash_qbittorrent_download_directory: "{{ stash_data_content_directory }}"
 stash_qbittorrent_download_directory_active: "{{ stash_data_content_directory }}/.incomplete"
 

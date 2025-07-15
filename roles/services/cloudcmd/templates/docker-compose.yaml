@@ -1,0 +1,38 @@
+---
+name: cloudcmd
+
+services:
+  cloudcmd:
+    container_name: "{{ cloudcmd_container_name }}"
+    image: coderaiser/cloudcmd:latest
+    pull_policy: always
+    ports:
+      - "{{ cloudcmd_port }}:8000"
+    volumes:
+{% for volume in cloudcmd_volumes %}
+      - "{{ volume }}"
+{% endfor %}
+    environment:
+      TZ: "{{ ansible_nas_timezone }}"
+      PUID: "{{ ansible_nas_user_id }}"
+      PGID: "{{ ansible_nas_group_id }}"
+    restart: unless-stopped
+    mem_limit: "{{ cloudcmd_memory }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.cloudcmd.rule: "Host(`{{ cloudcmd_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.cloudcmd.entrypoints: "web_local"
+      traefik.http.services.cloudcmd.loadbalancer.server.port: "8000"
+{% if cloudcmd_available_externally %}
+      traefik.http.routers.cloudcmd-external.rule: "Host(`{{ cloudcmd_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.cloudcmd-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.cloudcmd-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.cloudcmd-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.cloudcmd-external.entrypoints: "web,websecure"
+      traefik.http.routers.cloudcmd-external.service: "cloudcmd"
+{% endif %}
+      homepage.group: Services
+      homepage.name: Cloudcmd
+      homepage.icon: cloudcmd.png
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ cloudcmd_port }}"
+      homepage.description: File manager

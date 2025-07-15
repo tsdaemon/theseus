@@ -3,6 +3,7 @@ pihole_enabled: false
 pihole_available_externally: false
 
 # directories
+pihole_directory: "{{ docker_home }}/pihole"
 pihole_config_directory: "{{ docker_home }}/pihole/config"
 pihole_dnsmasq_directory: "{{ docker_home }}/pihole/dnsmasq.d"
 

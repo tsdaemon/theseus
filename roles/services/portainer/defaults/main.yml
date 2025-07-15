@@ -3,7 +3,8 @@ portainer_enabled: false
 portainer_available_externally: false
 
 # directories
-portainer_data_directory: "{{ docker_home }}/portainer/config"
+portainer_directory: "{{ docker_home }}/portainer"
+portainer_data_directory: "{{ portainer_directory }}/data"
 
 # network
 portainer_port: "9000"

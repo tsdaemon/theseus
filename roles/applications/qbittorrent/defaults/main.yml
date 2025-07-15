@@ -3,7 +3,8 @@ qbittorrent_enabled: false
 qbittorrent_available_externally: false
 
 # directories
-qbittorrent_config_directory: "{{ docker_home }}/qbittorrent/config"
+qbittorrent_directory: "{{ docker_home }}/qbittorrent"
+qbittorrent_config_directory: "{{ qbittorrent_directory }}/config"
 qbittorrent_download_directory: "{{ downloads_root }}"
 qbittorrent_download_directory_active: "{{ downloads_root }}/.incomplete"
 

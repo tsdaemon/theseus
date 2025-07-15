@@ -9,52 +9,27 @@
         group: "{{ ansible_nas_group }}"
         mode: "770"
       with_items:
-        - "{{ duplicati_data_directory }}"
+        - "{{ duplicati_directory }}"
+        - "{{ duplicati_config_directory }}"
 
-    - name: Dupicati Docker Container
-      community.docker.docker_container:
-        name: "{{ duplicati_container_name }}"
-        image: linuxserver/duplicati:latest
-        pull: true
-        ports:
-          - "{{ duplicati_port }}:8200"
-        volumes:
-          - "{{ duplicati_data_directory }}:/config:rw"
-          - "{{ docker_home }}:/source/docker:{{ duplicati_data_permissions }}"
-          - "/mnt/data/archive:/source/archive:{{ duplicati_data_permissions }}"
-          - "{{ photo_root }}:/source/photo:{{ duplicati_data_permissions }}"
-          - "/etc/timezone:/etc/timezone:ro"
-        env:
-          TZ: "{{ ansible_nas_timezone }}"
-          PUID: "0"
-          PGID: "0"
-          SETTINGS_ENCRYPTION_KEY: "{{ duplicati_encryption_key }}"
-          DUPLICATI__WEBSERVICE_PASSWORD: "{{ duplicati_ui_password }}"
-        restart_policy: unless-stopped
-        memory: "{{ duplicati_memory }}"
-        labels:
-          traefik.enable: "{{ duplicati_available_externally | string }}"
-          traefik.http.routers.duplicati.rule: "Host(`{{ duplicati_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.duplicati.tls.certresolver: "letsencrypt"
-          traefik.http.routers.duplicati.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.duplicati.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.services.duplicati.loadbalancer.server.port: "8200"
-          homepage.group: Services
-          homepage.name: Duplicati
-          homepage.icon: duplicati.png
-          homepage.href: >-
-            {% if duplicati_available_externally %}
-              https://{{ duplicati_hostname }}.{{ ansible_nas_domain }}
-            {% else %}
-              http://{{ ansible_nas_ip }}:{{ duplicati_port }}
-            {% endif %}
-          homepage.description: Backup client
-  when: duplicati_enabled is true
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ duplicati_directory }}/docker-compose.yaml"
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: '0440'
+
+    - name: Start Duplicati
+      community.docker.docker_compose_v2:
+        project_src: "{{ duplicati_directory }}"
+
+  when: duplicati_enabled
 
 - name: Stop Duplicati
   block:
     - name: Stop Duplicati
-      community.docker.docker_container:
-        name: "{{ duplicati_container_name }}"
-        state: absent
-  when: duplicati_enabled is false
+      community.docker.docker_compose_v2:
+        project_src: "{{ duplicati_directory }}"
+        state: stopped
+  when: not duplicati_enabled
