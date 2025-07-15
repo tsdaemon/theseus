@@ -7,7 +7,7 @@ positions:
   filename: /data/positions.yml
 
 clients:
-  - url: {{ loki_url }}
+  - url: "{{ loki_url }}"
     tenant_id: 1
 
 scrape_configs:
@@ -15,9 +15,10 @@ scrape_configs:
     docker_sd_configs:
       - host: unix:///var/run/docker.sock
         refresh_interval: 5s
-        labels:
+    pipeline_stages:
+      - static_labels:
+          host: "{{ ansible_hostname }}"
           job: docker
-          host: {{ ansible_hostname }}
     relabel_configs:
       - source_labels: ['__meta_docker_container_name']
         regex: '/(.*)'

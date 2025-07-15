@@ -17,4 +17,9 @@ tasks:
   theseus:
     desc: Run Thesesus playbook
     cmds:
-      - ansible-playbook -i inventories/theseus/inventory playbooks/theseus.yml {{if .CLI_ARGS}}--tags "{{.CLI_ARGS}}"{{end}}
+      - ansible-playbook -i inventories/local/inventory.toml playbooks/theseus.yml {{if .CLI_ARGS}}--tags "{{.CLI_ARGS}}"{{end}}
+
+  gpu:
+    desc: Run GPU playbook
+    cmds:
+      - ansible-playbook -i inventories/local/inventory.toml playbooks/gpu.yml {{if .CLI_ARGS}}--tags "{{.CLI_ARGS}}"{{end}}

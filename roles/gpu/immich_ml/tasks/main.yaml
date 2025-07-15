@@ -1,0 +1,25 @@
+---
+- name: Start Immich ML
+  block:
+    - name: Create immich_remote_ml directory
+      file:
+        path: "{{ immich_ml_folder }}"
+        state: directory
+        mode: '0755'
+
+    - name: Create docker-compose.yaml
+      template:
+        src: docker-compose.yaml
+        dest: "{{ immich_ml_folder }}/docker-compose.yaml"
+        mode: "0640"
+
+    - name: Start Immich ML
+      community.docker.docker_compose_v2:
+        project_src: "{{ immich_ml_folder }}"
+  when: immich_ml_enabled
+
+- name: Stop Immich ML
+  community.docker.docker_compose_v2:
+    project_src: "{{ immich_ml_folder }}"
+    state: stopped
+  when: not immich_ml_enabled
