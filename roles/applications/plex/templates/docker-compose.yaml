@@ -12,7 +12,12 @@ services:
       - "{{ plex_movies_directory }}:/movies:{{ plex_movies_permissions }}"
       - "{{ plex_tv_directory }}:/tv:{{ plex_tv_permissions }}"
     network_mode: "host"
-    devices: "{{ plex_devices | default(omit) }}"
+{% if plex_devices %}
+    devices:
+{% for device in plex_devices %}
+        - "{{ device }}"
+{% endfor %}
+{% endif %}
     environment:
       TZ: "{{ ansible_nas_timezone }}"
       PUID: "{{ plex_user_id }}"
@@ -33,7 +38,7 @@ services:
       traefik.http.routers.plex-external.entrypoints: "web,websecure"
       traefik.http.routers.plex-external.service: "plex"
 {% endif %}
-      homepage.group: Media
+      homepage.group: "Applications"
       homepage.name: Plex
       homepage.icon: plex
       homepage.href: "{% if plex_available_externally %}https://{{ plex_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:32400{% endif %}"

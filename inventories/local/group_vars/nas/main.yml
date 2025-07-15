@@ -184,7 +184,7 @@ homepage_settings_yaml:
   language: "en-GB"
   showStats: true
   layout:
-    - Media:
+    - Applications:
     - Services:
     - Networking:
     - Monitoring:

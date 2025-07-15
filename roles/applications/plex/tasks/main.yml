@@ -9,54 +9,25 @@
         group: "{{ ansible_nas_group }}"
         mode: "770"
       with_items:
+        - "{{ plex_directory }}"
         - "{{ plex_config_directory }}"
         - "{{ plex_logs }}"
 
-    - name: Create Plex Docker Container
-      community.docker.docker_container:
-        name: "{{ plex_container_name }}"
-        image: "{{ plex_image_name }}:{{ plex_image_version }}"
-        pull: true
-        volumes:
-          - "{{ plex_config_directory }}:/config:rw"
-          - "{{ plex_logs }}:/opt/plex/Library/Application Support/Plex Media Server/Logs:rw"
-          - "{{ plex_movies_directory }}:/movies:{{ plex_movies_permissions }}"
-          - "{{ plex_tv_directory }}:/tv:{{ plex_tv_permissions }}"
-        network_mode: "host"
-        devices: "{{ plex_devices | default(omit) }}"
-        env:
-          TZ: "{{ ansible_nas_timezone }}"
-          PUID: "{{ plex_user_id }}"
-          PGID: "{{ plex_group_id }}"
-          VERSION: "{{ plex_version }}"
-        restart_policy: unless-stopped
-        memory: "{{ plex_memory }}"
-        labels:
-          traefik.enable: "{{ plex_available_externally | string }}"
-          traefik.http.routers.plex.rule: "Host(`{{ plex_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.plex.tls.certresolver: "letsencrypt"
-          traefik.http.routers.plex.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.plex.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.services.plex.loadbalancer.server.port: "32400"
-          homepage.group: Media
-          homepage.name: Plex
-          homepage.icon: plex
-          homepage.href: >-
-            {% if plex_available_externally %}
-              https://{{ plex_hostname }}.{{ ansible_nas_domain }}
-            {% else %}
-              http://{{ ansible_nas_ip }}:32400
-            {% endif %}
-          homepage.description: Media server
-          homepage.widget.type: plex
-          homepage.widget.url: "http://{{ ansible_nas_ip }}:32400"
-          homepage.widget.key: "{{ plex_token }}"
-  when: plex_enabled is true
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ plex_directory }}/docker-compose.yaml"
+        mode: '0440'
+
+    - name: Start Plex
+      community.docker.docker_compose_v2:
+        project_src: "{{ plex_directory }}"
+        state: present
+
+  when: plex_enabled
 
 - name: Stop Plex
-  block:
-    - name: Stop Plex
-      community.docker.docker_container:
-        name: "{{ plex_container_name }}"
-        state: absent
-  when: plex_enabled is false
+  community.docker.docker_compose_v2:
+    project_src: "{{ plex_directory }}"
+    state: stopped
+  when: not plex_enabled

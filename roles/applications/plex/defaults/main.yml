@@ -3,8 +3,9 @@ plex_enabled: false
 plex_available_externally: false
 
 # directories
-plex_config_directory: "{{ docker_home }}/plex/config"
-plex_logs: "{{ docker_home }}/plex/logs"
+plex_directory: "{{ docker_home }}/plex"
+plex_config_directory: "{{ plex_directory }}/config"
+plex_logs: "{{ plex_directory }}/logs"
 plex_movies_directory: "{{ movies_root }}"
 plex_tv_directory: "{{ tv_root }}"
 plex_photos_directory: "{{ photos_root }}"
@@ -36,6 +37,7 @@ plex_image_version: "latest"
 # specs
 plex_memory: "2g"
 
+plex_devices: []
 # Device mappings for the docker container. E.g. To enable hardware transcoding:
 # plex_devices:
 #  - "/dev/dri:/dev/dri"
