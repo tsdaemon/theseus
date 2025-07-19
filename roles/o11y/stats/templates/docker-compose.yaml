@@ -99,7 +99,7 @@ services:
     restart: unless-stopped
     mem_limit: "{{ stats_prometheus_memory }}"
     user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
-    command: "--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.retention.size={{ stats_prometheus_retention_size }} --storage.tsdb.retention.time={{ stats_prometheus_retention_time }}"
+    command: "--web.enable-otlp-receiver --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.retention.size={{ stats_prometheus_retention_size }} --storage.tsdb.retention.time={{ stats_prometheus_retention_time }}"
     labels:
       traefik.enable: "true"
       traefik.http.routers.prometheus.rule: "Host(`{{ stats_prometheus_hostname }}.{{ ansible_nas_local_domain }}`)"
