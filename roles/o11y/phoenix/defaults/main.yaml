@@ -1,0 +1,13 @@
+phoenix_enabled: false
+phoenix_available_externally: false
+phoenix_hostname: "phoenix"
+
+phoenix_directory: "{{ docker_home }}/phoenix"
+
+phoenix_memory: 1g
+
+phoenix_container_name: "phoenix"
+phoenix_image_name: "arizephoenix/phoenix"
+phoenix_image_version: "latest"
+
+phoenix_port: "6006"

@@ -1,0 +1,31 @@
+---
+name: phoenix
+
+services:
+  phoenix:
+    container_name: "{{ phoenix_container_name }}"
+    image: "{{ phoenix_image_name }}:{{ phoenix_image_version }}"
+    pull_policy: always
+    volumes: []
+    ports:
+      - "{{ phoenix_port }}:6006"
+      - "4317:4317"
+    restart: unless-stopped
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.phoenix.rule: "Host(`{{ phoenix_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.phoenix.entrypoints: "web_local"
+      traefik.http.services.phoenix.loadbalancer.server.port: "9090"
+{% if phoenix_available_externally %}
+      traefik.http.routers.phoenix-external.rule: "Host(`{{ phoenix_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.phoenix-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.phoenix-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.phoenix-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.phoenix-external.entrypoints: "web,websecure"
+      traefik.http.routers.phoenix-external.service: "phoenix"
+{% endif %}
+      homepage.group: Monitoring
+      homepage.name: Phoenix
+      homepage.icon: mdi-fire
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ phoenix_port }}"
+      homepage.description: Phoenix

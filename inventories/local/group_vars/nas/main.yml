@@ -243,3 +243,6 @@ netdata_enabled: false
 netdata_claim_token: "HjAD-r4SQXKz-FzaU2OxuCzZ8kA_uWpTRpgfO-sB-0GmR8z96_AZbuE-deXORBC9LkMegAVHZcZJp8mFBnWEa8kzzTY0Ggxa_k_0-gEWazPiCNaVEIhcFDBdwxr3e5qh92Cmv2U"
 netdata_claim_rooms: "07487960-50b7-4f28-b9ff-70980ebe3832"
 netdata_claim_url: "https://app.netdata.cloud"
+
+## phoenix
+phoenix_enabled: true

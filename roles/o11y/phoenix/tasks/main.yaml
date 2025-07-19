@@ -1,0 +1,34 @@
+---
+- name: Start Phoenix
+  block:
+    - name: Create Phoenix Directory
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "770"
+      with_items:
+        - "{{ phoenix_directory }}"
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ phoenix_directory }}/docker-compose.yaml"
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: '0440'
+
+    - name: Start Phoenix
+      community.docker.docker_compose_v2:
+        project_src: "{{ phoenix_directory }}"
+
+  when: phoenix_enabled
+
+- name: Stop Phoenix
+  block:
+    - name: Stop Phoenix
+      community.docker.docker_compose_v2:
+        project_src: "{{ phoenix_directory }}"
+        state: stopped
+  when: not phoenix_enabled
