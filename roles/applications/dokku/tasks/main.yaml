@@ -1,0 +1,35 @@
+---
+- name: Start Dokku
+  block:
+    - name: Create Dokku Directory
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "770"
+      with_items:
+        - "{{ dokku_directory }}"
+        - "{{ dokku_config_directory }}"
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ dokku_directory }}/docker-compose.yaml"
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: '0440'
+
+    - name: Start Dokku
+      community.docker.docker_compose_v2:
+        project_src: "{{ dokku_directory }}"
+
+  when: dokku_enabled
+
+- name: Stop Dokku
+  block:
+    - name: Stop Dokku
+      community.docker.docker_compose_v2:
+        project_src: "{{ dokku_directory }}"
+        state: stopped
+  when: not dokku_enabled

@@ -92,6 +92,9 @@ samba_shares:
 
 # Applications
 
+## dokku
+dokku_enabled: true
+
 ## n8n
 n8n_enabled: true
 

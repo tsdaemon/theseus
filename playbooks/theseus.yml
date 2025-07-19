@@ -174,3 +174,8 @@
       tags:
         - n8n
         - applications
+
+    - role: dokku
+      tags:
+        - dokku
+        - applications

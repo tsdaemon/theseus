@@ -1,0 +1,23 @@
+---
+name: dokku
+
+services:
+  dokku:
+    container_name: "{{ dokku_container_name }}"
+    image: "{{ dokku_image_name }}:{{ dokku_image_version }}"
+    pull_policy: always
+    volumes:
+      - "{{ dokku_config_directory }}:/mnt/dokku:rw"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    ports:
+      - "{{ dokku_port_ssh }}:22"
+      - "{{ dokku_port }}:80"
+    environment:
+      DOKKU_HOSTNAME: "{% if dokku_available_externally %}{{ dokku_hostname }}.{{ ansible_nas_domain }}{% else %}{{ dokku_hostname }}.{{ ansible_nas_local_domain }}{% endif %}"
+      DOKKU_HOST_ROOT: "/var/lib/dokku/home/dokku"
+      DOKKU_LIB_HOST_ROOT: "/var/lib/dokku/var/lib/dokku"
+    restart: unless-stopped
+    mem_limit: "{{ dokku_memory }}"
+    group_add:
+      - "{{ docker_group_id }}"
+      - "{{ ansible_nas_group_id }}"

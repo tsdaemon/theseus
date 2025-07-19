@@ -1,0 +1,15 @@
+dokku_enabled: false
+dokku_available_externally: false
+dokku_hostname: "dokku"
+
+dokku_directory: "{{ docker_home }}/dokku"
+dokku_config_directory: "{{ dokku_directory }}/config"
+
+dokku_memory: 1g
+
+dokku_port: "8180"
+dokku_port_ssh: "3022"
+
+dokku_container_name: dokku
+dokku_image_name: dokku/dokku
+dokku_image_version: latest
