@@ -83,7 +83,8 @@
         files:
           - "{{ coolify_directory }}/docker-compose.yml"
           - "{{ coolify_directory }}/docker-compose.prod.yml"
-        state: stopped
+        state: absent
+        remove_images: all
 
     - name: Remove Coolify user
       include_tasks: user.yaml
