@@ -180,6 +180,11 @@
         - n8n
         - applications
 
+    - role: coolify
+      tags:
+        - coolify
+        - applications
+
     - role: dokku
       tags:
         - dokku

@@ -1,0 +1,90 @@
+---
+- name: Start Coolify
+  block:
+    - name: Create Coolify user
+      include_tasks: user.yaml
+
+    - name: Create Coolify Directory
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ coolify_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "770"
+      with_items:
+        - "{{ coolify_directory }}"
+        - "{{ coolify_source_directory }}"
+        - "{{ coolify_applications_directory }}"
+        - "{{ coolify_databases_directory }}"
+        - "{{ coolify_backups_directory }}"
+        - "{{ coolify_services_directory }}"
+        - "{{ coolify_proxy_directory }}"
+        - "{{ coolify_webhooks_during_maintenance_directory }}"
+        - "{{ coolify_proxy_dynamic_directory }}"
+        - "{{ coolify_postgres_data_directory }}"
+
+    - name: Copy upgrade script to Coolify root user
+      ansible.builtin.copy:
+        src: upgrade.sh
+        dest: "{{ coolify_source_directory }}/upgrade.sh"
+        owner: "{{ coolify_user_id }}"
+        group: "{{ ansible_nas_group }}"
+        mode: '0750'
+
+    - name: Copy .env file to Coolify root user
+      ansible.builtin.template:
+        src: .env.j2
+        dest: "{{ coolify_source_directory }}/.env"
+        owner: "{{ coolify_user_id }}"
+        group: "{{ ansible_nas_group }}"
+        mode: '0440'
+
+    - name: Ensure 'coolify' Docker network exists and is attachable
+      community.docker.docker_network:
+        name: coolify
+        attachable: true
+        driver: bridge
+
+    - name: Create docker-compose.yml
+      ansible.builtin.copy:
+        src: docker-compose.yml
+        dest: "{{ coolify_directory }}/docker-compose.yml"
+        owner: "{{ coolify_user_id }}"
+        group: "{{ ansible_nas_group }}"
+        mode: '0440'
+
+    - name: Create docker-compose.prod.yml
+      ansible.builtin.template:
+        src: docker-compose.prod.yml
+        dest: "{{ coolify_directory }}/docker-compose.prod.yml"
+        owner: "{{ coolify_user_id }}"
+        group: "{{ ansible_nas_group }}"
+        mode: '0440'
+
+    - name: Start Coolify
+      community.docker.docker_compose_v2:
+        project_src: "{{ coolify_directory }}"
+        pull: always
+        recreate: always
+        remove_orphans: true
+        files:
+          - "{{ coolify_directory }}/docker-compose.yml"
+          - "{{ coolify_directory }}/docker-compose.prod.yml"
+        env_files:
+          - "{{ coolify_source_directory }}/.env"
+
+  when: coolify_enabled
+
+- name: Stop Coolify
+  block:
+    - name: Stop Coolify
+      community.docker.docker_compose_v2:
+        project_src: "{{ coolify_directory }}"
+        files:
+          - "{{ coolify_directory }}/docker-compose.yml"
+          - "{{ coolify_directory }}/docker-compose.prod.yml"
+        state: stopped
+
+    - name: Remove Coolify user
+      include_tasks: user.yaml
+  when: not coolify_enabled

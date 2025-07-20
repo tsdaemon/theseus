@@ -1,0 +1,52 @@
+---
+- name: Enable Coolify user
+  block:
+    - name: Create Coolify user
+      ansible.builtin.user:
+        name: "{{ coolify_user }}"
+        groups:
+          - "{{ ansible_nas_group }}"
+          - "docker"
+        uid: "{{ coolify_user_id }}"
+        state: present
+
+    - name: Create Coolify ssh directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ coolify_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "700"
+      with_items:
+        - "{{ coolify_ssh_directory }}"
+        - "{{ coolify_ssh_keys_directory }}"
+        - "{{ coolify_ssh_mux_directory }}"
+
+    - name: Create Coolify .ssh directory
+      ansible.builtin.file:
+        path: "/home/{{ coolify_user }}/.ssh"
+        state: directory
+        owner: "{{ coolify_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "700"
+
+    - name: Add Coolify application public key to authorized_keys
+      ansible.builtin.lineinfile:
+        dest: "/home/{{ coolify_user }}/.ssh/authorized_keys"
+        line: "{{ coolify_public_key }}"
+        regexp: ".*"
+        create: yes
+        owner: "{{ coolify_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "0640"
+
+  when: coolify_enabled
+
+- name: Disable Coolify user
+  block:
+    - name: Remove Coolify user
+      ansible.builtin.user:
+        name: "{{ coolify_user }}"
+        state: absent
+
+  when: not coolify_enabled

@@ -1,0 +1,23 @@
+coolify_enabled: false
+coolify_available_externally: false
+coolify_hostname: "coolify"
+
+coolify_directory: "{{ docker_home }}/coolify"
+coolify_source_directory: "{{ coolify_directory }}/source"
+coolify_ssh_directory: "{{ coolify_directory }}/ssh"
+coolify_applications_directory: "{{ coolify_directory }}/applications"
+coolify_databases_directory: "{{ coolify_directory }}/databases"
+coolify_backups_directory: "{{ coolify_directory }}/backups"
+coolify_services_directory: "{{ coolify_directory }}/services"
+coolify_proxy_directory: "{{ coolify_directory }}/proxy"
+coolify_webhooks_during_maintenance_directory: "{{ coolify_directory }}/webhooks-during-maintenance"
+coolify_ssh_keys_directory: "{{ coolify_ssh_directory }}/keys"
+coolify_ssh_mux_directory: "{{ coolify_ssh_directory }}/mux"
+coolify_proxy_dynamic_directory: "{{ coolify_proxy_directory }}/dynamic"
+coolify_postgres_data_directory: "{{ coolify_directory }}/postgres"
+
+coolify_memory: 1g
+coolify_port: 8000
+
+coolify_user: "coolify"
+coolify_user_id: 9999
