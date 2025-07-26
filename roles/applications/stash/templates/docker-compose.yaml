@@ -33,7 +33,6 @@ services:
       traefik.http.routers.stash-qbittorrent-external.service: "stash-qbittorrent"
       traefik.http.routers.stash-qbittorrent-external.middlewares: "auth@file"
 {% endif %}
-      homepage.group: Applications
 
   stash:
     container_name: "{{ stash_container_name }}"
