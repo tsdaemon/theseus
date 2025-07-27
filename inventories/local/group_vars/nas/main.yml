@@ -240,6 +240,7 @@ stats_internet_speed_test_enabled: true
 stats_prometheus_data_directory: "{{ ansible_nas_data_root }}/data/stats/prometheus"
 stats_grafana_data_directory: "{{ ansible_nas_data_root }}/data/stats/grafana"
 stats_telegraf_influxdb_port: "8186"
+stats_smartctl_docker_image_name: "tsdaemon/prometheus-smartctl"
 
 ## netdata
 netdata_enabled: false
