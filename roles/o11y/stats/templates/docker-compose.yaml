@@ -39,11 +39,11 @@ services:
       - "{{ stats_speedtest_exporter_port }}:9798"
     restart: unless-stopped
     mem_limit: "{{ stats_speedtest_exporter_memory }}"
-    user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
+    user: "speedtest:{{ ansible_nas_group_id }}"
     networks:
       - "{{ o11y_network_name }}"
     volumes:
-      - speedtest_config:/config
+      - speedtest_config:/.config
 
   grafana:
     container_name: "{{ stats_grafana_container_name }}"
