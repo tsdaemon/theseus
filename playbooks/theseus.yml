@@ -189,3 +189,13 @@
       tags:
         - dokku
         - applications
+
+    - role: ubooquity
+      tags:
+        - ubooquity
+        - applications
+
+    - role: calibre
+      tags:
+        - calibre
+        - applications

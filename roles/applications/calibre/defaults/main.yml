@@ -1,0 +1,33 @@
+---
+calibre_enabled: false
+calibre_available_externally: false
+calibreweb_available_externally: false
+
+# directories
+calibre_directory: "{{ docker_home }}/calibre"
+calibre_config_directory: "{{ calibre_directory }}/config"
+calibreweb_directory: "{{ calibre_directory }}/web"
+calibreweb_config_directory: "{{ calibreweb_directory }}/config"
+calibreweb_data_directory: "{{ calibreweb_directory }}/data"
+calibreweb_books_directory: "{{ calibre_config_directory }}/Calibre Library"
+
+# network
+calibre_port: "8093"
+calibre_webserver_port: "8094"
+calibre_hostname: "calibre"
+calibreweb_port: "8084"
+calibreweb_hostname: "calibreweb"
+
+# env
+calibre_password: ""
+calibre_cli_args: ""
+calibre_security_opts: "seccomp=unconfined" # For why this is here, see https://github.com/linuxserver/docker-calibre/issues/102
+
+# specs
+calibre_memory: 1g
+calibreweb_memory: 1g
+
+# docker
+calibre_container_name: calibre
+calibreweb_ebook_conversion: "linuxserver/calibre-web:calibre"
+calibreweb_container_name: calibreweb
