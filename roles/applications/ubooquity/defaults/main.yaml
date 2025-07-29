@@ -1,0 +1,28 @@
+---
+ubooquity_enabled: false
+ubooquity_available_externally: false
+
+# directories
+ubooquity_directory: "{{ docker_home }}/ubooquity"
+ubooquity_config_directory: "{{ ubooquity_directory }}/config"
+ubooquity_books_directory: "{{ books_root }}"
+ubooquity_comics_directory: "{{ comics_root }}"
+ubooquity_raw_files_directory: "{{ media_root }}/ubooquity/raw"
+
+# uid / gid
+ubooquity_user_id: "{{ ansible_nas_user_id }}"
+ubooquity_group_id: "{{ ansible_nas_group_id }}"
+
+# network
+ubooquity_port1: "2202"
+ubooquity_port2: "2203"
+ubooquity_hostname: "ubooquity"
+
+# docker
+ubooquity_container_name: "ubooquity"
+ubooquity_image_name: "linuxserver/ubooquity"
+ubooquity_image_version: "latest"
+
+# specs
+ubooquity_memory: 1g
+ubooquity_memory_limit: 1024

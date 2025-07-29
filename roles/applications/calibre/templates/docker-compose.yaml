@@ -1,0 +1,75 @@
+---
+services:
+  calibre:
+    image: linuxserver/calibre:latest
+    container_name: "{{ calibre_container_name }}"
+    environment:
+      - TZ={{ ansible_nas_timezone }}
+      - PUID={{ ansible_nas_user_id }}
+      - PGID={{ ansible_nas_group_id }}
+      - PASSWORD={{ calibre_password }}
+      - CLI_ARGS={{ calibre_cli_args }}
+    volumes:
+      - "{{ calibre_config_directory }}:/config:rw"
+      - "{{ books_root }}:/books:rw"
+      - "{{ comics_root }}:/comics:rw"
+    ports:
+      - "{{ calibre_webserver_port }}:8181"
+      - "{{ calibre_port }}:8081"
+    security_opt:
+      - "{{ calibre_security_opts }}"
+    restart: unless-stopped
+    mem_limit: "{{ calibre_memory }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.calibre.rule: "Host(`{{ calibre_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.calibre.entrypoints: "web_local"
+      traefik.http.services.calibre.loadbalancer.server.port: "8181"
+{% if calibre_available_externally %}
+      traefik.http.routers.calibre-external.rule: "Host(`{{ calibre_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.calibre-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.calibre-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.calibre-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.calibre-external.entrypoints: "web,websecure"
+      traefik.http.routers.calibre-external.service: "calibre"
+{% endif %}
+      homepage.group: Applications
+      homepage.name: Calibre
+      homepage.icon: sh-calibre.png
+      homepage.href: "{% if calibre_available_externally %}https://{{ calibre_hostname }}.{{ ansible_nas_domain }}{% else %}https://{{ ansible_nas_ip }}:{{ calibre_webserver_port }}{% endif %}"
+      homepage.description: E-book management
+
+  calibreweb:
+    image: linuxserver/calibre-web:latest
+    container_name: "{{ calibreweb_container_name }}"
+    environment:
+      - TZ={{ ansible_nas_timezone }}
+      - PUID={{ ansible_nas_user_id }}
+      - PGID={{ ansible_nas_group_id }}
+      - DOCKER_MODS={{ calibreweb_ebook_conversion }}
+    volumes:
+      - "{{ calibreweb_config_directory }}:/config"
+      - "{{ calibreweb_books_directory }}:/books"
+      - "{{ calibreweb_data_directory }}:/data"
+    ports:
+      - "{{ calibreweb_port }}:8083"
+    restart: unless-stopped
+    mem_limit: "{{ calibreweb_memory }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.calibreweb.rule: "Host(`{{ calibreweb_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.calibreweb.entrypoints: "web_local"
+      traefik.http.services.calibreweb.loadbalancer.server.port: "8083"
+{% if calibreweb_available_externally %}
+      traefik.http.routers.calibreweb-external.rule: "Host(`{{ calibreweb_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.calibreweb-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.calibreweb-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.calibreweb-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.calibreweb-external.entrypoints: "web,websecure"
+      traefik.http.routers.calibreweb-external.service: "calibreweb"
+{% endif %}
+      homepage.group: Applications
+      homepage.name: Calibre-Web
+      homepage.icon: sh-calibre-web.png
+      homepage.href: "{% if calibreweb_available_externally %}https://{{ calibreweb_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ calibreweb_port }}{% endif %}"
+      homepage.description: Nice calibre web interface

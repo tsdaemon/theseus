@@ -1,0 +1,33 @@
+---
+- name: Start ubooquity
+  block:
+    - name: Create ubooquity Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "770"
+      with_items:
+        - "{{ ubooquity_directory }}"
+        - "{{ ubooquity_config_directory }}"
+        - "{{ ubooquity_books_directory }}"
+        - "{{ ubooquity_comics_directory }}"
+        - "{{ ubooquity_raw_files_directory }}"
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ ubooquity_directory }}/docker-compose.yaml"
+        mode: '0440'
+
+    - name: Start ubooquity
+      community.docker.docker_compose_v2:
+        project_src: "{{ ubooquity_directory }}"
+  when: ubooquity_enabled
+
+- name: Stop ubooquity
+  community.docker.docker_compose_v2:
+    project_src: "{{ ubooquity_directory }}"
+    state: absent
+  when: not ubooquity_enabled

@@ -1,0 +1,37 @@
+---
+services:
+  ubooquity:
+    image: {{ ubooquity_image_name }}:{{ ubooquity_image_version }}
+    container_name: {{ ubooquity_container_name }}
+    environment:
+      - PUID={{ ubooquity_user_id }}
+      - PGID={{ ubooquity_group_id }}
+      - TZ={{ ansible_nas_timezone }}
+      - MAXMEM={{ ubooquity_memory_limit }}
+    volumes:
+      - {{ ubooquity_config_directory }}:/config
+      - {{ ubooquity_books_directory }}:/books
+      - {{ ubooquity_comics_directory }}:/comics
+      - {{ ubooquity_raw_files_directory }}:/files
+    ports:
+      - {{ ubooquity_port1 }}:2202
+      - {{ ubooquity_port2 }}:2203
+    restart: unless-stopped
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.ubooquity.rule: "Host(`{{ ubooquity_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.ubooquity.entrypoints: "web_local"
+      traefik.http.services.ubooquity.loadbalancer.server.port: "2202"
+{% if ubooquity_available_externally %}
+      traefik.http.routers.ubooquity-external.rule: "Host(`{{ ubooquity_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.ubooquity-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.ubooquity-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.ubooquity-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.ubooquity-external.entrypoints: "web,websecure"
+      traefik.http.routers.ubooquity-external.service: "ubooquity"
+{% endif %}
+      homepage.group: Applications
+      homepage.name: Ubooquity
+      homepage.icon: mdi-bookshelf
+      homepage.href: "{% if ubooquity_available_externally %}https://{{ ubooquity_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ ubooquity_port1 }}{% endif %}"
+      homepage.description: Book server

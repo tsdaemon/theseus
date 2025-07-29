@@ -1,0 +1,33 @@
+---
+- name: Start Calibre
+  block:
+    - name: Create Calibre Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: 0770
+      with_items:
+        - "{{ calibre_config_directory }}"
+        - "{{ calibreweb_config_directory }}"
+        - "{{ calibreweb_data_directory }}"
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ calibre_directory }}/docker-compose.yaml"
+        mode: '0440'
+
+    - name: Start Calibre
+      community.docker.docker_compose_v2:
+        project_src: "{{ calibre_directory }}"
+        state: present
+
+  when: calibre_enabled
+
+- name: Stop Calibre
+  community.docker.docker_compose_v2:
+    project_src: "{{ calibre_directory }}"
+    state: absent
+  when: not calibre_enabled
