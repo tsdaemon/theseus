@@ -1,0 +1,22 @@
+---
+frigate_enabled: false
+frigate_available_externally: false
+frigate_hostname: "frigate"
+
+# directories
+frigate_directory: "{{ docker_home }}/frigate"
+frigate_config_directory: "{{ frigate_directory }}/config"
+frigate_storage_directory: "{{ cameras_root }}"
+
+# network
+frigate_port_http: "8971"
+frigate_port_rtsp: "8554"
+frigate_port_webrtc: "8555"
+
+# docker
+frigate_container_name: "frigate"
+frigate_image_name: "ghcr.io/blakeblackshear/frigate"
+frigate_image_version: "stable"
+
+# specs
+frigate_shm_size: 400mb

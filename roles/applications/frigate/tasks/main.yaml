@@ -1,0 +1,32 @@
+---
+- name: Start Frigate
+  block:
+    - name: Create Frigate Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: 0770
+      with_items:
+        - "{{ frigate_config_directory }}"
+        - "{{ frigate_storage_directory }}"
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ frigate_directory }}/docker-compose.yaml"
+        mode: '0440'
+
+    - name: Start Frigate
+      community.docker.docker_compose_v2:
+        project_src: "{{ frigate_directory }}"
+        state: present
+
+  when: frigate_enabled
+
+- name: Stop Frigate
+  community.docker.docker_compose_v2:
+    project_src: "{{ frigate_directory }}"
+    state: absent
+  when: not frigate_enabled

@@ -39,6 +39,7 @@ books_root: "{{ media_root }}/books"
 comics_root: "{{ media_root }}/comics"
 photo_root: "{{ media_root }}/photo"
 archive_root: "{{ ansible_nas_data_root }}/archive"
+cameras_root: "{{ media_root }}/cameras"
 
 # Shares you want published over Samba.
 samba_shares:
@@ -90,6 +91,14 @@ samba_shares:
     browseable: yes
     path: "{{ archive_root }}"
 
+  - name: cameras
+    comment: "Cameras"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ cameras_root }}"
+
 # Applications
 
 ## ubooquity
@@ -104,6 +113,9 @@ dokku_enabled: false
 
 ## n8n
 n8n_enabled: true
+
+## frigate
+frigate_enabled: true
 
 ## calibre
 calibre_enabled: true
