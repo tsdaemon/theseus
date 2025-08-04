@@ -23,6 +23,7 @@ tasks:
       - mkdir -p roles/{{.CLI_ARGS}}/defaults
       - touch roles/{{.CLI_ARGS}}/tasks/main.yaml
       - touch roles/{{.CLI_ARGS}}/defaults/main.yaml
+      - touch roles/{{.CLI_ARGS}}/templates/docker-compose.yaml
 
   theseus:
     desc: Run Thesesus playbook

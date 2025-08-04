@@ -1,0 +1,42 @@
+services:
+  frigate:
+    container_name: {{ frigate_container_name }}
+    restart: unless-stopped
+    stop_grace_period: 30s # allow enough time to shut down the various services
+    image: "{{ frigate_image_name }}:{{ frigate_image_version }}"
+    shm_size: "{{ frigate_shm_size }}"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - {{ frigate_config_directory }}:/config
+      - {{ frigate_storage_directory }}:/media/frigate
+      - type: tmpfs
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    ports:
+      - "{{ frigate_port_http }}:8971"
+      # - "5000:5000" # Internal unauthenticated access. Expose carefully.
+      - "{{ frigate_port_rtsp }}:8554" # RTSP feeds
+      - "{{ frigate_port_webrtc }}:8555/tcp" # WebRTC over tcp
+      - "{{ frigate_port_webrtc }}:8555/udp" # WebRTC over udp
+    environment:
+      FRIGATE_RTSP_PASSWORD: "{{ frigate_rtsp_password }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.frigate.rule: "Host(`{{ frigate_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.frigate.entrypoints: "web_local"
+      traefik.http.services.frigate.loadbalancer.server.port: "8971"
+{% if frigate_available_externally %}
+      traefik.http.routers.frigate-external.rule: "Host(`{{ frigate_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.frigate-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.frigate-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.frigate-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.frigate-external.entrypoints: "web,websecure"
+      traefik.http.routers.frigate-external.service: "frigate"
+      traefik.http.routers.frigate-external.middlewares: "auth@file"
+{% endif %}
+      homepage.group: Applications
+      homepage.name: Frigate
+      homepage.icon: frigate
+      homepage.href: "{% if frigate_available_externally %}https://{{ frigate_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ frigate_port_http }}{% endif %}"
+      homepage.description: Camera recordings

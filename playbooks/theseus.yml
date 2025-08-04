@@ -199,3 +199,8 @@
       tags:
         - calibre
         - applications
+
+    - role: frigate
+      tags:
+        - frigate
+        - applications
