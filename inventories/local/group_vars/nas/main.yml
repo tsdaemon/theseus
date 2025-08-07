@@ -269,3 +269,6 @@ netdata_claim_url: "https://app.netdata.cloud"
 
 ## phoenix
 phoenix_enabled: true
+
+## watchtower
+watchtower_enabled: true

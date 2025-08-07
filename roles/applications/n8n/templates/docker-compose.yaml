@@ -12,6 +12,7 @@ services:
       - "{{ n8n_data_folder }}:/home/node/.n8n"
       - "{{ n8n_local_files_folder }}:/files"
       - "{{ docker_home }}/archiver:/archiver"
+      - "{{ archive_root }}:/archive"
     user: "node:{{ ansible_nas_group_id }}"
     labels:
       traefik.enable: "true"
