@@ -1,0 +1,30 @@
+---
+- name: Start Watchtower
+  block:
+    - name: Create Watchtower Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0770'
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+      with_items:
+        - "{{ watchtower_directory }}"
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ watchtower_directory }}/docker-compose.yaml"
+        mode: '0440'
+
+    - name: Start Watchtower
+      community.docker.docker_compose_v2:
+        project_src: "{{ watchtower_directory }}"
+
+  when: watchtower_enabled
+
+- name: Stop Watchtower
+  community.docker.docker_compose_v2:
+    project_src: "{{ watchtower_directory }}"
+    state: stopped
+  when: not watchtower_enabled

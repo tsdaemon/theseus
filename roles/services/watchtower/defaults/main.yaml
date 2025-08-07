@@ -1,0 +1,12 @@
+---
+# enable or disable the application
+watchtower_enabled: false
+
+# directories
+watchtower_directory: "{{ docker_home }}/watchtower"
+
+# network
+watchtower_api_port: 8989
+
+# docker
+watchtower_container_name: watchtower
