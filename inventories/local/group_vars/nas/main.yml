@@ -140,13 +140,10 @@ plex_config_directory: "{{ ansible_nas_data_root }}/data/plex"
 
 ## stash
 stash_enabled: true
-stash_available_externally: false
 stash_hostname: stash
 stash_data_content_directory: "{{ ansible_nas_data_root }}/private/stash/content"
 stash_blobs_directory: "{{ ansible_nas_data_root }}/private/stash/blobs"
 stash_generated_directory: "{{ ansible_nas_data_root }}/private/stash/generated"
-
-stash_qbittorrent_available_externally: false
 stash_qbittorrent_hostname: qb-stash
 
 # Storage

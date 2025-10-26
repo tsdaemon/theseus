@@ -20,8 +20,8 @@ services:
     restart: unless-stopped
     mem_limit: "{{ stash_qbittorrent_memory }}"
     labels:
+      traefik.enable: "true"
       traefik.http.routers.stash-qbittorrent.rule: "Host(`{{ stash_qbittorrent_hostname }}.{{ ansible_nas_local_domain }}`)"
-      traefik.http.routers.stash-qbittorrent.middlewares: "auth@file"
       traefik.http.routers.stash-qbittorrent.entrypoints: "web_local"
       traefik.http.services.stash-qbittorrent.loadbalancer.server.port: "8080"
 {% if stash_qbittorrent_available_externally %}
@@ -31,7 +31,6 @@ services:
       traefik.http.routers.stash-qbittorrent-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
       traefik.http.routers.stash-qbittorrent-external.entrypoints: "web,websecure"
       traefik.http.routers.stash-qbittorrent-external.service: "stash-qbittorrent"
-      traefik.http.routers.stash-qbittorrent-external.middlewares: "auth@file"
 {% endif %}
 
   stash:
