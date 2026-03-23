@@ -146,6 +146,12 @@ stash_blobs_directory: "{{ ansible_nas_data_root }}/private/stash/blobs"
 stash_generated_directory: "{{ ansible_nas_data_root }}/private/stash/generated"
 stash_qbittorrent_hostname: qb-stash
 
+## gramps
+gramps_enabled: true
+gramps_available_externally: true
+gramps_tree_name: "Anatolii Stehnii Family Tree"
+gramps_hostname: "gr"
+
 # Storage
 
 ## influxdb2
