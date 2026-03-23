@@ -1,0 +1,36 @@
+---
+- name: Start Gramps
+  block:
+    - name: Create Gramps Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "770"
+      with_items:
+        - "{{ gramps_directory }}"
+        - "{{ gramps_users_directory }}"
+        - "{{ gramps_index_directory }}"
+        - "{{ gramps_secret_directory }}"
+        - "{{ gramps_db_directory }}"
+        - "{{ gramps_media_directory }}"
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ gramps_directory }}/docker-compose.yaml"
+        mode: '0440'
+
+    - name: Start Gramps
+      community.docker.docker_compose_v2:
+        project_src: "{{ gramps_directory }}"
+        state: present
+
+  when: gramps_enabled
+
+- name: Stop Gramps
+  community.docker.docker_compose_v2:
+    project_src: "{{ gramps_directory }}"
+    state: stopped
+  when: not gramps_enabled

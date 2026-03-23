@@ -1,0 +1,23 @@
+---
+gramps_enabled: false
+gramps_available_externally: false
+
+# directories
+gramps_directory: "{{ docker_home }}/gramps"
+gramps_users_directory: "{{ gramps_directory }}/users"
+gramps_index_directory: "{{ gramps_directory }}/indexdir"
+gramps_secret_directory: "{{ gramps_directory }}/secret"
+gramps_db_directory: "{{ gramps_directory }}/db"
+gramps_media_directory: "{{ media_root }}/gramps"
+
+# network
+gramps_hostname: "gramps"
+gramps_port: "5000"
+
+# docker
+gramps_container_name: "gramps"
+gramps_image_name: "ghcr.io/gramps-project/grampsweb"
+gramps_image_version: "latest"
+
+# application
+gramps_tree_name: "My Tree"

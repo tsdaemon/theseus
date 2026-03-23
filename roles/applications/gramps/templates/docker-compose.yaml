@@ -1,0 +1,64 @@
+---
+name: "gramps"
+
+services:
+  gramps: &grampsweb
+    container_name: "{{ gramps_container_name }}"
+    image: "{{ gramps_image_name }}:{{ gramps_image_version }}"
+    restart: always
+    ports:
+      - "{{ gramps_port }}:5000"  # host:docker
+    environment:
+      GRAMPSWEB_TREE: "{{ gramps_tree_name }}"  # will create a new tree if not exists
+      GRAMPSWEB_CELERY_CONFIG__broker_url: "redis://gramps_redis:6379/0"
+      GRAMPSWEB_CELERY_CONFIG__result_backend: "redis://gramps_redis:6379/0"
+      GRAMPSWEB_RATELIMIT_STORAGE_URI: redis://gramps_redis:6379/1
+    depends_on:
+      - gramps_redis
+    volumes:
+      - "{{ gramps_users_directory }}:/app/users"  # persist user database
+      - "{{ gramps_index_directory }}:/app/indexdir"  # persist search index
+      - gramps_thumb_cache:/app/thumbnail_cache  # persist thumbnails
+      - gramps_cache:/app/cache  # persist export and report caches
+      - "{{ gramps_secret_directory }}:/app/secret"  # persist flask secret
+      - "{{ gramps_db_directory }}:/root/.gramps/grampsdb"  # persist Gramps database
+      - "{{ gramps_media_directory }}:/app/media"  # persist media files
+      - gramps_tmp:/tmp
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.gramps.rule: "Host(`{{ gramps_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.gramps.entrypoints: "web_local"
+      traefik.http.services.gramps.loadbalancer.server.port: "5000"
+{% if gramps_available_externally %}
+      traefik.http.routers.gramps-external.rule: "Host(`{{ gramps_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.gramps-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.gramps-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.gramps-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.gramps-external.entrypoints: "web,websecure"
+      traefik.http.routers.gramps-external.service: "gramps"
+{% endif %}
+      homepage.group: "Applications"
+      homepage.name: Grapmps
+      homepage.icon: mdi-family-tree
+      homepage.href: "{% if gramps_available_externally %}https://{{ gramps_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ gramps_port }}{% endif %}"
+      homepage.description: Family tree management
+
+  gramps_celery:
+    <<: *grampsweb  # YAML merge key copying the entire grampsweb service config
+    ports: []
+    container_name: "{{ gramps_container_name }}_celery"
+    depends_on:
+      - gramps
+      - gramps_redis
+    command: celery -A gramps_webapi.celery worker --loglevel=INFO --concurrency=2
+    labels: []
+
+  gramps_redis:
+    container_name: "{{ gramps_container_name }}_redis"
+    image: docker.io/library/redis:7.2.4-alpine
+    restart: always
+
+volumes:
+  gramps_thumb_cache:
+  gramps_cache:
+  gramps_tmp:
