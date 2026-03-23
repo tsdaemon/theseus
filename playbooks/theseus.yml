@@ -209,3 +209,8 @@
       tags:
         - frigate
         - applications
+
+    - role: gramps
+      tags:
+        - gramps
+        - applications
