@@ -152,6 +152,10 @@ gramps_available_externally: true
 gramps_tree_name: "Anatolii Stehnii Family Tree"
 gramps_hostname: "gr"
 
+## baserow
+baserow_enabled: false
+baserow_hostname: br
+
 # Storage
 
 ## influxdb2
