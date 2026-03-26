@@ -1,0 +1,35 @@
+name: baserow
+
+services:
+  baserow:
+    container_name: "{{ baserow_container_name }}"
+    image: "{{ baserow_image_name }}:{{ baserow_image_version }}"
+    pull_policy: always
+    restart: always
+    ports:
+      - "{{ baserow_port }}:80"
+    volumes:
+      - "{{ baserow_data_directory }}:/baserow/data"
+    environment:
+      BASEROW_PUBLIC_URL: "{% if baserow_available_externally %}https://{{ baserow_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ baserow_port }}{% endif %}"
+{% if baserow_available_externally %}
+      BASEROW_ENABLE_SECURE_PROXY_SSL_HEADER: "true"
+{% endif %}
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.baserow.rule: "Host(`{{ baserow_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.baserow.entrypoints: "web_local"
+      traefik.http.services.baserow.loadbalancer.server.port: "80"
+{% if baserow_available_externally %}
+      traefik.http.routers.baserow-external.rule: "Host(`{{ baserow_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.baserow-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.baserow-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.baserow-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.baserow-external.entrypoints: "web,websecure"
+      traefik.http.routers.baserow-external.service: "baserow"
+{% endif %}
+      homepage.group: "Applications"
+      homepage.name: "Baserow"
+      homepage.icon: mdi-table-large
+      homepage.href: "{% if baserow_available_externally %}https://{{ baserow_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ baserow_port }}{% endif %}"
+      homepage.description: "Open-source no-code database"

@@ -214,3 +214,8 @@
       tags:
         - gramps
         - applications
+
+    - role: baserow
+      tags:
+        - baserow
+        - applications

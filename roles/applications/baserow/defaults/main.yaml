@@ -1,0 +1,14 @@
+baserow_enabled: false
+baserow_available_externally: false
+
+baserow_folder: "{{ docker_home }}/baserow"
+baserow_data_directory: "{{ baserow_folder }}/data"
+
+baserow_hostname: baserow
+baserow_port: 8580
+
+baserow_container_name: baserow
+baserow_image_name: baserow/baserow
+baserow_image_version: "2.1.6"
+
+baserow_uid: 9999

@@ -1,0 +1,31 @@
+---
+- name: Start Baserow
+  block:
+    - name: Create Baserow directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ baserow_uid }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "2770"
+      loop:
+        - "{{ baserow_data_directory }}"
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ baserow_folder }}/docker-compose.yaml"
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "0640"
+
+    - name: Start Baserow
+      community.docker.docker_compose_v2:
+        project_src: "{{ baserow_folder }}"
+  when: baserow_enabled
+
+- name: Stop Baserow
+  community.docker.docker_compose_v2:
+    project_src: "{{ baserow_folder }}"
+    state: stopped
+  when: not baserow_enabled
