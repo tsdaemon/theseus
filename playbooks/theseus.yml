@@ -219,3 +219,8 @@
       tags:
         - baserow
         - applications
+
+    - role: adminer
+      tags:
+        - adminer
+        - applications

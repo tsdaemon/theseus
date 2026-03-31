@@ -156,6 +156,11 @@ gramps_hostname: "gr"
 baserow_enabled: false
 baserow_hostname: br
 
+## adminer
+adminer_enabled: false
+adminer_available_externally: false
+adminer_hostname: db
+
 # Storage
 
 ## influxdb2
@@ -165,6 +170,13 @@ influxdb2_data_directory: "{{ ansible_nas_data_root }}/data/influxdb2"
 ## mariadb
 mariadb_enabled: true
 mariadb_data_directory: "{{ ansible_nas_data_root }}/data/mariadb"
+mariadb_databases:
+  - name: homeassistant
+mariadb_users:
+  - name: homeassistant
+    database: homeassistant
+    host: "%"
+    privileges: "ALL"
 
 # Services
 
@@ -250,6 +262,9 @@ wireguard_enabled: true
 
 ## portainer
 portainer_enabled: true
+
+## mariadb
+
 
 # o11y
 

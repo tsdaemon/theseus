@@ -11,26 +11,97 @@
       with_items:
         - "{{ mariadb_config_directory }}"
         - "{{ mariadb_data_directory }}"
+        - "{{ mariadb_data_directory }}/run"
 
-    - name: Create MariaDB Docker Container
-      community.docker.docker_container:
-        name: "{{ mariadb_container_name }}"
-        image: mariadb:latest
-        pull: true
-        volumes:
-          - "{{ mariadb_data_directory }}:/var/lib/mysql:rw"
-          - "{{ mariadb_config_directory }}:/etc/mysql:rw"
-        ports:
-          - "{{ mariadb_tcp_port }}:3306"
-        restart_policy: unless-stopped
-        env:
-          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "true"
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ mariadb_data_directory }}/docker-compose.yaml"
+        mode: '0440'
+
+    - name: Remove MariaDB transaction coordinator log (tc.log) if present
+      ansible.builtin.file:
+        path: "{{ mariadb_data_directory }}/tc.log"
+        state: absent
+
+    - name: Start MariaDB
+      community.docker.docker_compose_v2:
+        project_src: "{{ mariadb_data_directory }}"
+        state: present
+
+    - name: Install MariaDB provisioning dependencies
+      ansible.builtin.apt:
+        name:
+          - python3
+          - python3-pymysql
+        state: present
+
+    - name: Wait for MariaDB to accept connections (unix socket)
+      community.mysql.mysql_info:
+        filter: version
+        login_unix_socket: "{{ mariadb_data_directory }}/run/mysqld.sock"
+        login_user: root
+        login_password: >-
+          {{ mariadb_root_password if (mariadb_root_password | length > 0) else omit }}
+        config_file: ""
+      register: mariadb_info
+      retries: 30
+      delay: 2
+      until: mariadb_info is succeeded
+
+    - name: Ensure MariaDB secrets directory exists (controller)
+      ansible.builtin.file:
+        path: "{{ mariadb_secrets_dir }}"
+        state: directory
+        mode: "0700"
+      delegate_to: localhost
+      become: false
+
+    - name: Provision MariaDB databases
+      community.mysql.mysql_db:
+        name: "{{ item.name | default(item) }}"
+        encoding: "{{ item.charset | default('utf8mb4') }}"
+        collation: "{{ item.collation | default('utf8mb4_unicode_ci') }}"
+        state: present
+        login_unix_socket: "{{ mariadb_data_directory }}/run/mysqld.sock"
+        login_user: root
+        login_password: >-
+          {{ mariadb_root_password if (mariadb_root_password | length > 0) else omit }}
+        config_file: ""
+      loop: "{{ mariadb_databases }}"
+      when: mariadb_databases | length > 0
+
+    - name: Provision MariaDB users
+      community.mysql.mysql_user:
+        name: "{{ item.name }}"
+        password: >-
+          {{
+            item.password
+            | default(
+                lookup(
+                  'password',
+                  mariadb_secrets_dir ~ '/' ~ item.name ~
+                  ' length=32 chars=ascii_letters,digits'
+                )
+              )
+          }}
+        host: "{{ item.host | default('%') }}"
+        priv: "{{ item.database }}.*:{{ item.privileges | default('ALL') }}"
+        state: present
+        update_password: on_create
+        login_unix_socket: "{{ mariadb_data_directory }}/run/mysqld.sock"
+        login_user: root
+        login_password: >-
+          {{ mariadb_root_password if (mariadb_root_password | length > 0) else omit }}
+        config_file: ""
+      loop: "{{ mariadb_users }}"
+      when: mariadb_users | length > 0
   when: mariadb_enabled is true
 
 - name: Stop MariaDB
   block:
     - name: Stop MariaDB
-      community.docker.docker_container:
-        name: "{{ mariadb_container_name }}"
-        state: absent
+      community.docker.docker_compose_v2:
+        project_src: "{{ mariadb_data_directory }}"
+        state: stopped
   when: mariadb_enabled is false

@@ -1,0 +1,26 @@
+---
+name: mariadb
+
+services:
+  mariadb:
+    container_name: "{{ mariadb_container_name }}"
+    image: mariadb:latest
+    restart: unless-stopped
+    ports:
+      - "{{ mariadb_tcp_port }}:3306"
+    volumes:
+      - "{{ mariadb_data_directory }}:/var/lib/mysql:rw"
+      - "{{ mariadb_config_directory }}:/etc/mysql:rw"
+      - "{{ mariadb_data_directory }}/run:/var/run/mysqld:rw"
+    environment:
+{% if mariadb_root_password | length > 0 %}
+      MARIADB_ROOT_PASSWORD: "{{ mariadb_root_password }}"
+{% else %}
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "true"
+{% endif %}
+    networks:
+      - "{{ docker_network_name }}"
+
+networks:
+  "{{ docker_network_name }}":
+    external: true
