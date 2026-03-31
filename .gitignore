@@ -4,6 +4,7 @@ site
 *.retry
 *.log
 secrets.yaml
+.secrets/
 .cache
 bertvv.samba
 geerlingguy.docker

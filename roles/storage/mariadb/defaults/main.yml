@@ -10,3 +10,24 @@ mariadb_tcp_port: "3306"
 
 # docker
 mariadb_container_name: mariadb
+
+# Auth
+# If empty, the container is started with an empty root password.
+mariadb_root_password: ""
+
+# Provisioning (optional)
+# Password generation storage (controller machine). Values are persisted here so
+# omitting `mariadb_users[].password` does not rotate credentials on each run.
+mariadb_secrets_dir: "{{ playbook_dir }}/.secrets/mariadb"
+
+# Example:
+# mariadb_databases:
+#   - name: app_db
+# mariadb_users:
+#   - name: app_user
+#     password: "change-me"
+#     database: app_db
+#     host: "%"
+#     privileges: "ALL"
+mariadb_databases: []
+mariadb_users: []
