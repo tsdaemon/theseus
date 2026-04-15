@@ -1,12 +1,10 @@
 [entryPoints]
+{% if ansible_nas_external_access_enabled | default(true) %}
   [entryPoints.web]
     address = ":{{ traefik_port_http_external }}"
 
   [entryPoints.web.http.redirections.entryPoint]
     to = "websecure"
-
-  [entryPoints.web_local]
-    address = ":{{ traefik_port_http_local }}"
 
   [entryPoints.websecure]
     address = ":{{ traefik_port_https }}"
@@ -19,6 +17,10 @@
           sans = [
             "*.{{ ansible_nas_domain }}"
           ]
+
+{% endif %}
+  [entryPoints.web_local]
+    address = ":{{ traefik_port_http_local }}"
 
   [entryPoints.traefik]
     address = ":{{ traefik_port_ui }}"
