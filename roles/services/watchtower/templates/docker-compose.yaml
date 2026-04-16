@@ -18,6 +18,6 @@ services:
       homepage.group: Services
       homepage.name: Watchtower
       homepage.icon: watchtower.png
-      homepage.widget.type: watchtower
-      homepage.widget.url: http://{{ ansible_nas_ip }}:{{ watchtower_api_port }}
-      homepage.widget.key: {{ watchtower_http_api_token }}
+      # homepage.widget.type: watchtower
+      # homepage.widget.url: http://{{ ansible_nas_ip }}:{{ watchtower_api_port }}
+      # homepage.widget.key: {{ watchtower_http_api_token }}
