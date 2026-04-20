@@ -1,0 +1,25 @@
+---
+bambuddy_enabled: false
+
+# directories
+bambuddy_directory: "{{ docker_home }}/bambuddy"
+bambuddy_data_directory: "{{ bambuddy_directory }}/data"
+bambuddy_logs_directory: "{{ bambuddy_directory }}/logs"
+bambuddy_virtual_printer_directory: "{{ bambuddy_directory }}/virtual_printer"
+
+# docker
+bambuddy_container_name: "bambuddy"
+bambuddy_image_name: "ghcr.io/maziggy/bambuddy"
+bambuddy_image_version: "latest"
+
+# application
+bambuddy_available_externally: false
+bambuddy_hostname: "bambuddy"
+bambuddy_port: "8000"
+bambuddy_timezone: "{{ ansible_nas_timezone }}"
+
+# Proxy mode: allow binding to privileged ports (322, 990) as non-root user
+bambuddy_cap_add_net_bind_service: true
+
+# Virtual printer: required for FTP passive mode when behind NAT (bridge mode)
+bambuddy_virtual_printer_pasv_address: ""
