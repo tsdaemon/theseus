@@ -1,0 +1,45 @@
+---
+name: "bambuddy"
+
+services:
+  bambuddy:
+    container_name: "{{ bambuddy_container_name }}"
+    image: "{{ bambuddy_image_name }}:{{ bambuddy_image_version }}"
+    restart: unless-stopped
+
+    # Run as current user to avoid permission issues with mounted volumes
+    user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
+
+{% if bambuddy_cap_add_net_bind_service %}
+    cap_add:
+      - NET_BIND_SERVICE
+{% endif %}
+
+    # LINUX: Use host mode for printer discovery and camera streaming
+    network_mode: host
+
+    volumes:
+      - "{{ bambuddy_data_directory }}:/app/data"
+      - "{{ bambuddy_logs_directory }}:/app/logs"
+      - "{{ bambuddy_virtual_printer_directory }}:/app/data/virtual_printer"
+
+    environment:
+      TZ: "{{ bambuddy_timezone }}"
+      PORT: "{{ bambuddy_port }}"
+{% if bambuddy_virtual_printer_pasv_address | default('') | length > 0 %}
+      VIRTUAL_PRINTER_PASV_ADDRESS: "{{ bambuddy_virtual_printer_pasv_address }}"
+{% endif %}
+
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.bambuddy.rule: "Host(`{{ bambuddy_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.bambuddy.entrypoints: "web_local"
+      traefik.http.services.bambuddy.loadbalancer.server.port: "{{ bambuddy_port }}"
+{% if bambuddy_available_externally %}
+      traefik.http.routers.bambuddy-external.rule: "Host(`{{ bambuddy_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.bambuddy-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.bambuddy-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.bambuddy-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.bambuddy-external.entrypoints: "web,websecure"
+      traefik.http.routers.bambuddy-external.service: "bambuddy"
+{% endif %}

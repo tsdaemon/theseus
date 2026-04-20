@@ -219,3 +219,8 @@
       tags:
         - baserow
         - applications
+
+    - role: bambuddy
+      tags:
+        - bambuddy
+        - applications

@@ -155,14 +155,9 @@ gramps_available_externally: true
 gramps_tree_name: "Anatolii Stehnii Family Tree"
 gramps_hostname: "gr"
 
-## baserow
-baserow_enabled: false
-baserow_hostname: br
-
-## adminer
-adminer_enabled: false
-adminer_available_externally: false
-adminer_hostname: db
+## bambuddy
+bambuddy_enabled: true
+bambuddy_port: "18000"
 
 # Storage
 
