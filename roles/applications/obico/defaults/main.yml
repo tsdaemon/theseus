@@ -1,0 +1,10 @@
+---
+obico_enabled: false
+
+# directories
+obico_directory: "{{ docker_home }}/obico"
+
+# application
+obico_available_externally: false
+obico_hostname: "obico"
+obico_timezone: "{{ ansible_nas_timezone }}"

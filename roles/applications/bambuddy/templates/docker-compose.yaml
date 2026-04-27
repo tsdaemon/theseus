@@ -43,3 +43,24 @@ services:
       traefik.http.routers.bambuddy-external.entrypoints: "web,websecure"
       traefik.http.routers.bambuddy-external.service: "bambuddy"
 {% endif %}
+      homepage.group: Applications
+      homepage.name: BambuDDY
+      homepage.icon: sh-bambuddy.png
+      homepage.href: "{% if bambuddy_available_externally %}https://{{ bambuddy_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ bambuddy_port }}{% endif %}"
+      homepage.description: 3D printing
+
+  obico_ml:
+    restart: unless-stopped
+    build:
+      context: '{{ bambuddy_obico_directory }}/ml_api'
+    environment:
+      DEBUG: 'True'
+      FLASK_APP: 'server.py'
+    tty: true
+    command: bash -c "gunicorn --bind 0.0.0.0:3333 --workers 1 wsgi"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider --no-check-certificate http://obico_ml:3333/hc/"]
+      start_period: 30s
+      interval: 30s
+      timeout: 10s
+      retries: 3

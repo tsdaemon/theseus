@@ -14,6 +14,13 @@
         - "{{ bambuddy_logs_directory }}"
         - "{{ bambuddy_virtual_printer_directory }}"
 
+    - name: Clone obico repository
+      ansible.builtin.git:
+        repo: "https://github.com/TheSpaghettiDetective/obico-server.git"
+        dest: "{{ bambuddy_obico_directory }}"
+        version: "release"
+        force: true
+
     - name: Create docker-compose.yaml
       ansible.builtin.template:
         src: docker-compose.yaml

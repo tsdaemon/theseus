@@ -224,3 +224,8 @@
       tags:
         - bambuddy
         - applications
+
+    - role: obico
+      tags:
+        - obico
+        - applications

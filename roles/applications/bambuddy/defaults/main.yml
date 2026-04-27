@@ -6,6 +6,7 @@ bambuddy_directory: "{{ docker_home }}/bambuddy"
 bambuddy_data_directory: "{{ bambuddy_directory }}/data"
 bambuddy_logs_directory: "{{ bambuddy_directory }}/logs"
 bambuddy_virtual_printer_directory: "{{ bambuddy_directory }}/virtual_printer"
+bambuddy_obico_directory: "{{ bambuddy_directory }}/obico"
 
 # docker
 bambuddy_container_name: "bambuddy"
