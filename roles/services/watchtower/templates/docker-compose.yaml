@@ -4,7 +4,7 @@ name: watchtower
 services:
   watchtower:
     container_name: "{{ watchtower_container_name }}"
-    image: containrrr/watchtower:latest
+    image: "{{ watchtower_image_name }}:{{ watchtower_image_version }}"
     pull_policy: always
     ports:
       - "{{ watchtower_api_port }}:8080"
@@ -12,12 +12,14 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
     environment:
+      WATCHTOWER_UPDATE_ON_START: "true"
       WATCHTOWER_HTTP_API_TOKEN: "{{ watchtower_http_api_token }}"
       WATCHTOWER_HTTP_API_METRICS: "true"
+      TZ: "{{ ansible_nas_timezone }}"
     labels:
       homepage.group: Services
       homepage.name: Watchtower
       homepage.icon: watchtower.png
-      # homepage.widget.type: watchtower
-      # homepage.widget.url: http://{{ ansible_nas_ip }}:{{ watchtower_api_port }}
-      # homepage.widget.key: {{ watchtower_http_api_token }}
+      homepage.widget.type: watchtower
+      homepage.widget.url: http://{{ ansible_nas_ip }}:{{ watchtower_api_port }}
+      homepage.widget.key: {{ watchtower_http_api_token }}
