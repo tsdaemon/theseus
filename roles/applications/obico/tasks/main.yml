@@ -1,0 +1,28 @@
+---
+- name: Start obico
+  block:
+    - name: Clone obico repository
+      ansible.builtin.git:
+        repo: "https://github.com/TheSpaghettiDetective/obico-server.git"
+        dest: "{{ obico_directory }}"
+        version: "release"
+        force: true
+
+    - name: Rewrite docker-compose.yml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ obico_directory }}/docker-compose.yml"
+        mode: '0440'
+
+    - name: Start obico
+      community.docker.docker_compose_v2:
+        project_src: "{{ obico_directory }}"
+        state: present
+    # https://www.obico.io/docs/server-guides/configure/#4-add-a-site-to-your-obico-server
+  when: obico_enabled
+
+- name: Stop obico
+  community.docker.docker_compose_v2:
+    project_src: "{{ obico_directory }}"
+    state: stopped
+  when: not obico_enabled

@@ -159,6 +159,10 @@ gramps_hostname: "gr"
 bambuddy_enabled: true
 bambuddy_port: "18000"
 
+## obico
+obico_enabled: false
+obico_port: "3334"
+
 # Storage
 
 ## influxdb2
@@ -221,15 +225,19 @@ homepage_services_yaml:
           icon: home-assistant.png
           href: "http://192.168.0.100/"
           description: Home Assistant
+
 homepage_settings_yaml:
   title: "Theseus Homepage"
   language: "en-GB"
   showStats: true
   layout:
     - Applications:
-    - Services:
-    - Networking:
+        style: row
+        columns: 5
+    - 3D printing:
     - Monitoring:
+    - Networking:
+    - Services:
     - External:
   maxGroupColumns: 8
   useEqualHeights: true
