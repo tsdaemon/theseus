@@ -46,7 +46,7 @@ services:
       homepage.group: Applications
       homepage.name: BambuDDY
       homepage.icon: sh-bambuddy.png
-      homepage.href: "{% if bambuddy_available_externally %}https://{{ bambuddy_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ bambuddy_port }}{% endif %}"
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ bambuddy_port }}"
       homepage.description: 3D printing
 
   obico_ml:

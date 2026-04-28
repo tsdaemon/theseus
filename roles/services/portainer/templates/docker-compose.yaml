@@ -30,7 +30,7 @@ services:
       homepage.group: Services
       homepage.name: Portainer
       homepage.icon: portainer.png
-      homepage.href: "{% if portainer_available_externally %}https://{{ portainer_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ portainer_port }}{% endif %}"
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ portainer_port }}"
       homepage.description: Container management
       homepage.widget.type: portainer
       homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ portainer_port }}"

@@ -115,7 +115,7 @@ coolify_enabled: false
 dokku_enabled: false
 
 ## n8n
-n8n_enabled: true
+n8n_enabled: false
 
 ## frigate
 frigate_enabled: true
@@ -296,7 +296,7 @@ netdata_claim_rooms: "07487960-50b7-4f28-b9ff-70980ebe3832"
 netdata_claim_url: "https://app.netdata.cloud"
 
 ## phoenix
-phoenix_enabled: true
+phoenix_enabled: false
 
 ## watchtower
 watchtower_enabled: true

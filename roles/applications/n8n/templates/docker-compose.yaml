@@ -30,7 +30,7 @@ services:
       homepage.group: "Applications"
       homepage.name: "N8N"
       homepage.icon: "n8n.png"
-      homepage.href: "{% if n8n_available_externally %}https://{{ n8n_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ n8n_port }}{% endif %}"
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ n8n_port }}"
       homepage.description: "Workflow automation"
     environment:
       N8N_EMAIL_MODE: "smtp"

@@ -36,7 +36,7 @@ services:
       homepage.group: Applications
       homepage.name: Calibre
       homepage.icon: sh-calibre.png
-      homepage.href: "{% if calibre_available_externally %}https://{{ calibre_hostname }}.{{ ansible_nas_domain }}{% else %}https://{{ ansible_nas_ip }}:{{ calibre_webserver_port }}{% endif %}"
+      homepage.href: "https://{{ ansible_nas_ip }}:{{ calibre_webserver_port }}"
       homepage.description: E-book management
 
   calibreweb:
@@ -71,5 +71,5 @@ services:
       homepage.group: Applications
       homepage.name: Calibre-Web
       homepage.icon: sh-calibre-web.png
-      homepage.href: "{% if calibreweb_available_externally %}https://{{ calibreweb_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ calibreweb_port }}{% endif %}"
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ calibreweb_port }}"
       homepage.description: Nice calibre web interface

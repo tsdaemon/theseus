@@ -53,7 +53,7 @@ services:
       homepage.group: "Applications"
       homepage.name: "Coolify"
       homepage.icon: "sh-coolify.png"
-      homepage.href: "{% if coolify_available_externally %}https://{{ coolify_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ coolify_port }}{% endif %}"
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ coolify_port }}"
       homepage.description: "Application management"
     user: "{{ coolify_user_id }}:{{ ansible_nas_group_id }}"
   postgres:

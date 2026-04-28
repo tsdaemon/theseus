@@ -28,6 +28,7 @@ plex_audiobooks_permissions: "rw"
 
 # network
 plex_hostname: "plex"
+plex_port: "32400"
 
 # docker
 plex_container_name: "plex"

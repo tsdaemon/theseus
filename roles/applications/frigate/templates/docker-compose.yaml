@@ -38,5 +38,5 @@ services:
       homepage.group: Applications
       homepage.name: Frigate
       homepage.icon: frigate
-      homepage.href: "{% if frigate_available_externally %}https://{{ frigate_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ frigate_port_http }}{% endif %}"
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ frigate_port_http }}"
       homepage.description: Camera recordings
