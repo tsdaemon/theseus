@@ -38,5 +38,5 @@ services:
       homepage.group: Services
       homepage.name: Duplicati
       homepage.icon: duplicati.png
-      homepage.href: "{% if duplicati_available_externally %}https://{{ duplicati_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ duplicati_port }}{% endif %}"
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ duplicati_port }}"
       homepage.description: Backup client

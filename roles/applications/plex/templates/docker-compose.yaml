@@ -29,7 +29,7 @@ services:
       traefik.enable: "true"
       traefik.http.routers.plex.rule: "Host(`{{ plex_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.plex.entrypoints: "web_local"
-      traefik.http.services.plex.loadbalancer.server.port: "32400"
+      traefik.http.services.plex.loadbalancer.server.port: "{{ plex_port }}"
 {% if plex_available_externally %}
       traefik.http.routers.plex-external.rule: "Host(`{{ plex_hostname }}.{{ ansible_nas_domain }}`)"
       traefik.http.routers.plex-external.tls.certresolver: "letsencrypt"
@@ -41,8 +41,8 @@ services:
       homepage.group: "Applications"
       homepage.name: Plex
       homepage.icon: plex
-      homepage.href: "{% if plex_available_externally %}https://{{ plex_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:32400{% endif %}"
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ plex_port }}"
       homepage.description: Media server
       homepage.widget.type: plex
-      homepage.widget.url: "http://{{ ansible_nas_ip }}:32400"
+      homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ plex_port }}"
       homepage.widget.key: "{{ plex_token }}"

@@ -31,5 +31,5 @@ services:
       homepage.group: "Applications"
       homepage.name: "Baserow"
       homepage.icon: mdi-table-large
-      homepage.href: "{% if baserow_available_externally %}https://{{ baserow_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ baserow_port }}{% endif %}"
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ baserow_port }}"
       homepage.description: "Open-source no-code database"

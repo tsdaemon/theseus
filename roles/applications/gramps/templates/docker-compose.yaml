@@ -38,9 +38,9 @@ services:
       traefik.http.routers.gramps-external.service: "gramps"
 {% endif %}
       homepage.group: "Applications"
-      homepage.name: Grapmps
+      homepage.name: "Gramps"
       homepage.icon: mdi-family-tree
-      homepage.href: "{% if gramps_available_externally %}https://{{ gramps_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ gramps_port }}{% endif %}"
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ gramps_port }}"
       homepage.description: Family tree management
 
   gramps_celery:

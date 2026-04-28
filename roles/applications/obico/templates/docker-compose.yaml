@@ -100,7 +100,7 @@ services:
       homepage.group: 3D printing
       homepage.name: Obico
       homepage.icon: sh-obico.png
-      homepage.href: "{% if obico_available_externally %}https://{{ obico_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ obico_port }}{% endif %}"
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ obico_port }}"
       homepage.description: Obico
 
   tasks:
