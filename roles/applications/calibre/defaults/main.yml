@@ -9,7 +9,7 @@ calibre_config_directory: "{{ calibre_directory }}/config"
 calibreweb_directory: "{{ calibre_directory }}/web"
 calibreweb_config_directory: "{{ calibreweb_directory }}/config"
 calibreweb_data_directory: "{{ calibreweb_directory }}/data"
-calibreweb_books_directory: "{{ calibre_config_directory }}/Calibre Library"
+calibreweb_books_directory: "{{ books_root }}/Calibre Library"
 
 # network
 calibre_port: "8093"

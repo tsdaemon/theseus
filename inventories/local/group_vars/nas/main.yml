@@ -104,16 +104,6 @@ samba_shares:
 
 # Applications
 
-## ubooquity
-ubooquity_enabled: false
-ubooquity_hostname: books
-
-## coolify
-coolify_enabled: false
-
-## dokku
-dokku_enabled: false
-
 ## n8n
 n8n_enabled: false
 
@@ -125,7 +115,7 @@ calibre_enabled: true
 
 ## immich
 immich_enabled: true
-immich_available_externally: true
+immich_available_externally: false
 immich_hostname: im
 
 ## qbittorrent
@@ -151,7 +141,7 @@ stash_qbittorrent_hostname: qb-stash
 
 ## gramps
 gramps_enabled: true
-gramps_available_externally: true
+gramps_available_externally: false
 gramps_tree_name: "Anatolii Stehnii Family Tree"
 gramps_hostname: "gr"
 
@@ -253,6 +243,7 @@ homepage_settings_yaml:
 duplicati_enabled: true
 duplicati_available_externally: false
 duplicati_hostname: dpl
+duplicati_data_permissions: rw
 
 ## cloudcmd
 cloudcmd_enabled: true
