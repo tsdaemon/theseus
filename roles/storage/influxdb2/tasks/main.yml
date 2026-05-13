@@ -13,24 +13,21 @@
         - "{{ influxdb2_directory }}/wal"
         - "{{ influxdb2_data_directory }}"
 
-    - name: Create InfluxDB2 Docker Container
-      community.docker.docker_container:
-        name: "{{ influxdb2_container_name }}"
-        image: influxdb:2
-        pull: true
-        volumes:
-          - "{{ influxdb2_directory }}/config:/etc/influxdb2:rw"
-          - "{{ influxdb2_directory }}/wal:/var/lib/influxdb2/engine/wal:rw"
-          - "{{ influxdb2_data_directory }}:/var/lib/influxdb2:rw"
-        ports:
-          - "{{ influxdb2_tcp_port }}:8086/tcp"
-        restart_policy: unless-stopped
-  when: influxdb2_enabled is true
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ influxdb2_directory }}/docker-compose.yaml"
+        mode: "0440"
+
+    - name: Start InfluxDB2
+      community.docker.docker_compose_v2:
+        project_src: "{{ influxdb2_directory }}"
+  when: influxdb2_enabled
 
 - name: Stop InfluxDB2
   block:
     - name: Stop InfluxDB2
-      community.docker.docker_container:
-        name: "{{ influxdb2_container_name }}"
-        state: absent
-  when: influxdb2_enabled is false
+      community.docker.docker_compose_v2:
+        project_src: "{{ influxdb2_directory }}"
+        state: stopped
+  when: not influxdb2_enabled

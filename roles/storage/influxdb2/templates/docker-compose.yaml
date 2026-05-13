@@ -1,0 +1,33 @@
+---
+name: influxdb2
+
+services:
+  influxdb2:
+    container_name: "{{ influxdb2_container_name }}"
+    image: "{{ influxdb2_image }}"
+    pull_policy: always
+    ports:
+      - "{{ influxdb2_tcp_port }}:8086"
+    volumes:
+      - "{{ influxdb2_directory }}/config:/etc/influxdb2:rw"
+      - "{{ influxdb2_directory }}/wal:/var/lib/influxdb2/engine/wal:rw"
+      - "{{ influxdb2_data_directory }}:/var/lib/influxdb2:rw"
+    restart: unless-stopped
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.influxdb2.rule: "Host(`{{ influxdb2_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.influxdb2.entrypoints: "web_local"
+      traefik.http.services.influxdb2.loadbalancer.server.port: "8086"
+{% if influxdb2_available_externally %}
+      traefik.http.routers.influxdb2-external.rule: "Host(`{{ influxdb2_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.influxdb2-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.influxdb2-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.influxdb2-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.influxdb2-external.entrypoints: "web,websecure"
+      traefik.http.routers.influxdb2-external.service: "influxdb2"
+{% endif %}
+      homepage.group: Monitoring
+      homepage.name: InfluxDB
+      homepage.icon: influxdb
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ influxdb2_tcp_port }}"
+      homepage.description: Time-series database
