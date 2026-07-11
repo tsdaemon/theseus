@@ -10,6 +10,7 @@
         mode: "2770"
       loop:
         - "{{ baserow_data_directory }}"
+        - "{{ baserow_database_directory }}"
 
     - name: Create docker-compose.yaml
       ansible.builtin.template:

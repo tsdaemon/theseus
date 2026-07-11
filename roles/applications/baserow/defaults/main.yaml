@@ -3,6 +3,10 @@ baserow_available_externally: false
 
 baserow_folder: "{{ docker_home }}/baserow"
 baserow_data_directory: "{{ baserow_folder }}/data"
+baserow_database_directory: "{{ baserow_folder }}/postgres"
+
+baserow_db_user: baserow
+baserow_db_name: baserow
 
 baserow_hostname: baserow
 baserow_port: 8580
