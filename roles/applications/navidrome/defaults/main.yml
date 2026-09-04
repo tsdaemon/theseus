@@ -1,0 +1,30 @@
+---
+navidrome_enabled: false
+navidrome_available_externally: false
+
+# directories
+navidrome_directory: "{{ docker_home }}/navidrome"
+navidrome_data_directory: "{{ navidrome_directory }}/data"
+navidrome_music_directory: "{{ music_root }}"
+
+# uid / gid
+navidrome_user_id: "{{ ansible_nas_user_id }}"
+navidrome_group_id: "{{ ansible_nas_group_id }}"
+
+# network
+navidrome_hostname: "navidrome"
+navidrome_port: "4533"
+
+# docker
+navidrome_container_name: "navidrome"
+navidrome_image_name: "deluan/navidrome"
+navidrome_image_version: "latest"
+
+# specs
+navidrome_memory: "1g"
+
+# Last.fm integration (optional: scrobbling, similar artists, artist images).
+# Get a key at https://www.last.fm/api/account/create
+# navidrome_lastfm_api_key / navidrome_lastfm_secret are set in secrets.yaml.
+# Set to false to silence the "API-Key is not configured" warning instead.
+navidrome_lastfm_enabled: true

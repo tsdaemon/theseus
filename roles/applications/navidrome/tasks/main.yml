@@ -1,0 +1,31 @@
+---
+- name: Start navidrome
+  block:
+    - name: Create navidrome Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "770"
+      with_items:
+        - "{{ navidrome_directory }}"
+        - "{{ navidrome_data_directory }}"
+        - "{{ navidrome_music_directory }}"
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ navidrome_directory }}/docker-compose.yaml"
+        mode: '0440'
+
+    - name: Start navidrome
+      community.docker.docker_compose_v2:
+        project_src: "{{ navidrome_directory }}"
+  when: navidrome_enabled
+
+- name: Stop navidrome
+  community.docker.docker_compose_v2:
+    project_src: "{{ navidrome_directory }}"
+    state: stopped
+  when: not navidrome_enabled

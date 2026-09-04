@@ -1,0 +1,36 @@
+---
+name: "flaresolverr"
+
+services:
+  flaresolverr:
+    container_name: "{{ flaresolverr_container_name }}"
+    image: "{{ flaresolverr_image_name }}:{{ flaresolverr_image_version }}"
+    pull_policy: always
+    shm_size: "{{ flaresolverr_shm_size }}"
+    ports:
+      - "{{ flaresolverr_port }}:8191"
+    environment:
+      TZ: "{{ ansible_nas_timezone }}"
+      LOG_LEVEL: "{{ flaresolverr_log_level }}"
+      CAPTCHA_SOLVER: "none"
+    restart: unless-stopped
+    mem_limit: "{{ flaresolverr_memory }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.flaresolverr.rule: "Host(`{{ flaresolverr_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.flaresolverr.entrypoints: "web_local"
+      traefik.http.services.flaresolverr.loadbalancer.server.port: "8191"
+{% if flaresolverr_available_externally %}
+      traefik.http.routers.flaresolverr-external.rule: "Host(`{{ flaresolverr_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.flaresolverr-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.flaresolverr-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.flaresolverr-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.flaresolverr-external.entrypoints: "web,websecure"
+      traefik.http.routers.flaresolverr-external.service: "flaresolverr"
+      traefik.http.routers.flaresolverr-external.middlewares: "auth@file"
+{% endif %}
+      homepage.group: Arr
+      homepage.name: FlareSolverr
+      homepage.icon: flaresolverr
+      homepage.href: "{% if flaresolverr_available_externally %}https://{{ flaresolverr_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ flaresolverr_port }}{% endif %}"
+      homepage.description: Cloudflare challenge solver for indexers

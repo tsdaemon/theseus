@@ -1,0 +1,41 @@
+---
+name: "navidrome"
+
+services:
+  navidrome:
+    container_name: "{{ navidrome_container_name }}"
+    image: "{{ navidrome_image_name }}:{{ navidrome_image_version }}"
+    pull_policy: always
+    user: "{{ navidrome_user_id }}:{{ navidrome_group_id }}"
+    volumes:
+      - "{{ navidrome_data_directory }}:/data:rw"
+      - "{{ navidrome_music_directory }}:/music:ro"
+    ports:
+      - "{{ navidrome_port }}:4533"
+    environment:
+      TZ: "{{ ansible_nas_timezone }}"
+      ND_LASTFM_ENABLED: "{{ navidrome_lastfm_enabled | lower }}"
+{% if navidrome_lastfm_api_key %}
+      ND_LASTFM_APIKEY: "{{ navidrome_lastfm_api_key }}"
+      ND_LASTFM_SECRET: "{{ navidrome_lastfm_secret }}"
+{% endif %}
+    restart: unless-stopped
+    mem_limit: "{{ navidrome_memory }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.navidrome.rule: "Host(`{{ navidrome_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.navidrome.entrypoints: "web_local"
+      traefik.http.services.navidrome.loadbalancer.server.port: "4533"
+{% if navidrome_available_externally %}
+      traefik.http.routers.navidrome-external.rule: "Host(`{{ navidrome_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.navidrome-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.navidrome-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.navidrome-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.navidrome-external.entrypoints: "web,websecure"
+      traefik.http.routers.navidrome-external.service: "navidrome"
+{% endif %}
+      homepage.group: Applications
+      homepage.name: Navidrome
+      homepage.icon: navidrome
+      homepage.href: "{% if navidrome_available_externally %}https://{{ navidrome_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ navidrome_port }}{% endif %}"
+      homepage.description: Music streaming server

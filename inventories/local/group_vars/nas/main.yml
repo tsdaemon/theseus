@@ -1,4 +1,6 @@
 ---
+ansible_become_password: "{{ theseus_sudo_password }}"
+
 keep_packages_updated: true
 
 ansible_nas_hostname: theseus
@@ -40,6 +42,7 @@ movies_root: "{{ media_root }}/movies"
 tv_root: "{{ media_root }}/tv"
 books_root: "{{ media_root }}/books"
 comics_root: "{{ media_root }}/comics"
+music_root: "{{ media_root }}/music"
 photo_root: "{{ media_root }}/photo"
 archive_root: "{{ ansible_nas_data_root }}/archive"
 cameras_root: "{{ media_root }}/cameras"
@@ -77,6 +80,14 @@ samba_shares:
     writable: yes
     browseable: yes
     path: "{{ comics_root }}"
+
+  - name: music
+    comment: "Music"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ music_root }}"
 
   - name: photos
     comment: "Photos"
@@ -130,6 +141,26 @@ plex_enabled: true
 plex_available_externally: false
 plex_hostname: plex
 plex_config_directory: "{{ ansible_nas_data_root }}/data/plex"
+
+## lidarr
+lidarr_enabled: true
+lidarr_available_externally: false
+lidarr_hostname: lidarr
+
+## flaresolverr
+flaresolverr_enabled: true
+flaresolverr_available_externally: false
+flaresolverr_hostname: flaresolverr
+
+## prowlarr
+prowlarr_enabled: true
+prowlarr_available_externally: false
+prowlarr_hostname: prowlarr
+
+## navidrome
+navidrome_enabled: true
+navidrome_available_externally: false
+navidrome_hostname: navidrome
 
 ## stash
 stash_enabled: true
@@ -227,6 +258,9 @@ homepage_settings_yaml:
     - Applications:
         style: row
         columns: 5
+    - Arr:
+        style: row
+        columns: 4
     - 3D printing:
     - Monitoring:
     - Networking:
