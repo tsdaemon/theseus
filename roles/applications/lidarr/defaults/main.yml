@@ -1,0 +1,28 @@
+---
+lidarr_enabled: false
+lidarr_available_externally: false
+
+# directories
+lidarr_directory: "{{ docker_home }}/lidarr"
+lidarr_config_directory: "{{ lidarr_directory }}/config"
+lidarr_music_directory: "{{ music_root }}"
+lidarr_downloads_directory: "{{ qbittorrent_download_directory }}"
+
+# uid / gid
+lidarr_user_id: "{{ ansible_nas_user_id }}"
+lidarr_group_id: "{{ ansible_nas_group_id }}"
+
+# network
+lidarr_hostname: "lidarr"
+lidarr_port: "8686"
+
+# docker
+lidarr_container_name: "lidarr"
+lidarr_image_name: "linuxserver/lidarr"
+lidarr_image_version: "latest"
+
+# specs
+lidarr_memory: "1g"
+
+# lidarr_api_key is set in secrets.yaml (from Lidarr Settings > General >
+# Security > API Key, after first run) to enable the homepage widget.

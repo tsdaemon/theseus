@@ -1,0 +1,30 @@
+---
+- name: Start prowlarr
+  block:
+    - name: Create prowlarr Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "770"
+      with_items:
+        - "{{ prowlarr_directory }}"
+        - "{{ prowlarr_config_directory }}"
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ prowlarr_directory }}/docker-compose.yaml"
+        mode: '0440'
+
+    - name: Start prowlarr
+      community.docker.docker_compose_v2:
+        project_src: "{{ prowlarr_directory }}"
+  when: prowlarr_enabled
+
+- name: Stop prowlarr
+  community.docker.docker_compose_v2:
+    project_src: "{{ prowlarr_directory }}"
+    state: stopped
+  when: not prowlarr_enabled

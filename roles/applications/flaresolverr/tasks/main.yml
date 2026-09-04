@@ -1,0 +1,29 @@
+---
+- name: Start flaresolverr
+  block:
+    - name: Create flaresolverr Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "770"
+      with_items:
+        - "{{ flaresolverr_directory }}"
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ flaresolverr_directory }}/docker-compose.yaml"
+        mode: '0440'
+
+    - name: Start flaresolverr
+      community.docker.docker_compose_v2:
+        project_src: "{{ flaresolverr_directory }}"
+  when: flaresolverr_enabled
+
+- name: Stop flaresolverr
+  community.docker.docker_compose_v2:
+    project_src: "{{ flaresolverr_directory }}"
+    state: stopped
+  when: not flaresolverr_enabled

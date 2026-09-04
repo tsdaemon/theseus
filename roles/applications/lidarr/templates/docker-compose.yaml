@@ -1,0 +1,44 @@
+---
+name: "lidarr"
+
+services:
+  lidarr:
+    container_name: "{{ lidarr_container_name }}"
+    image: "{{ lidarr_image_name }}:{{ lidarr_image_version }}"
+    pull_policy: always
+    volumes:
+      - "{{ lidarr_config_directory }}:/config:rw"
+      - "{{ lidarr_music_directory }}:/music:rw"
+      - "{{ lidarr_downloads_directory }}:/downloads:rw"
+    ports:
+      - "{{ lidarr_port }}:8686"
+    environment:
+      TZ: "{{ ansible_nas_timezone }}"
+      PUID: "{{ lidarr_user_id }}"
+      PGID: "{{ lidarr_group_id }}"
+    restart: unless-stopped
+    mem_limit: "{{ lidarr_memory }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.lidarr.rule: "Host(`{{ lidarr_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.lidarr.entrypoints: "web_local"
+      traefik.http.services.lidarr.loadbalancer.server.port: "8686"
+{% if lidarr_available_externally %}
+      traefik.http.routers.lidarr-external.rule: "Host(`{{ lidarr_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.lidarr-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.lidarr-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.lidarr-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.lidarr-external.entrypoints: "web,websecure"
+      traefik.http.routers.lidarr-external.service: "lidarr"
+      traefik.http.routers.lidarr-external.middlewares: "auth@file"
+{% endif %}
+      homepage.group: Arr
+      homepage.name: Lidarr
+      homepage.icon: lidarr
+      homepage.href: "{% if lidarr_available_externally %}https://{{ lidarr_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ lidarr_port }}{% endif %}"
+      homepage.description: Music collection manager
+{% if lidarr_api_key %}
+      homepage.widget.type: lidarr
+      homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ lidarr_port }}"
+      homepage.widget.key: "{{ lidarr_api_key }}"
+{% endif %}

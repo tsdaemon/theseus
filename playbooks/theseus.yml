@@ -170,6 +170,26 @@
         - plex
         - applications
 
+    - role: lidarr
+      tags:
+        - lidarr
+        - applications
+
+    - role: flaresolverr
+      tags:
+        - flaresolverr
+        - applications
+
+    - role: prowlarr
+      tags:
+        - prowlarr
+        - applications
+
+    - role: navidrome
+      tags:
+        - navidrome
+        - applications
+
     - role: immich
       tags:
         - immich
