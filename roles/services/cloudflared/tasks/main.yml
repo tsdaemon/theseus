@@ -1,0 +1,44 @@
+---
+- name: Start Cloudflared
+  when: cloudflared_enabled
+  block:
+    - name: Check tunnel token is configured
+      ansible.builtin.assert:
+        that:
+          - cloudflare_tunnel_token is defined
+          - cloudflare_tunnel_token | default('') | length > 0
+        fail_msg: Set cloudflare_tunnel_token in inventory secrets before enabling Cloudflared.
+      no_log: true
+
+    - name: Create Cloudflared directory
+      ansible.builtin.file:
+        path: "{{ cloudflared_directory }}"
+        state: directory
+        mode: '0700'
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ cloudflared_directory }}/docker-compose.yaml"
+        mode: '0600'
+      no_log: true
+
+    - name: Start Cloudflared container
+      community.docker.docker_compose_v2:
+        project_src: "{{ cloudflared_directory }}"
+      no_log: true
+
+- name: Check for existing Cloudflared compose file
+  ansible.builtin.stat:
+    path: "{{ cloudflared_directory }}/docker-compose.yaml"
+  register: cloudflared_compose
+  when: not cloudflared_enabled
+
+- name: Stop Cloudflared
+  community.docker.docker_compose_v2:
+    project_src: "{{ cloudflared_directory }}"
+    state: stopped
+  when:
+    - not cloudflared_enabled
+    - cloudflared_compose.stat.exists
+  no_log: true
