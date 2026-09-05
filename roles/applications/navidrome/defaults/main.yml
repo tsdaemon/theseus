@@ -28,3 +28,11 @@ navidrome_memory: "1g"
 # navidrome_lastfm_api_key / navidrome_lastfm_secret are set in secrets.yaml.
 # Set to false to silence the "API-Key is not configured" warning instead.
 navidrome_lastfm_enabled: true
+
+# homepage widget
+# Uses the Subsonic API auth scheme: token = md5(password + salt).
+# navidrome_user / navidrome_password are set in secrets.yaml; the widget is
+# omitted when no user is configured.
+navidrome_user: ""
+navidrome_password: ""
+navidrome_widget_salt: "homepage"

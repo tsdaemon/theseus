@@ -23,4 +23,4 @@ qbittorrent_image_name: "linuxserver/qbittorrent"
 qbittorrent_image_version: "latest"
 
 # specs
-qbittorrent_memory: 1g
+qbittorrent_memory: 2g

@@ -39,3 +39,10 @@ services:
       homepage.icon: navidrome
       homepage.href: "{% if navidrome_available_externally %}https://{{ navidrome_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ navidrome_port }}{% endif %}"
       homepage.description: Music streaming server
+{% if navidrome_user %}
+      homepage.widget.type: navidrome
+      homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ navidrome_port }}"
+      homepage.widget.user: "{{ navidrome_user }}"
+      homepage.widget.salt: "{{ navidrome_widget_salt }}"
+      homepage.widget.token: "{{ (navidrome_password ~ navidrome_widget_salt) | hash('md5') }}"
+{% endif %}
