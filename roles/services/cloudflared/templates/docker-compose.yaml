@@ -1,0 +1,12 @@
+---
+name: cloudflared
+
+services:
+  cloudflared:
+    container_name: "{{ cloudflared_container_name }}"
+    image: "{{ cloudflared_image_name }}:{{ cloudflared_image_version }}"
+    command: tunnel --no-autoupdate run
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      TUNNEL_TOKEN: {{ cloudflare_tunnel_token | to_json }}

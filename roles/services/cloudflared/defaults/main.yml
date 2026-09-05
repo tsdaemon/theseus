@@ -1,0 +1,8 @@
+---
+cloudflared_enabled: false
+
+cloudflared_directory: "{{ docker_home }}/cloudflared"
+
+cloudflared_container_name: cloudflared
+cloudflared_image_name: cloudflare/cloudflared
+cloudflared_image_version: latest

@@ -95,6 +95,11 @@
         - traefik
         - services
 
+    - role: cloudflared
+      tags:
+        - cloudflared
+        - services
+
     - role: watchtower
       tags:
         - watchtower
