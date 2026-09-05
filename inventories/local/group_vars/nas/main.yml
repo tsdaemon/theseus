@@ -258,14 +258,14 @@ homepage_settings_yaml:
     - Applications:
         style: row
         columns: 5
-    - Arr:
-        style: row
-        columns: 4
     - 3D printing:
     - Monitoring:
     - Networking:
     - Services:
     - External:
+    - Arr:
+        style: row
+        columns: 5
   maxGroupColumns: 8
   useEqualHeights: true
   statusStyle: "dot"

@@ -40,4 +40,3 @@ services:
       homepage.description: Torrent client
       homepage.widget.type: qbittorrent
       homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ qbittorrent_port_http }}"
-      homepage.widget.enableLeechProgress: "true"
