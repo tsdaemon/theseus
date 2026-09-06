@@ -8,7 +8,6 @@ services:
     pull_policy: always
     volumes:
       - "{{ lidarr_config_directory }}:/config:rw"
-      - "{{ lidarr_music_directory }}:/music:rw"
       - "{{ lidarr_downloads_directory }}:/downloads:rw"
     ports:
       - "{{ lidarr_port }}:8686"
