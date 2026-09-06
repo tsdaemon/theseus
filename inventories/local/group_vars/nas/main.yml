@@ -242,33 +242,20 @@ homepage_widgets_yaml:
       cache: 5 # Time in minutes to cache API responses, to stay within limits
       format: # optional, Intl.NumberFormat options
         maximumFractionDigits: 1
-homepage_services_yaml:
-  - External:
-      - Router:
-          icon: asus-router
-          href: "http://192.168.0.1/"
-          description: Asus Router
-      - Home Assistant:
-          icon: home-assistant.png
-          href: "http://192.168.0.100/"
-          description: Home Assistant
 
 homepage_settings_yaml:
   title: "Theseus Homepage"
   language: "en-GB"
   showStats: true
+  color: slate
   layout:
     - Applications:
         style: row
-        columns: 5
-    - 3D printing:
+        columns: 4
     - Monitoring:
     - Networking:
     - Services:
-    - External:
     - Arr:
-        style: row
-        columns: 5
   maxGroupColumns: 8
   useEqualHeights: true
   statusStyle: "dot"

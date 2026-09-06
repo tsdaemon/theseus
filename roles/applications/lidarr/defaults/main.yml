@@ -5,7 +5,10 @@ lidarr_available_externally: false
 # directories
 lidarr_directory: "{{ docker_home }}/lidarr"
 lidarr_config_directory: "{{ lidarr_directory }}/config"
-lidarr_music_directory: "{{ music_root }}"
+# Single media mount: qbittorrent's download dir is the parent of the media
+# tree, so Lidarr reaches the library at /downloads/media/music. Mounting the
+# music dir separately would give it a distinct device id and silently break
+# hardlinks on import.
 lidarr_downloads_directory: "{{ qbittorrent_download_directory }}"
 
 # uid / gid
