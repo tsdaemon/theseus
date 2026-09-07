@@ -15,3 +15,37 @@
   ansible.builtin.file:
     path: "/tmp/hddfancontrol_2.0.3-1_amd64.deb"
     state: absent
+
+- name: Ensure nct6775 hwmon module loads at boot
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/nct6775.conf
+    content: "nct6775\n"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Ensure nct6775 is loaded now
+  community.general.modprobe:
+    name: nct6775
+    state: present
+
+- name: Configure hddfancontrol daemon arguments
+  ansible.builtin.template:
+    src: hddfancontrol.j2
+    dest: /etc/conf.d/hddfancontrol
+    owner: root
+    group: root
+    mode: "0644"
+  register: hddfancontrol_conf
+
+- name: Restart hddfancontrol when its configuration changes
+  ansible.builtin.systemd:
+    name: hddfancontrol
+    state: restarted
+  when: hddfancontrol_conf is changed
+
+- name: Enable and start hddfancontrol
+  ansible.builtin.systemd:
+    name: hddfancontrol
+    enabled: true
+    state: started
