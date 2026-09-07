@@ -1,0 +1,50 @@
+---
+name: "hermes"
+
+services:
+  hermes:
+    container_name: "{{ hermes_container_name }}"
+    image: "{{ hermes_image_name }}:{{ hermes_image_version }}"
+    restart: unless-stopped
+    command: ["gateway", "run"]
+    shm_size: "{{ hermes_shm_size }}"
+    ports:
+      - "{{ hermes_dashboard_port }}:9119"
+    volumes:
+      - "{{ hermes_data_directory }}:/opt/data"
+    environment:
+      TZ: "{{ hermes_timezone }}"
+      HERMES_UID: "{{ ansible_nas_user_id }}"
+      HERMES_GID: "{{ ansible_nas_group_id }}"
+      HERMES_DASHBOARD: "1"
+      HERMES_DASHBOARD_HOST: "0.0.0.0"
+      HERMES_DASHBOARD_PORT: "9119"
+      HERMES_DASHBOARD_BASIC_AUTH_USERNAME: "{{ hermes_dashboard_username }}"
+      HERMES_DASHBOARD_BASIC_AUTH_PASSWORD: "{{ hermes_dashboard_password }}"
+      HASS_URL: "{{ hermes_hass_url }}"
+      HASS_TOKEN: "{{ hermes_hass_token }}"
+      NTFY_TOPIC: "{{ hermes_ntfy_topic }}"
+      NOTION_API_TOKEN: "{{ hermes_notion_api_token }}"
+    deploy:
+      resources:
+        limits:
+          memory: "{{ hermes_memory }}"
+          cpus: "{{ hermes_cpus }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.hermes.rule: "Host(`{{ hermes_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.hermes.entrypoints: "web_local"
+      traefik.http.services.hermes.loadbalancer.server.port: "9119"
+{% if hermes_available_externally %}
+      traefik.http.routers.hermes-external.rule: "Host(`{{ hermes_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.hermes-external.tls.certresolver: "letsencrypt"
+      traefik.http.routers.hermes-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.hermes-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.hermes-external.entrypoints: "web,websecure"
+      traefik.http.routers.hermes-external.service: "hermes"
+{% endif %}
+      homepage.group: "Applications"
+      homepage.name: "Hermes"
+      homepage.icon: "mdi-robot"
+      homepage.href: "{% if hermes_available_externally %}https://{{ hermes_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ hermes_hostname }}.{{ ansible_nas_local_domain }}{% endif %}"
+      homepage.description: "AI agent dashboard"
