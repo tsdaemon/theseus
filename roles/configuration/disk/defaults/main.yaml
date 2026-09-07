@@ -1,0 +1,12 @@
+---
+# nct6795 Super I/O, pwm4 = SYS_FAN1 chassis intake fan (DC mode).
+# start/stop PWM thresholds (75/55) from `hddfancontrol pwm-test`.
+# NOTE: hwmonN numbering can shift across reboots/kernel updates — revisit
+# if hddfancontrol logs a missing pwm path.
+hddfancontrol_daemon_args: >-
+  --drives /dev/sdb /dev/sdc
+  --pwm /sys/class/hwmon/hwmon3/pwm4:75:55
+  --drive-temp-range 43 53
+  --interval 30s
+  --restore-fan-settings
+hddfancontrol_log_level: info
