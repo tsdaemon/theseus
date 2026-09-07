@@ -115,6 +115,18 @@ samba_shares:
 
 # Applications
 
+## hermes
+hermes_enabled: true
+hermes_available_externally: false
+hermes_hostname: hermes
+
+## ntfy
+ntfy_enabled: false
+ntfy_available_externally: false
+ntfy_private_source_ranges:
+  - "192.168.0.0/24"
+  - "10.42.42.42/32" # WireGuard container's masqueraded traffic
+
 ## n8n
 n8n_enabled: false
 
