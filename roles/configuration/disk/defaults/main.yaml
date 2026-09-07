@@ -1,0 +1,21 @@
+---
+# Data HDDs whose temperature drives the fan curve; the boot SSD is excluded.
+hddfancontrol_drives:
+  - /dev/sdb
+  - /dev/sdc
+
+# nct6795 Super I/O, pwm4 = SYS_FAN1 chassis intake fan (DC mode).
+# NOTE: hwmonN numbering can shift across reboots/kernel updates — revisit
+# if hddfancontrol logs a missing pwm path.
+hddfancontrol_pwm_path: /sys/class/hwmon/hwmon3/pwm4
+# Fan start/stop PWM thresholds, found via `hddfancontrol pwm-test`.
+hddfancontrol_pwm_start: 75
+hddfancontrol_pwm_stop: 55
+
+# Ramp the fan across this HDD temperature range (degrees C).
+hddfancontrol_temp_min: 43
+hddfancontrol_temp_max: 53
+
+hddfancontrol_interval: 30s
+hddfancontrol_restore_fan_settings: true
+hddfancontrol_log_level: info

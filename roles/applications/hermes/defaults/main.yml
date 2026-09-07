@@ -1,0 +1,29 @@
+---
+hermes_enabled: false
+hermes_available_externally: false
+hermes_hostname: "hermes"
+
+# directories
+hermes_directory: "{{ docker_home }}/hermes"
+hermes_data_directory: "{{ hermes_directory }}/data"
+
+# docker
+hermes_container_name: "hermes"
+hermes_image_name: "nousresearch/hermes-agent"
+hermes_image_version: "latest"
+hermes_memory: "4G"
+hermes_cpus: "2.0"
+hermes_shm_size: "1G"
+
+# dashboard
+hermes_dashboard_port: "9119"
+hermes_dashboard_username: "hermes"
+# Set hermes_dashboard_password in inventory secrets.
+
+# Home Assistant
+hermes_hass_url: "http://192.168.0.100"
+
+# Run the setup wizard on the server before first deployment:
+# docker run -it --rm -v /appdata/hermes/data:/opt/data nousresearch/hermes-agent:latest setup
+# Wizard configuration persists in the data directory. Tokens supplied through Compose override .env.
+hermes_timezone: "{{ ansible_nas_timezone }}"

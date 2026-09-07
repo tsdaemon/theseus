@@ -1,0 +1,42 @@
+---
+- name: Start hermes
+  block:
+    - name: Create hermes directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "0700"
+      loop:
+        - "{{ hermes_directory }}"
+        - "{{ hermes_data_directory }}"
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ hermes_directory }}/docker-compose.yaml"
+        mode: "0440"
+      no_log: true
+      diff: false
+
+    - name: Start hermes
+      community.docker.docker_compose_v2:
+        project_src: "{{ hermes_directory }}"
+        state: present
+      no_log: true
+  when: hermes_enabled
+
+- name: Check for hermes compose file
+  ansible.builtin.stat:
+    path: "{{ hermes_directory }}/docker-compose.yaml"
+  register: hermes_compose_file
+  when: not hermes_enabled
+
+- name: Stop hermes
+  community.docker.docker_compose_v2:
+    project_src: "{{ hermes_directory }}"
+    state: stopped
+  when:
+    - not hermes_enabled
+    - hermes_compose_file.stat.exists

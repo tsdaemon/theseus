@@ -1,0 +1,3 @@
+# Managed by Ansible (roles/configuration/disk)
+HDDFANCONTROL_DAEMON_ARGS="--drives {{ hddfancontrol_drives | join(' ') }} --pwm {{ hddfancontrol_pwm_path }}:{{ hddfancontrol_pwm_start }}:{{ hddfancontrol_pwm_stop }} --drive-temp-range {{ hddfancontrol_temp_min }} {{ hddfancontrol_temp_max }} --interval {{ hddfancontrol_interval }}{% if hddfancontrol_restore_fan_settings %} --restore-fan-settings{% endif %}"
+HDDFANCONTROL_LOG_LEVEL="{{ hddfancontrol_log_level }}"
