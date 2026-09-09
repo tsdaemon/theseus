@@ -21,7 +21,7 @@ navidrome_image_name: "deluan/navidrome"
 navidrome_image_version: "latest"
 
 # specs
-navidrome_memory: "1g"
+navidrome_memory: "2g"
 
 # Last.fm integration (optional: scrobbling, similar artists, artist images).
 # Get a key at https://www.last.fm/api/account/create
