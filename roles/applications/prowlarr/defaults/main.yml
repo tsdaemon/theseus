@@ -20,7 +20,8 @@ prowlarr_image_name: "linuxserver/prowlarr"
 prowlarr_image_version: "latest"
 
 # specs
-prowlarr_memory: "512m"
+prowlarr_memory: 1g
+prowlarr_memswap_memory: 1.5g
 
 # prowlarr_api_key is set in secrets.yaml (from Prowlarr Settings > General >
 # Security > API Key, after first run) to enable the homepage widget.

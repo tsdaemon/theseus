@@ -13,7 +13,8 @@ duplicati_data_permissions: "ro" # set this to rw to enable the ability to resto
 duplicati_port: "8200"
 duplicati_hostname: "duplicati"
 
-duplicati_memory: 1g
+duplicati_memory: 2g
+duplicati_memswap_memory: 3g
 
 # docker
 duplicati_container_name: duplicati
