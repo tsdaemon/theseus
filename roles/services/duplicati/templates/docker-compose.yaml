@@ -22,6 +22,7 @@ services:
       DUPLICATI__WEBSERVICE_PASSWORD: "{{ duplicati_ui_password }}"
     restart: unless-stopped
     mem_limit: "{{ duplicati_memory }}"
+    memswap_limit: "{{ duplicati_memswap_memory }}"
     labels:
       traefik.enable: "true"
       traefik.http.routers.duplicati.rule: "Host(`{{ duplicati_hostname }}.{{ ansible_nas_local_domain }}`)"
