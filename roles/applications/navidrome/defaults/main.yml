@@ -23,6 +23,9 @@ navidrome_image_version: "latest"
 # specs
 navidrome_memory: "2g"
 
+# how often to scan the music library for changes
+navidrome_scan_schedule: "1m"
+
 # Last.fm integration (optional: scrobbling, similar artists, artist images).
 # Get a key at https://www.last.fm/api/account/create
 # navidrome_lastfm_api_key / navidrome_lastfm_secret are set in secrets.yaml.
