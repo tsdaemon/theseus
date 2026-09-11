@@ -15,6 +15,7 @@ services:
     environment:
       TZ: "{{ ansible_nas_timezone }}"
       ND_LASTFM_ENABLED: "{{ navidrome_lastfm_enabled | lower }}"
+      ND_SCANSCHEDULE: "{{ navidrome_scan_schedule }}"
 {% if navidrome_lastfm_api_key %}
       ND_LASTFM_APIKEY: "{{ navidrome_lastfm_api_key }}"
       ND_LASTFM_SECRET: "{{ navidrome_lastfm_secret }}"
