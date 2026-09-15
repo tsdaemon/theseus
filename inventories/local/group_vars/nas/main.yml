@@ -116,7 +116,7 @@ samba_shares:
 # Applications
 
 ## hermes
-hermes_enabled: true
+hermes_enabled: false
 hermes_available_externally: false
 hermes_hostname: hermes
 
