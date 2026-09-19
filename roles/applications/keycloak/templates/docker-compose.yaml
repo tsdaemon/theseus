@@ -43,7 +43,8 @@ services:
       traefik.http.routers.keycloak.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
       traefik.http.routers.keycloak.service: "keycloak"
       # Public (Cloudflare Tunnel -> web_cloudflare entrypoint): only the {{ keycloak_public_realm }} realm and static resources; no /admin, no master realm
-      traefik.http.routers.keycloak-public.rule: "Host(`{{ keycloak_public_hostname }}`) && (PathPrefix(`/realms/{{ keycloak_public_realm }}/`) || PathPrefix(`/resources/`) || Path(`/robots.txt`))"
+      # Also that realm's RFC 8414 metadata URL (issuer with a path). ChatGPT requests it first and reports "does not implement OAuth" on a 404
+      traefik.http.routers.keycloak-public.rule: "Host(`{{ keycloak_public_hostname }}`) && (PathPrefix(`/realms/{{ keycloak_public_realm }}/`) || PathPrefix(`/resources/`) || Path(`/robots.txt`) || Path(`/.well-known/oauth-authorization-server/realms/{{ keycloak_public_realm }}`))"
       traefik.http.routers.keycloak-public.entrypoints: "web_cloudflare"
       traefik.http.routers.keycloak-public.service: "keycloak"
       # Public traffic is always HTTPS at the Cloudflare edge; make sure Keycloak sees that (secure cookies)
