@@ -24,6 +24,10 @@
   [entryPoints.web_cloudflare]
     address = "127.0.0.1:{{ traefik_port_web_cloudflare }}"
 
+    # Keep Cloudflare's X-Forwarded-Proto / X-Forwarded-For (cloudflared connects from loopback).
+    [entryPoints.web_cloudflare.forwardedHeaders]
+      trustedIPs = ["127.0.0.1/32"]
+
   [entryPoints.traefik]
     address = ":{{ traefik_port_ui }}"
 

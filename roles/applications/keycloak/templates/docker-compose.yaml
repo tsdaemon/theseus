@@ -46,6 +46,9 @@ services:
       traefik.http.routers.keycloak-public.rule: "Host(`{{ keycloak_public_hostname }}`) && (PathPrefix(`/realms/{{ keycloak_public_realm }}/`) || PathPrefix(`/resources/`) || Path(`/robots.txt`))"
       traefik.http.routers.keycloak-public.entrypoints: "web_cloudflare"
       traefik.http.routers.keycloak-public.service: "keycloak"
+      # Public traffic is always HTTPS at the Cloudflare edge; make sure Keycloak sees that (secure cookies)
+      traefik.http.routers.keycloak-public.middlewares: "keycloak-https"
+      traefik.http.middlewares.keycloak-https.headers.customrequestheaders.X-Forwarded-Proto: "https"
       traefik.http.services.keycloak.loadbalancer.server.port: "8080"
       homepage.group: "Services"
       homepage.name: "Keycloak"
