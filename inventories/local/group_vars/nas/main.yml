@@ -6,7 +6,6 @@ keep_packages_updated: true
 ansible_nas_hostname: theseus
 ansible_nas_timezone: Europe/Kyiv
 ansible_nas_email: tsdaemon@gmail.com
-ansible_nas_domain: example.com
 ansible_nas_local_domain: theseus
 ansible_nas_user: theseus
 ansible_nas_user_id: "1001"
@@ -14,10 +13,10 @@ ansible_nas_group: users
 ansible_nas_group_id: "100"
 
 # mail
-ansible_nas_from_address: "theseus@mail.example.com"
+ansible_nas_from_address: "theseus@mail.{{ ansible_nas_domain }}"
 ansible_nas_from_name: "Theseus NAS"
 ansible_nas_smtp_hostname: "smtp.eu.mailgun.org"
-ansible_nas_smtp_username: "theseus@mail.example.com"
+ansible_nas_smtp_username: "theseus@mail.{{ ansible_nas_domain }}"
 
 ansible_nas_data_root: "/mnt/data"
 
