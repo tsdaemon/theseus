@@ -1,0 +1,26 @@
+keycloak_enabled: false
+
+keycloak_folder: "{{ docker_home }}/keycloak"
+keycloak_database_directory: "{{ keycloak_folder }}/postgres"
+keycloak_backup_directory: "{{ keycloak_folder }}/backups"
+keycloak_backup_retention_days: 14
+
+keycloak_db_user: keycloak
+keycloak_db_name: keycloak
+# keycloak_db_password, keycloak_admin_username, keycloak_admin_password: set in inventory secrets
+
+# Public URL is served through the Cloudflare Tunnel (cloudflared -> Traefik entrypoint web_cloudflare).
+# The path allowlist is enforced by the keycloak-public Traefik router.
+keycloak_public_hostname: "keycloak.{{ ansible_nas_domain }}"
+keycloak_public_realm: home
+# Admin console is LAN only, over HTTPS (the console needs a secure browser context).
+# Needs a Pi-hole local DNS record pointing this name at the NAS; Traefik's wildcard cert covers it.
+keycloak_admin_hostname: "keycloak-admin.{{ ansible_nas_domain }}"
+
+keycloak_container_name: keycloak
+keycloak_image_name: quay.io/keycloak/keycloak
+keycloak_image_version: "26.7.4"
+keycloak_memory_limit: 2g
+
+keycloak_postgres_image: postgres:17-alpine
+keycloak_postgres_uid: 999

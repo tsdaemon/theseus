@@ -24,13 +24,18 @@ services:
       traefik.enable: "true"
       traefik.http.routers.immich.rule: "Host(`{{ immich_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.immich.entrypoints: "web_local"
+      traefik.http.routers.immich.service: "immich"
+      # Public (Cloudflare Tunnel -> web_cloudflare entrypoint)
+      traefik.http.routers.immich-public.rule: "Host(`{{ immich_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.immich-public.entrypoints: "web_cloudflare"
+      traefik.http.routers.immich-public.service: "immich"
       traefik.http.services.immich.loadbalancer.server.port: "2283"
 {% if immich_available_externally %}
       traefik.http.routers.immich-external.rule: "Host(`{{ immich_hostname }}.{{ ansible_nas_domain }}`)"
       traefik.http.routers.immich-external.tls.certresolver: "letsencrypt"
       traefik.http.routers.immich-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.immich-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.immich-external.entrypoints: "web,websecure"
+      traefik.http.routers.immich-external.entrypoints: "web,web_secure"
       traefik.http.routers.immich-external.service: "immich"
 {% endif %}
       homepage.group: "Applications"

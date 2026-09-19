@@ -24,3 +24,13 @@ pihole_memory: "512m"
 pihole_webpassword: "admin"  # Change this to your desired admin password
 pihole_dns1: "8.8.8.8"  # Primary DNS server
 pihole_dns2: "8.8.4.4"  # Secondary DNS server
+
+# dnsmasq lines (FTLCONF_misc_dnsmasq_lines).
+pihole_dnsmasq_lines:
+  - "address=/{{ ansible_nas_hostname }}/{{ ansible_nas_ip }}"
+  - "address=/.{{ ansible_nas_hostname }}/{{ ansible_nas_ip }}"
+
+# LAN-only names under the public domain (routers on the web_secure entrypoint): one hostname per service.
+# Each gets address=/name/ip (A record) plus local=/name/ (never forwarded). address= alone still forwards AAAA/HTTPS,
+# which leaks a public wildcard's (e.g. Cloudflare) IPv6 and h3/ECH hints.
+pihole_local_hostnames: []

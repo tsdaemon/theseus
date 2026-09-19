@@ -45,7 +45,8 @@
     - name: Start Traefik
       community.docker.docker_compose_v2:
         project_src: "{{ traefik_directory }}"
-        recreate: auto
+        # traefik.toml is a bind mount, so compose does not notice changes; entrypoints are static config.
+        recreate: "{{ 'always' if template_config.changed else 'auto' }}"
 
     - name: Set letsencrypt permissions
       ansible.builtin.file:

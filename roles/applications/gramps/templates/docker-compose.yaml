@@ -34,7 +34,7 @@ services:
       traefik.http.routers.gramps-external.tls.certresolver: "letsencrypt"
       traefik.http.routers.gramps-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.gramps-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.gramps-external.entrypoints: "web,websecure"
+      traefik.http.routers.gramps-external.entrypoints: "web,web_secure"
       traefik.http.routers.gramps-external.service: "gramps"
 {% endif %}
       homepage.group: "Applications"

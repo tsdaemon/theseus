@@ -34,7 +34,7 @@ services:
       traefik.http.routers.baserow-external.tls.certresolver: "letsencrypt"
       traefik.http.routers.baserow-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.baserow-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.baserow-external.entrypoints: "web,websecure"
+      traefik.http.routers.baserow-external.entrypoints: "web,web_secure"
       traefik.http.routers.baserow-external.service: "baserow"
 {% endif %}
       homepage.group: "Applications"

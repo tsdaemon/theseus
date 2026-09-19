@@ -94,7 +94,7 @@ services:
       traefik.http.routers.obico-external.tls.certresolver: "letsencrypt"
       traefik.http.routers.obico-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.obico-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.obico-external.entrypoints: "web,websecure"
+      traefik.http.routers.obico-external.entrypoints: "web,web_secure"
       traefik.http.routers.obico-external.service: "obico"
 {% endif %}
       homepage.group: 3D printing

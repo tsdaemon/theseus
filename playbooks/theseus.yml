@@ -250,6 +250,11 @@
         - baserow
         - applications
 
+    - role: keycloak
+      tags:
+        - keycloak
+        - applications
+
     - role: bambuddy
       tags:
         - bambuddy

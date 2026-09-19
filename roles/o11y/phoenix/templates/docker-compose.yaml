@@ -21,7 +21,7 @@ services:
       traefik.http.routers.phoenix-external.tls.certresolver: "letsencrypt"
       traefik.http.routers.phoenix-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.phoenix-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.phoenix-external.entrypoints: "web,websecure"
+      traefik.http.routers.phoenix-external.entrypoints: "web,web_secure"
       traefik.http.routers.phoenix-external.service: "phoenix"
 {% endif %}
       homepage.group: Monitoring

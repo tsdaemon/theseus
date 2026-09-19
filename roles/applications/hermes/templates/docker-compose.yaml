@@ -40,7 +40,7 @@ services:
       traefik.http.routers.hermes-external.tls.certresolver: "letsencrypt"
       traefik.http.routers.hermes-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.hermes-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.hermes-external.entrypoints: "web,websecure"
+      traefik.http.routers.hermes-external.entrypoints: "web,web_secure"
       traefik.http.routers.hermes-external.service: "hermes"
 {% endif %}
       homepage.group: "Applications"

@@ -24,7 +24,7 @@ services:
       traefik.http.routers.portainer-external.tls.certresolver: "letsencrypt"
       traefik.http.routers.portainer-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.portainer-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.portainer-external.entrypoints: "web,websecure"
+      traefik.http.routers.portainer-external.entrypoints: "web,web_secure"
       traefik.http.routers.portainer-external.service: "portainer"
 {% endif %}
       homepage.group: Services

@@ -1,26 +1,28 @@
 [entryPoints]
-{% if ansible_nas_external_access_enabled | default(true) %}
   [entryPoints.web]
     address = ":{{ traefik_port_http_external }}"
 
   [entryPoints.web.http.redirections.entryPoint]
-    to = "websecure"
+    to = "web_secure"
 
-  [entryPoints.websecure]
+  [entryPoints.web_secure]
     address = ":{{ traefik_port_https }}"
 
-      [entryPoints.websecure.http.tls]
+      [entryPoints.web_secure.http.tls]
         certResolver = "letsencrypt"
 
-        [[entryPoints.websecure.http.tls.domains]]
+        [[entryPoints.web_secure.http.tls.domains]]
           main = "{{ ansible_nas_domain }}"
           sans = [
             "*.{{ ansible_nas_domain }}"
           ]
 
-{% endif %}
   [entryPoints.web_local]
     address = ":{{ traefik_port_http_local }}"
+
+  # Loopback only: the Cloudflare Tunnel (cloudflared, host network) is the sole client.
+  [entryPoints.web_cloudflare]
+    address = "127.0.0.1:{{ traefik_port_web_cloudflare }}"
 
   [entryPoints.traefik]
     address = ":{{ traefik_port_ui }}"

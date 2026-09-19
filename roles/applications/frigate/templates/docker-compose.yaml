@@ -31,7 +31,7 @@ services:
       traefik.http.routers.frigate-external.tls.certresolver: "letsencrypt"
       traefik.http.routers.frigate-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.frigate-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.frigate-external.entrypoints: "web,websecure"
+      traefik.http.routers.frigate-external.entrypoints: "web,web_secure"
       traefik.http.routers.frigate-external.service: "frigate"
       traefik.http.routers.frigate-external.middlewares: "auth@file"
 {% endif %}

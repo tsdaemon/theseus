@@ -71,7 +71,7 @@ services:
       traefik.http.routers.grafana-external.tls.certresolver: "letsencrypt"
       traefik.http.routers.grafana-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.grafana-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.grafana-external.entrypoints: "web,websecure"
+      traefik.http.routers.grafana-external.entrypoints: "web,web_secure"
       traefik.http.routers.grafana-external.service: "grafana"
 {% endif %}
       homepage.group: Monitoring
@@ -110,7 +110,7 @@ services:
       traefik.http.routers.prometheus-external.tls.certresolver: "letsencrypt"
       traefik.http.routers.prometheus-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.prometheus-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.prometheus-external.entrypoints: "web,websecure"
+      traefik.http.routers.prometheus-external.entrypoints: "web,web_secure"
       traefik.http.routers.prometheus-external.service: "prometheus"
 {% endif %}
       homepage.group: Monitoring

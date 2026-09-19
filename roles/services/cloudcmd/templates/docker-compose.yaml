@@ -28,7 +28,7 @@ services:
       traefik.http.routers.cloudcmd-external.tls.certresolver: "letsencrypt"
       traefik.http.routers.cloudcmd-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.cloudcmd-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.cloudcmd-external.entrypoints: "web,websecure"
+      traefik.http.routers.cloudcmd-external.entrypoints: "web,web_secure"
       traefik.http.routers.cloudcmd-external.service: "cloudcmd"
 {% endif %}
       homepage.group: Services

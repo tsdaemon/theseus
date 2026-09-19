@@ -7,9 +7,6 @@
 traefik_enabled: false
 traefik_available_externally: false
 
-# Public HTTP(S): entrypoints web + websecure are defined in traefik.toml only when
-# ansible_nas_external_access_enabled is true (group_vars/all).
-
 # directories
 traefik_directory: "{{ docker_home }}/traefik"
 traefik_config_directory: "{{ traefik_directory }}/config"
@@ -20,6 +17,7 @@ traefik_hostname: "traefik"
 traefik_port_http_local: "80"
 traefik_port_http_external: "2881"
 traefik_port_https: "443"
+traefik_port_web_cloudflare: "8081"
 traefik_port_ui: "8083"
 
 traefik_container_name: "traefik"

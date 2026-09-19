@@ -1,0 +1,75 @@
+name: keycloak
+
+services:
+  keycloak:
+    container_name: "{{ keycloak_container_name }}"
+    image: "{{ keycloak_image_name }}:{{ keycloak_image_version }}"
+    command: start
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    mem_limit: "{{ keycloak_memory_limit }}"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: "jdbc:postgresql://postgres:5432/{{ keycloak_db_name }}"
+      KC_DB_USERNAME: "{{ keycloak_db_user }}"
+      KC_DB_PASSWORD: {{ keycloak_db_password | to_json }}
+      KC_BOOTSTRAP_ADMIN_USERNAME: {{ keycloak_admin_username | to_json }}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: {{ keycloak_admin_password | to_json }}
+      KC_HOSTNAME: "https://{{ keycloak_public_hostname }}"
+      KC_HOSTNAME_ADMIN: "https://{{ keycloak_admin_hostname }}"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: "true"
+    healthcheck:
+      # Management interface (9000) is not exposed; the image has no curl.
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q '\"UP\"' <&3"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    labels:
+      traefik.enable: "true"
+      # LAN (HTTPS via wildcard cert, DNS only in Pi-hole): full access including /admin
+      traefik.http.routers.keycloak.rule: "Host(`{{ keycloak_admin_hostname }}`)"
+      traefik.http.routers.keycloak.entrypoints: "web_secure"
+      traefik.http.routers.keycloak.tls.certresolver: "letsencrypt"
+      traefik.http.routers.keycloak.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.keycloak.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.keycloak.service: "keycloak"
+      # Public (Cloudflare Tunnel -> web_cloudflare entrypoint): only the {{ keycloak_public_realm }} realm and static resources; no /admin, no master realm
+      traefik.http.routers.keycloak-public.rule: "Host(`{{ keycloak_public_hostname }}`) && (PathPrefix(`/realms/{{ keycloak_public_realm }}/`) || PathPrefix(`/resources/`) || Path(`/robots.txt`))"
+      traefik.http.routers.keycloak-public.entrypoints: "web_cloudflare"
+      traefik.http.routers.keycloak-public.service: "keycloak"
+      traefik.http.services.keycloak.loadbalancer.server.port: "8080"
+      homepage.group: "Services"
+      homepage.name: "Keycloak"
+      homepage.icon: keycloak
+      homepage.href: "https://{{ keycloak_admin_hostname }}"
+      homepage.description: "Identity provider"
+
+  postgres:
+    container_name: "{{ keycloak_container_name }}_postgres"
+    image: "{{ keycloak_postgres_image }}"
+    restart: unless-stopped
+    user: "{{ keycloak_postgres_uid }}:{{ keycloak_postgres_uid }}"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      POSTGRES_USER: "{{ keycloak_db_user }}"
+      POSTGRES_DB: "{{ keycloak_db_name }}"
+      POSTGRES_PASSWORD: {{ keycloak_db_password | to_json }}
+    volumes:
+      - "{{ keycloak_database_directory }}:/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U {{ keycloak_db_user }} -d {{ keycloak_db_name }}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

@@ -25,7 +25,7 @@ services:
       traefik.http.routers.flaresolverr-external.tls.certresolver: "letsencrypt"
       traefik.http.routers.flaresolverr-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.flaresolverr-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.flaresolverr-external.entrypoints: "web,websecure"
+      traefik.http.routers.flaresolverr-external.entrypoints: "web,web_secure"
       traefik.http.routers.flaresolverr-external.service: "flaresolverr"
       traefik.http.routers.flaresolverr-external.middlewares: "auth@file"
 {% endif %}

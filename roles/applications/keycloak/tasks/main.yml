@@ -1,0 +1,56 @@
+---
+- name: Start Keycloak
+  block:
+    - name: Check Keycloak secrets are configured
+      ansible.builtin.assert:
+        that:
+          - keycloak_db_password is defined
+          - keycloak_db_password | length > 0
+          - keycloak_admin_username is defined
+          - keycloak_admin_password is defined
+          - keycloak_admin_password | length > 0
+        fail_msg: Set keycloak_db_password, keycloak_admin_username and keycloak_admin_password in inventory secrets.
+      no_log: true
+
+    - name: Create Keycloak directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - { path: "{{ keycloak_folder }}", owner: "{{ ansible_nas_user }}", group: "{{ ansible_nas_group }}", mode: "0750" }
+        - { path: "{{ keycloak_database_directory }}", owner: "{{ keycloak_postgres_uid }}", group: "{{ keycloak_postgres_uid }}", mode: "0700" }
+        - { path: "{{ keycloak_backup_directory }}", owner: "{{ ansible_nas_user }}", group: "{{ ansible_nas_group }}", mode: "0700" }
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ keycloak_folder }}/docker-compose.yaml"
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "0600"
+      no_log: true
+
+    - name: Start Keycloak
+      community.docker.docker_compose_v2:
+        project_src: "{{ keycloak_folder }}"
+      no_log: true
+
+    - name: Schedule Keycloak database backup
+      ansible.builtin.cron:
+        name: keycloak-db-backup
+        minute: "30"
+        hour: "3"
+        job: >-
+          docker exec {{ keycloak_container_name }}_postgres pg_dump -U {{ keycloak_db_user }} -Fc {{ keycloak_db_name }}
+          > {{ keycloak_backup_directory }}/keycloak-$(date +\%F).dump
+          && find {{ keycloak_backup_directory }} -name 'keycloak-*.dump' -mtime +{{ keycloak_backup_retention_days }} -delete
+  when: keycloak_enabled
+
+- name: Stop Keycloak
+  community.docker.docker_compose_v2:
+    project_src: "{{ keycloak_folder }}"
+    state: stopped
+  when: not keycloak_enabled

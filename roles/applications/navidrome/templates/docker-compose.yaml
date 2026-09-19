@@ -32,7 +32,7 @@ services:
       traefik.http.routers.navidrome-external.tls.certresolver: "letsencrypt"
       traefik.http.routers.navidrome-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.navidrome-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.navidrome-external.entrypoints: "web,websecure"
+      traefik.http.routers.navidrome-external.entrypoints: "web,web_secure"
       traefik.http.routers.navidrome-external.service: "navidrome"
 {% endif %}
       homepage.group: Applications

@@ -29,7 +29,7 @@ services:
       traefik.http.routers.qbittorrent-external.tls.certresolver: "letsencrypt"
       traefik.http.routers.qbittorrent-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
       traefik.http.routers.qbittorrent-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.qbittorrent-external.entrypoints: "web,websecure"
+      traefik.http.routers.qbittorrent-external.entrypoints: "web,web_secure"
       traefik.http.routers.qbittorrent-external.service: "qbittorrent"
       traefik.http.routers.qbittorrent-external.middlewares: "auth@file"
 {% endif %}
