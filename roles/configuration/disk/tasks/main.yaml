@@ -29,6 +29,28 @@
     name: nct6775
     state: present
 
+- name: Create hddfancontrol systemd drop-in directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/hddfancontrol.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Resolve hwmon path by chip name before hddfancontrol starts
+  ansible.builtin.template:
+    src: hddfancontrol-hwmon.conf.j2
+    dest: /etc/systemd/system/hddfancontrol.service.d/hwmon.conf
+    owner: root
+    group: root
+    mode: "0644"
+  register: hddfancontrol_dropin
+
+- name: Reload systemd when the drop-in changes
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when: hddfancontrol_dropin is changed
+
 - name: Configure hddfancontrol daemon arguments
   ansible.builtin.template:
     src: hddfancontrol.j2
@@ -42,7 +64,7 @@
   ansible.builtin.systemd:
     name: hddfancontrol
     state: restarted
-  when: hddfancontrol_conf is changed
+  when: hddfancontrol_conf is changed or hddfancontrol_dropin is changed
 
 - name: Enable and start hddfancontrol
   ansible.builtin.systemd:

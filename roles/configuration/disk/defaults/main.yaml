@@ -5,9 +5,11 @@ hddfancontrol_drives:
   - /dev/sdc
 
 # nct6795 Super I/O, pwm4 = SYS_FAN1 chassis intake fan (DC mode).
-# NOTE: hwmonN numbering can shift across reboots/kernel updates — revisit
-# if hddfancontrol logs a missing pwm path.
-hddfancontrol_pwm_path: /sys/class/hwmon/hwmon3/pwm4
+# hwmonN numbering shifts between boots (nouveau races nct6775), so the unit's
+# ExecStartPre links the hwmon directory named `hddfancontrol_hwmon_name` here.
+hddfancontrol_hwmon_name: nct6795
+hddfancontrol_hwmon_link: /run/hddfancontrol/hwmon
+hddfancontrol_pwm_path: "{{ hddfancontrol_hwmon_link }}/pwm4"
 # Fan start/stop PWM thresholds, found via `hddfancontrol pwm-test`.
 hddfancontrol_pwm_start: 75
 hddfancontrol_pwm_stop: 55
