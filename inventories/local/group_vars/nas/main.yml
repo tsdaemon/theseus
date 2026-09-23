@@ -23,6 +23,11 @@ ansible_nas_data_root: "/mnt/data"
 docker_home: /appdata
 docker_network_name: "main"
 docker_group_id: 987
+docker_daemon_json_extra:
+  runtimes:
+    nvidia:
+      path: nvidia-container-runtime
+      runtimeArgs: []
 
 # Samba
 samba_shares_root: "{{ ansible_nas_data_root }}/data/media"
@@ -149,6 +154,10 @@ plex_enabled: true
 plex_available_externally: false
 plex_hostname: plex
 plex_config_directory: "{{ ansible_nas_data_root }}/data/plex"
+
+## jellyfin
+jellyfin_enabled: true
+jellyfin_hostname: jellyfin
 
 ## lidarr
 lidarr_enabled: true

@@ -1,0 +1,7 @@
+---
+# Verified working on the Quadro P400 (Pascal) in theseus, 2026-09-23.
+nvidia_driver_branch: "580-server"
+
+nvidia_container_toolkit_keyring: /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+nvidia_container_toolkit_gpg_key_url: https://nvidia.github.io/libnvidia-container/gpgkey
+nvidia_container_toolkit_apt_list_url: https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list

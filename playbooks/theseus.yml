@@ -69,6 +69,11 @@
         - docker
         - configuration
 
+    - role: nvidia
+      tags:
+        - nvidia
+        - configuration
+
     ###
     ### Storage
     ###
@@ -178,6 +183,11 @@
     - role: plex
       tags:
         - plex
+        - applications
+
+    - role: jellyfin
+      tags:
+        - jellyfin
         - applications
 
     - role: lidarr

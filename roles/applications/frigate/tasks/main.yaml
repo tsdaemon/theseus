@@ -18,6 +18,14 @@
         dest: "{{ frigate_directory }}/docker-compose.yaml"
         mode: '0440'
 
+    - name: Create config.yml
+      ansible.builtin.template:
+        src: config.yml
+        dest: "{{ frigate_config_directory }}/config.yml"
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: '0640'
+
     - name: Start Frigate
       community.docker.docker_compose_v2:
         project_src: "{{ frigate_directory }}"

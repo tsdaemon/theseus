@@ -1,0 +1,77 @@
+mqtt:
+  enabled: false
+
+tls:
+  enabled: false
+
+audio:
+  enabled: true
+
+{% if frigate_ffmpeg_hwaccel_args %}
+ffmpeg:
+  hwaccel_args: {{ frigate_ffmpeg_hwaccel_args }}
+{% endif %}
+
+go2rtc:
+  streams:
+    balcony:
+      - ffmpeg:rtsp://{{ frigate_balcony_camera_user }}:{{ frigate_balcony_camera_password }}@{{ frigate_balcony_camera_ip }}:554/stream1#video=copy#audio=aac # <- stream which supports video & aac audio.
+
+snapshots:
+  enabled: true
+  timestamp: true
+
+detectors:
+  ov:
+    type: openvino
+    device: CPU
+
+semantic_search:
+  enabled: true
+  model: jinav1
+  model_size: small
+
+model:
+  width: 300
+  height: 300
+  input_tensor: nhwc
+  input_pixel_format: bgr
+  path: /openvino-model/ssdlite_mobilenet_v2.xml
+  labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+
+cameras:
+  balcony:
+    ffmpeg:
+      output_args:
+        record: preset-record-generic-audio-copy
+      inputs:
+        - path: rtsp://127.0.0.1:8554/balcony # <--- the name here must match the name of the camera in restream
+          input_args: preset-rtsp-restream
+          roles:
+            - record
+            - detect
+            - audio
+    live:
+      streams:
+        balcony: balcony
+    audio:
+      enabled: true
+      listen:
+        - scream
+        - glass
+        - smash
+        - breaking
+        - yell
+    zones: {}
+    review:
+      alerts: {}
+    motion: {}
+record:
+  enabled: true
+  continuous:
+    days: 30
+  motion:
+    days: 30
+version: 0.18-0
+detect:
+  enabled: true

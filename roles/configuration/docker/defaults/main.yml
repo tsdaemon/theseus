@@ -12,8 +12,9 @@ docker_image_directory: "/var/lib/docker"
 # You might want to change this to ZFS, depending on your underlying filesystem.
 docker_storage_driver: overlay2
 
-docker_daemon_json:
-  data-root: "{{ docker_image_directory }}"
-  storage-driver: "{{ docker_storage_driver }}"
+# Extra keys merged into docker_daemon_json below, e.g. to register the nvidia runtime.
+docker_daemon_json_extra: {}
+
+docker_daemon_json: "{{ {'data-root': docker_image_directory, 'storage-driver': docker_storage_driver} | combine(docker_daemon_json_extra) }}"
 
 docker_network_name: "main"

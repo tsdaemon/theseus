@@ -5,6 +5,14 @@ services:
     stop_grace_period: 30s # allow enough time to shut down the various services
     image: "{{ frigate_image_name }}:{{ frigate_image_version }}"
     shm_size: "{{ frigate_shm_size }}"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - {{ frigate_config_directory }}:/config
@@ -21,6 +29,7 @@ services:
       - "{{ frigate_port_webrtc }}:8555/udp" # WebRTC over udp
     environment:
       FRIGATE_RTSP_PASSWORD: "{{ frigate_rtsp_password }}"
+      NVIDIA_DRIVER_CAPABILITIES: all
     labels:
       traefik.enable: "true"
       traefik.http.routers.frigate.rule: "Host(`{{ frigate_hostname }}.{{ ansible_nas_local_domain }}`)"

@@ -1,0 +1,68 @@
+---
+- name: Check if the NVIDIA driver is already loaded
+  ansible.builtin.command: nvidia-smi
+  register: nvidia_smi_check
+  changed_when: false
+  failed_when: false
+
+# DKMS builds against whatever kernel is actually running, so it survives
+# kernel upgrades without needing a matching prebuilt module package per
+# kernel version (that mismatch is what broke networking on 2026-09-23:
+# `ubuntu-drivers install --gpgpu` installed a no-dkms driver prebuilt only
+# for the newly-pulled-in kernel, and linux-modules-extra for that kernel
+# never got installed, so r8169 was missing after reboot).
+- name: Ensure headers for the running kernel are installed
+  ansible.builtin.apt:
+    name: "linux-headers-{{ ansible_kernel }}"
+    state: present
+
+- name: Install dkms and the NVIDIA driver
+  ansible.builtin.apt:
+    name:
+      - dkms
+      - "nvidia-dkms-{{ nvidia_driver_branch }}"
+      - "nvidia-utils-{{ nvidia_driver_branch }}"
+    state: present
+  register: nvidia_driver_install
+
+- name: Ensure the nvidia kernel module is loaded
+  community.general.modprobe:
+    name: nvidia
+    state: present
+  when: nvidia_driver_install.changed or nvidia_smi_check.rc != 0
+
+- name: Download the NVIDIA Container Toolkit GPG key
+  ansible.builtin.get_url:
+    url: "{{ nvidia_container_toolkit_gpg_key_url }}"
+    dest: /tmp/nvidia-container-toolkit.asc
+    mode: "0644"
+
+- name: Dearmor the NVIDIA Container Toolkit GPG key
+  ansible.builtin.command: >-
+    gpg --dearmor --yes -o {{ nvidia_container_toolkit_keyring }}
+    /tmp/nvidia-container-toolkit.asc
+  args:
+    creates: "{{ nvidia_container_toolkit_keyring }}"
+
+- name: Add the NVIDIA Container Toolkit apt source list
+  ansible.builtin.get_url:
+    url: "{{ nvidia_container_toolkit_apt_list_url }}"
+    dest: /etc/apt/sources.list.d/nvidia-container-toolkit.list
+    mode: "0644"
+  register: nvidia_container_toolkit_apt_list
+
+- name: Pin the NVIDIA Container Toolkit apt source to its keyring
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list.d/nvidia-container-toolkit.list
+    regexp: '^deb https://'
+    replace: "deb [signed-by={{ nvidia_container_toolkit_keyring }}] https://"
+
+- name: Update apt cache after adding the NVIDIA Container Toolkit repo
+  ansible.builtin.apt:
+    update_cache: true
+  when: nvidia_container_toolkit_apt_list.changed
+
+- name: Install nvidia-container-toolkit
+  ansible.builtin.apt:
+    name: nvidia-container-toolkit
+    state: present

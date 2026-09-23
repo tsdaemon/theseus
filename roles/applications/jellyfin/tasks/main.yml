@@ -1,0 +1,32 @@
+---
+- name: Start Jellyfin
+  block:
+    - name: Create Jellyfin Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: '0770'
+      with_items:
+        - "{{ jellyfin_config_directory }}"
+        - "{{ jellyfin_cache_directory }}"
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ jellyfin_directory }}/docker-compose.yaml"
+        mode: '0440'
+
+    - name: Start Jellyfin
+      community.docker.docker_compose_v2:
+        project_src: "{{ jellyfin_directory }}"
+        state: present
+
+  when: jellyfin_enabled
+
+- name: Stop Jellyfin
+  community.docker.docker_compose_v2:
+    project_src: "{{ jellyfin_directory }}"
+    state: absent
+  when: not jellyfin_enabled

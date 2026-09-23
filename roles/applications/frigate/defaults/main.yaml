@@ -20,3 +20,9 @@ frigate_image_version: "stable"
 
 # specs
 frigate_shm_size: 400mb
+
+# GPU (NVDEC decode offload; detector stays CPU/openvino)
+frigate_ffmpeg_hwaccel_args: "" # preset-nvidia-h264 crashes the record+detect ffmpeg filter graph on this Frigate version (scale_cuda vs auto_scale format mismatch) - needs follow-up
+
+# cameras
+frigate_balcony_camera_ip: "192.168.0.30"
