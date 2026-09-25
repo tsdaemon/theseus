@@ -17,8 +17,13 @@
         mode: "770"
       with_items:
         - "{{ pihole_directory }}"
-        - "{{ pihole_config_directory }}"
         - "{{ pihole_dnsmasq_directory }}"
+
+    # Owned by the container's pihole user (chowned on start); FTL needs write access for API changes.
+    - name: Create Pi-hole config directory
+      ansible.builtin.file:
+        path: "{{ pihole_config_directory }}"
+        state: directory
 
     - name: Create docker-compose.yaml
       ansible.builtin.template:
@@ -41,6 +46,125 @@
         content: |
           nameserver {{ ansible_nas_ip }}
         mode: "0644"
+
+    - name: Configure Pi-hole groups
+      when: pihole_groups | length > 0
+      vars:
+        pihole_api: "http://localhost:{{ pihole_web_port }}/api"
+      block:
+        - name: Log in to Pi-hole API
+          ansible.builtin.uri:
+            url: "{{ pihole_api }}/auth"
+            method: POST
+            body_format: json
+            body:
+              password: "{{ pihole_webpassword }}"
+          register: pihole_auth
+          retries: 30
+          delay: 2
+          until: pihole_auth.status == 200
+          no_log: true
+
+        - name: Get Pi-hole groups and lists
+          ansible.builtin.uri:
+            url: "{{ pihole_api }}/{{ item }}"
+            headers:
+              X-FTL-SID: "{{ pihole_auth.json.session.sid }}"
+          register: pihole_existing
+          retries: 30
+          delay: 2
+          until: pihole_existing.status == 200
+          loop:
+            - groups
+            - lists
+
+        - name: Create missing Pi-hole groups
+          ansible.builtin.uri:
+            url: "{{ pihole_api }}/groups"
+            method: POST
+            headers:
+              X-FTL-SID: "{{ pihole_auth.json.session.sid }}"
+            body_format: json
+            body:
+              name: "{{ item.name }}"
+              enabled: true
+            status_code: 201
+          loop: "{{ pihole_groups | rejectattr('name', 'in', pihole_existing.results[0].json.groups | map(attribute='name')) }}"
+          loop_control:
+            label: "{{ item.name }}"
+          register: pihole_groups_created
+
+        - name: Refresh Pi-hole group ids
+          ansible.builtin.uri:
+            url: "{{ pihole_api }}/groups"
+            headers:
+              X-FTL-SID: "{{ pihole_auth.json.session.sid }}"
+          register: pihole_groups_current
+
+        - name: Map Pi-hole adlists to group ids
+          ansible.builtin.set_fact:
+            pihole_adlist_groups: "{{ pihole_adlist_groups | default({}) | combine({item.1: (pihole_adlist_groups | default({}))[item.1] | default([]) + [pihole_group_ids[item.0.name]]}) }}"
+          vars:
+            pihole_group_ids: "{{ pihole_groups_current.json.groups | items2dict(key_name='name', value_name='id') }}"
+          loop: "{{ pihole_groups | subelements('adlists') }}"
+          loop_control:
+            label: "{{ item.1 }}"
+
+        - name: Map Pi-hole clients to group ids
+          ansible.builtin.set_fact:
+            pihole_client_groups: "{{ pihole_client_groups | default({}) | combine({item.1: (pihole_client_groups | default({}))[item.1] | default([0]) + [pihole_group_ids[item.0.name]]}) }}"
+          vars:
+            pihole_group_ids: "{{ pihole_groups_current.json.groups | items2dict(key_name='name', value_name='id') }}"
+          loop: "{{ pihole_groups | subelements('clients') }}"
+          loop_control:
+            label: "{{ item.1 }}"
+
+        - name: Set Pi-hole adlists
+          ansible.builtin.uri:
+            url: "{{ pihole_api }}/lists/{{ item.key | urlencode | replace('/', '%2F') }}?type=block"
+            method: PUT
+            headers:
+              X-FTL-SID: "{{ pihole_auth.json.session.sid }}"
+            body_format: json
+            body:
+              groups: "{{ item.value }}"
+              enabled: true
+              comment: "Managed by Ansible"
+          loop: "{{ pihole_adlist_groups | dict2items }}"
+          loop_control:
+            label: "{{ item.key }}"
+
+        - name: Set Pi-hole clients
+          ansible.builtin.uri:
+            url: "{{ pihole_api }}/clients/{{ item.key | urlencode }}"
+            method: PUT
+            headers:
+              X-FTL-SID: "{{ pihole_auth.json.session.sid }}"
+            body_format: json
+            body:
+              groups: "{{ item.value }}"
+              comment: "Managed by Ansible"
+          loop: "{{ pihole_client_groups | dict2items }}"
+          loop_control:
+            label: "{{ item.key }}"
+
+        - name: Update Pi-hole gravity for new adlists
+          ansible.builtin.uri:
+            url: "{{ pihole_api }}/action/gravity"
+            method: POST
+            headers:
+              X-FTL-SID: "{{ pihole_auth.json.session.sid }}"
+            timeout: 600
+          when: pihole_adlist_groups.keys() | difference(pihole_existing.results[1].json.lists | map(attribute='address')) | length > 0
+      always:
+        - name: Log out of Pi-hole API
+          ansible.builtin.uri:
+            url: "{{ pihole_api }}/auth"
+            method: DELETE
+            headers:
+              X-FTL-SID: "{{ pihole_auth.json.session.sid }}"
+            status_code: 204
+          when: pihole_auth.json.session.sid is defined
   when: pihole_enabled
 
 - name: Stop Pi-hole

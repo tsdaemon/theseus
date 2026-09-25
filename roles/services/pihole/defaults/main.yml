@@ -34,3 +34,10 @@ pihole_dnsmasq_lines:
 # Each gets address=/name/ip (A record) plus local=/name/ (never forwarded). address= alone still forwards AAAA/HTTPS,
 # which leaks a public wildcard's (e.g. Cloudflare) IPv6 and h3/ECH hints.
 pihole_local_hostnames: []
+
+# Groups with extra blocklists applied only to their clients (managed via the Pi-hole v6 API).
+# Clients also stay in Default. Lists/groups/clients not listed here are left untouched.
+# - name: lg-tv
+#   clients: ["192.168.0.106"]
+#   adlists: ["https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/SmartTV.txt"]
+pihole_groups: []

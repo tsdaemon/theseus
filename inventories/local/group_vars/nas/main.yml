@@ -303,6 +303,15 @@ pihole_dns2: "1.1.1.1"
 # (AAAA/HTTPS would otherwise come from Cloudflare). Add one name per service.
 pihole_local_hostnames:
   - "keycloak-admin.{{ ansible_nas_domain }}"
+# Smart TV tracking/ads (ACR, lgsmartad, lgtvcommon) blocked only for the LG TVs.
+pihole_groups:
+  - name: lg-tv
+    clients:
+      - "192.168.0.105"  # LG OLED55B9PLA, Вітальня
+      - "192.168.0.106"  # LG OLED42C34LA, Кабінет
+    adlists:
+      - "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/native.lgwebos.txt"
+      - "https://raw.githubusercontent.com/Perflyst/PiHoleBlocklist/master/SmartTV.txt"
 
 ## wireguard
 wireguard_enabled: true
