@@ -1,3 +1,3 @@
 # Managed by Ansible (roles/configuration/disk)
 [Service]
-ExecStartPre=+/bin/sh -c 'mkdir -p "$(dirname {{ hddfancontrol_hwmon_link }})"; for h in /sys/class/hwmon/hwmon*; do [ "$(cat $h/name)" = "{{ hddfancontrol_hwmon_name }}" ] && exec ln -sfn "$(readlink -f $h)" {{ hddfancontrol_hwmon_link }}; done; echo "hwmon {{ hddfancontrol_hwmon_name }} not found" >&2; exit 1'
+ExecStartPre=+/bin/sh -c 'mkdir -p "$(dirname {{ hddfancontrol_hwmon_link }})"; found=0; for h in /sys/class/hwmon/hwmon*; do [ "$(cat $h/name)" = "{{ hddfancontrol_hwmon_name }}" ] && { ln -sfn "$(readlink -f $h)" {{ hddfancontrol_hwmon_link }}; found=1; break; }; done; [ "$found" = "1" ] || { echo "hwmon {{ hddfancontrol_hwmon_name }} not found" >&2; exit 1; }; echo 1 > {{ hddfancontrol_hwmon_link }}/pwm4_enable'

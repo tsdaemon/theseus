@@ -4,18 +4,22 @@ hddfancontrol_drives:
   - /dev/sdb
   - /dev/sdc
 
-# nct6795 Super I/O, pwm4 = SYS_FAN1 chassis intake fan (DC mode).
-# hwmonN numbering shifts between boots (nouveau races nct6775), so the unit's
-# ExecStartPre links the hwmon directory named `hddfancontrol_hwmon_name` here.
+# nct6795 Super I/O, pwm4 = SYS_FAN1 chassis intake fan (4-pin PWM, set to
+# PWM mode in BIOS). The board resets pwm4_enable to its own auto curve (5)
+# on boot, so the unit's ExecStartPre both links the hwmon directory named
+# `hddfancontrol_hwmon_name` here (hwmonN numbering shifts between boots —
+# nouveau races nct6775) and forces pwm4_enable back to manual (1) so
+# hddfancontrol's writes stick.
 hddfancontrol_hwmon_name: nct6795
 hddfancontrol_hwmon_link: /run/hddfancontrol/hwmon
 hddfancontrol_pwm_path: "{{ hddfancontrol_hwmon_link }}/pwm4"
-# Fan start/stop PWM thresholds, found via `hddfancontrol pwm-test`.
-hddfancontrol_pwm_start: 75
-hddfancontrol_pwm_stop: 55
+# Fan start/stop PWM thresholds, found via `hddfancontrol pwm-test` (raw 0-255
+# scale, per the daemon's --pwm PATH:START:STOP format).
+hddfancontrol_pwm_start: 35
+hddfancontrol_pwm_stop: 30
 
 # Ramp the fan across this HDD temperature range (degrees C).
-hddfancontrol_temp_min: 43
+hddfancontrol_temp_min: 42
 hddfancontrol_temp_max: 53
 
 hddfancontrol_interval: 30s

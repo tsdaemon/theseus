@@ -21,6 +21,12 @@ ansible_nas_smtp_username: "theseus@mail.{{ ansible_nas_domain }}"
 ansible_nas_data_root: "/mnt/data"
 
 docker_home: /appdata
+# Duplicati's compose only mounts docker_home as a backup source, so anything
+# a service puts here is never seen by it. Point large/regenerable app data
+# (caches, time-series DBs, anything not worth backing up) here instead of
+# docker_home. Under /mnt/nvme, not a new top-level path — that's the actual
+# bind-mounted NVMe partition; a fresh path at "/" lands on the root SATA SSD.
+docker_home_large: /mnt/nvme/appdata_large
 docker_network_name: "main"
 docker_group_id: 987
 docker_daemon_json_extra:
@@ -163,6 +169,8 @@ jellyfin_hostname: jellyfin
 lidarr_enabled: true
 lidarr_available_externally: false
 lidarr_hostname: lidarr
+# Config/db only, not worth backing up.
+lidarr_directory: "{{ docker_home_large }}/lidarr"
 
 ## flaresolverr
 flaresolverr_enabled: true
@@ -211,7 +219,8 @@ keycloak_enabled: true
 
 ## influxdb2
 influxdb2_enabled: true
-influxdb2_data_directory: "{{ ansible_nas_data_root }}/data/influxdb2"
+# TSM engine/index only, not worth backing up.
+influxdb2_data_directory: "{{ docker_home_large }}/influxdb2/data"
 
 ## mariadb
 mariadb_enabled: true
