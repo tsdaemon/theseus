@@ -4,18 +4,21 @@ hddfancontrol_drives:
   - /dev/sdb
   - /dev/sdc
 
-# nct6795 Super I/O, pwm4 = SYS_FAN1 chassis intake fan (4-pin PWM, set to
-# PWM mode in BIOS). The board resets pwm4_enable to its own auto curve (5)
-# on boot, so the unit's ExecStartPre both links the hwmon directory named
-# `hddfancontrol_hwmon_name` here (hwmonN numbering shifts between boots —
-# nouveau races nct6775) and forces pwm4_enable back to manual (1) so
-# hddfancontrol's writes stick.
+# nct6795 Super I/O, pwm4 = SYS_FAN1 chassis intake fan (3-pin DC Jonsbo fan,
+# but this channel's pwm4_mode is stuck at 1/PWM in Linux regardless of BIOS
+# DC setting — confirmed hardware/driver mismatch, not fixable from the OS
+# side; the fan still responds to pwm4 proportionally, just with audible
+# coil buzz mid-range). The board resets pwm4_enable to its own auto curve
+# (5) on boot, so the unit's ExecStartPre both links the hwmon directory
+# named `hddfancontrol_hwmon_name` here (hwmonN numbering shifts between
+# boots — nouveau races nct6775) and forces pwm4_enable back to manual (1)
+# so hddfancontrol's writes stick.
 hddfancontrol_hwmon_name: nct6795
 hddfancontrol_hwmon_link: /run/hddfancontrol/hwmon
 hddfancontrol_pwm_path: "{{ hddfancontrol_hwmon_link }}/pwm4"
 # Fan start/stop PWM thresholds, found via `hddfancontrol pwm-test` (raw 0-255
 # scale, per the daemon's --pwm PATH:START:STOP format).
-hddfancontrol_pwm_start: 35
+hddfancontrol_pwm_start: 75
 hddfancontrol_pwm_stop: 30
 
 # Ramp the fan across this HDD temperature range (degrees C).
