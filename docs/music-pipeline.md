@@ -98,8 +98,12 @@ in line with the profiles in use.
 - Throughput: `slskd_soularr_albums_per_run` × runs per day
   (`86400 / slskd_soularr_interval`). The defaults (5 every 5 min, at most about 1,400 per day) are sized for
   the first rollout. Raise them once imports are confirmed working.
-- Network: port `50300` is published on the host but **not forwarded on the router**, so peers
-  can't open connections to us. Downloads from firewalled peers can fail. That's acceptable for now.
+- Network: peer port `50300/tcp` is forwarded on the router to Theseus. Without it, downloads
+  from firewalled peers (a large share of the network) fail with connection timeouts.
+- Expect waits: a download sits in the other user's upload queue (`Queued, Remotely`) until
+  they get to it. Soularr waits for its current batch before searching again, and cancels anything
+  stuck in a remote queue longer than `remote_queue_timeout` (5 min) or stalled longer than
+  `stalled_timeout` (1 h).
 - UI: `http://slskd.theseus` (LAN only, `web_local`).
 
 ## Rollout checklist

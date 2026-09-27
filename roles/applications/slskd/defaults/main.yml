@@ -21,8 +21,8 @@ slskd_group_id: "{{ ansible_nas_group_id }}"
 # network
 slskd_hostname: "slskd"
 slskd_port_http: "5030"
-# Soulseek peer port. Not forwarded on the router, so inbound peer
-# connections fail and only outbound (passive) transfers work.
+# Soulseek peer port; forwarded (TCP) on the router so firewalled peers can
+# connect to us.
 slskd_port_listen: "50300"
 
 # docker
