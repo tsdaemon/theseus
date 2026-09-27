@@ -27,18 +27,10 @@ services:
       traefik.http.routers.navidrome.rule: "Host(`{{ navidrome_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.navidrome.entrypoints: "web_local"
       traefik.http.services.navidrome.loadbalancer.server.port: "4533"
-{% if navidrome_available_externally %}
-      traefik.http.routers.navidrome-external.rule: "Host(`{{ navidrome_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.navidrome-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.navidrome-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.navidrome-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.navidrome-external.entrypoints: "web,web_secure"
-      traefik.http.routers.navidrome-external.service: "navidrome"
-{% endif %}
       homepage.group: Applications
       homepage.name: Navidrome
       homepage.icon: navidrome
-      homepage.href: "{% if navidrome_available_externally %}https://{{ navidrome_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ navidrome_port }}{% endif %}"
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ navidrome_port }}"
       homepage.description: Music streaming server
 {% if navidrome_user %}
       homepage.widget.type: navidrome

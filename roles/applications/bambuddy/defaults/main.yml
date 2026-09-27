@@ -14,7 +14,6 @@ bambuddy_image_name: "ghcr.io/maziggy/bambuddy"
 bambuddy_image_version: "latest"
 
 # application
-bambuddy_available_externally: false
 bambuddy_hostname: "bambuddy"
 bambuddy_port: "8000"
 bambuddy_timezone: "{{ ansible_nas_timezone }}"

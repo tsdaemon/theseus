@@ -1,6 +1,5 @@
 ---
 flaresolverr_enabled: false
-flaresolverr_available_externally: false
 
 # directories
 flaresolverr_directory: "{{ docker_home }}/flaresolverr"

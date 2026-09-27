@@ -1,7 +1,6 @@
 ---
 # enable or disable the application
 homepage_enabled: false
-homepage_available_externally: false
 
 # directories
 homepage_directory: "{{ docker_home }}/homepage"

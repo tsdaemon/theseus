@@ -35,14 +35,6 @@ services:
       traefik.http.routers.bambuddy.rule: "Host(`{{ bambuddy_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.bambuddy.entrypoints: "web_local"
       traefik.http.services.bambuddy.loadbalancer.server.port: "{{ bambuddy_port }}"
-{% if bambuddy_available_externally %}
-      traefik.http.routers.bambuddy-external.rule: "Host(`{{ bambuddy_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.bambuddy-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.bambuddy-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.bambuddy-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.bambuddy-external.entrypoints: "web,web_secure"
-      traefik.http.routers.bambuddy-external.service: "bambuddy"
-{% endif %}
       homepage.group: Applications
       homepage.name: BambuDDY
       homepage.icon: sh-bambuddy.png

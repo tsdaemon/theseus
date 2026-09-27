@@ -1,6 +1,5 @@
 # enable or disable the application
 immich_enabled: false
-immich_available_externally: false
 
 immich_hostname: "immich"
 

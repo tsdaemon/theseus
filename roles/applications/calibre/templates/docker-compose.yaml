@@ -26,14 +26,6 @@ services:
       traefik.http.routers.calibre.rule: "Host(`{{ calibre_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.calibre.entrypoints: "web_local"
       traefik.http.services.calibre.loadbalancer.server.port: "8181"
-{% if calibre_available_externally %}
-      traefik.http.routers.calibre-external.rule: "Host(`{{ calibre_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.calibre-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.calibre-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.calibre-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.calibre-external.entrypoints: "web,web_secure"
-      traefik.http.routers.calibre-external.service: "calibre"
-{% endif %}
       homepage.group: Applications
       homepage.name: Calibre
       homepage.icon: sh-calibre.png
@@ -61,14 +53,6 @@ services:
       traefik.http.routers.calibreweb.rule: "Host(`{{ calibreweb_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.calibreweb.entrypoints: "web_local"
       traefik.http.services.calibreweb.loadbalancer.server.port: "8083"
-{% if calibreweb_available_externally %}
-      traefik.http.routers.calibreweb-external.rule: "Host(`{{ calibreweb_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.calibreweb-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.calibreweb-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.calibreweb-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.calibreweb-external.entrypoints: "web,web_secure"
-      traefik.http.routers.calibreweb-external.service: "calibreweb"
-{% endif %}
       homepage.group: Applications
       homepage.name: Calibre-Web
       homepage.icon: sh-calibre-web.png

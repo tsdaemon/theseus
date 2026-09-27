@@ -1,6 +1,5 @@
 ---
 plex_enabled: false
-plex_available_externally: false
 
 # directories
 plex_directory: "{{ docker_home }}/plex"

@@ -1,7 +1,6 @@
 ---
 # enable or disable the application
 cloudcmd_enabled: false
-cloudcmd_available_externally: false
 
 # directories
 cloudcmd_directory: "{{ docker_home }}/cloudcmd"

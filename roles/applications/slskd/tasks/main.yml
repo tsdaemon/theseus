@@ -1,0 +1,45 @@
+---
+- name: Start slskd
+  block:
+    - name: Create slskd Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "770"
+      with_items:
+        - "{{ slskd_directory }}"
+        - "{{ slskd_config_directory }}"
+        - "{{ slskd_soularr_config_directory }}"
+        - "{{ slskd_downloads_directory }}"
+        - "{{ slskd_incomplete_directory }}"
+
+    - name: Create soularr config.ini
+      ansible.builtin.template:
+        src: soularr-config.ini
+        dest: "{{ slskd_soularr_config_directory }}/config.ini"
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: '0640'
+      register: slskd_soularr_config
+
+    - name: Create docker-compose.yaml
+      ansible.builtin.template:
+        src: docker-compose.yaml
+        dest: "{{ slskd_directory }}/docker-compose.yaml"
+        mode: '0440'
+
+    - name: Start slskd
+      community.docker.docker_compose_v2:
+        project_src: "{{ slskd_directory }}"
+        recreate: "{{ 'always' if slskd_soularr_config.changed else 'auto' }}"
+        # Drops the soularr container when slskd_soularr_enabled is turned off.
+        remove_orphans: true
+  when: slskd_enabled
+
+- name: Stop slskd
+  community.docker.docker_compose_v2:
+    project_src: "{{ slskd_directory }}"
+    state: stopped
+  when: not slskd_enabled

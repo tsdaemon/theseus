@@ -124,12 +124,10 @@ samba_shares:
 
 ## hermes
 hermes_enabled: false
-hermes_available_externally: false
 hermes_hostname: hermes
 
 ## ntfy
 ntfy_enabled: false
-ntfy_available_externally: false
 ntfy_private_source_ranges:
   - "192.168.0.0/24"
   - "10.42.42.42/32" # WireGuard container's masqueraded traffic
@@ -145,19 +143,16 @@ calibre_enabled: true
 
 ## immich
 immich_enabled: true
-immich_available_externally: false
 immich_hostname: im
 
 ## qbittorrent
 qbittorrent_enabled: true
-qbittorrent_available_externally: false
 qbittorrent_hostname: qb
 qbittorrent_download_directory: "{{ ansible_nas_data_root }}/data"
 qbittorrent_download_directory_active: "{{ media_root }}/incomplete"
 
 ## plex
 plex_enabled: true
-plex_available_externally: false
 plex_hostname: plex
 plex_config_directory: "{{ ansible_nas_data_root }}/data/plex"
 
@@ -167,24 +162,25 @@ jellyfin_hostname: jellyfin
 
 ## lidarr
 lidarr_enabled: true
-lidarr_available_externally: false
 lidarr_hostname: lidarr
 # Config/db only, not worth backing up.
 lidarr_directory: "{{ docker_home_large }}/lidarr"
 
+## slskd
+slskd_enabled: true
+slskd_hostname: slskd
+slskd_soularr_enabled: true
+
 ## flaresolverr
 flaresolverr_enabled: true
-flaresolverr_available_externally: false
 flaresolverr_hostname: flaresolverr
 
 ## prowlarr
 prowlarr_enabled: true
-prowlarr_available_externally: false
 prowlarr_hostname: prowlarr
 
 ## navidrome
 navidrome_enabled: true
-navidrome_available_externally: false
 navidrome_hostname: navidrome
 
 ## stash
@@ -197,7 +193,6 @@ stash_qbittorrent_hostname: qb-stash
 
 ## gramps
 gramps_enabled: true
-gramps_available_externally: false
 gramps_tree_name: "Anatolii Stehnii Family Tree"
 gramps_hostname: "gr"
 
@@ -248,7 +243,6 @@ crowdsec_data_directory: "{{ ansible_nas_data_root }}/data/crowdsec"
 
 ## homepage
 homepage_enabled: true
-homepage_available_externally: false
 homepage_bookmarks_yaml:
 homepage_widgets_yaml:
   - greeting:
@@ -296,7 +290,6 @@ homepage_settings_yaml:
 
 ## duplicati
 duplicati_enabled: true
-duplicati_available_externally: false
 duplicati_hostname: dpl
 duplicati_data_permissions: rw
 
@@ -340,7 +333,6 @@ loki_promtail_data_directory: "{{ ansible_nas_data_root }}/data/loki/promtail"
 
 ## stats
 stats_enabled: true
-stats_grafana_available_externally: false
 stats_internet_speed_test_enabled: true
 stats_prometheus_data_directory: "{{ ansible_nas_data_root }}/data/stats/prometheus"
 stats_grafana_data_directory: "{{ ansible_nas_data_root }}/data/stats/grafana"

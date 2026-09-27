@@ -22,14 +22,6 @@ services:
       traefik.http.routers.ubooquity.rule: "Host(`{{ ubooquity_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.ubooquity.entrypoints: "web_local"
       traefik.http.services.ubooquity.loadbalancer.server.port: "2202"
-{% if ubooquity_available_externally %}
-      traefik.http.routers.ubooquity-external.rule: "Host(`{{ ubooquity_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.ubooquity-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.ubooquity-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.ubooquity-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.ubooquity-external.entrypoints: "web,web_secure"
-      traefik.http.routers.ubooquity-external.service: "ubooquity"
-{% endif %}
       homepage.group: Applications
       homepage.name: Ubooquity
       homepage.icon: mdi-bookshelf

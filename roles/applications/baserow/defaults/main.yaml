@@ -1,5 +1,4 @@
 baserow_enabled: false
-baserow_available_externally: false
 
 baserow_folder: "{{ docker_home }}/baserow"
 baserow_data_directory: "{{ baserow_folder }}/data"

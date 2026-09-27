@@ -1,7 +1,5 @@
 ---
 calibre_enabled: false
-calibre_available_externally: false
-calibreweb_available_externally: false
 
 # directories
 calibre_directory: "{{ docker_home }}/calibre"

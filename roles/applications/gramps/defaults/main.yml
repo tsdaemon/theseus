@@ -1,6 +1,5 @@
 ---
 gramps_enabled: false
-gramps_available_externally: false
 
 # directories
 gramps_directory: "{{ docker_home }}/gramps"

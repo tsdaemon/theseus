@@ -1,5 +1,4 @@
 dokku_enabled: false
-dokku_available_externally: false
 dokku_hostname: "dokku"
 
 dokku_directory: "{{ docker_home }}/dokku"

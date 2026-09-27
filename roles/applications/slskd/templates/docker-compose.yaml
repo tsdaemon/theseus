@@ -1,0 +1,66 @@
+---
+name: "slskd"
+
+services:
+  slskd:
+    container_name: "{{ slskd_container_name }}"
+    image: "{{ slskd_image_name }}:{{ slskd_image_version }}"
+    pull_policy: always
+    user: "{{ slskd_user_id }}:{{ slskd_group_id }}"
+    volumes:
+      - "{{ slskd_config_directory }}:/app:rw"
+      - "{{ slskd_downloads_directory }}:/downloads:rw"
+      - "{{ slskd_incomplete_directory }}:/incomplete:rw"
+      - "{{ slskd_shared_directory }}:/music:ro"
+    ports:
+      - "{{ slskd_port_http }}:5030"
+      - "{{ slskd_port_listen }}:50300"
+    environment:
+      TZ: "{{ ansible_nas_timezone }}"
+      SLSKD_REMOTE_CONFIGURATION: "false"
+      SLSKD_SLSK_USERNAME: "{{ slskd_soulseek_username }}"
+      SLSKD_SLSK_PASSWORD: "{{ slskd_soulseek_password }}"
+      SLSKD_SLSK_LISTEN_PORT: "50300"
+      SLSKD_USERNAME: "{{ slskd_web_username }}"
+      SLSKD_PASSWORD: "{{ slskd_web_password }}"
+      SLSKD_API_KEY: "{{ slskd_api_key }}"
+      SLSKD_DOWNLOADS_DIR: "/downloads"
+      SLSKD_INCOMPLETE_DIR: "/incomplete"
+      SLSKD_SHARED_DIR: "/music"
+    restart: unless-stopped
+    mem_limit: "{{ slskd_memory }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.slskd.rule: "Host(`{{ slskd_hostname }}.{{ ansible_nas_local_domain }}`)"
+      traefik.http.routers.slskd.entrypoints: "web_local"
+      traefik.http.services.slskd.loadbalancer.server.port: "5030"
+      homepage.group: Arr
+      homepage.name: slskd
+      homepage.icon: slskd
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ slskd_port_http }}"
+      homepage.description: Soulseek client
+      homepage.widget.type: slskd
+      homepage.widget.url: "http://{{ ansible_nas_ip }}:{{ slskd_port_http }}"
+      homepage.widget.key: "{{ slskd_api_key }}"
+{% if slskd_soularr_enabled %}
+
+  soularr:
+    container_name: "{{ slskd_soularr_container_name }}"
+    image: "{{ slskd_soularr_image_name }}:{{ slskd_soularr_image_version }}"
+    pull_policy: always
+    user: "{{ slskd_user_id }}:{{ slskd_group_id }}"
+    volumes:
+      - "{{ slskd_soularr_config_directory }}:/data:rw"
+      - "{{ slskd_downloads_directory }}:/downloads:rw"
+    environment:
+      TZ: "{{ ansible_nas_timezone }}"
+      SCRIPT_INTERVAL: "{{ slskd_soularr_interval }}"
+      WEBUI_ENABLED: "false"
+    restart: unless-stopped
+    mem_limit: "{{ slskd_soularr_memory }}"
+    # slskd's image healthcheck polls /health on 5030, which only answers once
+    # the initial share scan is done; don't let soularr run against it before.
+    depends_on:
+      slskd:
+        condition: service_healthy
+{% endif %}

@@ -1,6 +1,5 @@
 ---
 hermes_enabled: false
-hermes_available_externally: false
 hermes_hostname: "hermes"
 
 # directories

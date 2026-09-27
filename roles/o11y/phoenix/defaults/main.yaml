@@ -1,5 +1,4 @@
 phoenix_enabled: false
-phoenix_available_externally: false
 phoenix_hostname: "phoenix"
 
 phoenix_directory: "{{ docker_home }}/phoenix"

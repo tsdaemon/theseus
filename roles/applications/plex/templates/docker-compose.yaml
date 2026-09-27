@@ -30,14 +30,6 @@ services:
       traefik.http.routers.plex.rule: "Host(`{{ plex_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.plex.entrypoints: "web_local"
       traefik.http.services.plex.loadbalancer.server.port: "{{ plex_port }}"
-{% if plex_available_externally %}
-      traefik.http.routers.plex-external.rule: "Host(`{{ plex_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.plex-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.plex-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.plex-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.plex-external.entrypoints: "web,web_secure"
-      traefik.http.routers.plex-external.service: "plex"
-{% endif %}
       homepage.group: "Applications"
       homepage.name: Plex
       homepage.icon: plex

@@ -21,19 +21,10 @@ services:
       traefik.http.routers.prowlarr.rule: "Host(`{{ prowlarr_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.prowlarr.entrypoints: "web_local"
       traefik.http.services.prowlarr.loadbalancer.server.port: "9696"
-{% if prowlarr_available_externally %}
-      traefik.http.routers.prowlarr-external.rule: "Host(`{{ prowlarr_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.prowlarr-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.prowlarr-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.prowlarr-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.prowlarr-external.entrypoints: "web,web_secure"
-      traefik.http.routers.prowlarr-external.service: "prowlarr"
-      traefik.http.routers.prowlarr-external.middlewares: "auth@file"
-{% endif %}
       homepage.group: Arr
       homepage.name: Prowlarr
       homepage.icon: prowlarr
-      homepage.href: "{% if prowlarr_available_externally %}https://{{ prowlarr_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ prowlarr_port }}{% endif %}"
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ prowlarr_port }}"
       homepage.description: Indexer manager
 {% if prowlarr_api_key %}
       homepage.widget.type: prowlarr

@@ -54,7 +54,6 @@ Example: `roles/applications/gramps/`
 
 ```yaml
 gramps_enabled: false
-gramps_available_externally: false
 gramps_directory: "{{ docker_home }}/gramps"
 gramps_image_name: "ghcr.io/gramps-project/grampsweb"
 gramps_image_version: "latest"

@@ -1,5 +1,4 @@
 coolify_enabled: false
-coolify_available_externally: false
 coolify_hostname: "coolify"
 
 coolify_directory: "{{ docker_home }}/coolify"

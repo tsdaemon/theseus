@@ -1,6 +1,5 @@
 ---
 wireguard_enabled: false
-wireguard_available_externally: false
 
 # directories
 wireguard_directory: "{{ docker_home }}/wireguard"

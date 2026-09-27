@@ -1,6 +1,5 @@
 ---
 frigate_enabled: false
-frigate_available_externally: false
 frigate_hostname: "frigate"
 
 # directories

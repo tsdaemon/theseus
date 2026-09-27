@@ -1,6 +1,5 @@
 ---
 prowlarr_enabled: false
-prowlarr_available_externally: false
 
 # directories
 prowlarr_directory: "{{ docker_home }}/prowlarr"

@@ -19,14 +19,6 @@ services:
       traefik.http.routers.n8n.rule: "Host(`{{ n8n_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.n8n.entrypoints: "web_local"
       traefik.http.services.n8n.loadbalancer.server.port: "5678"
-{% if n8n_available_externally %}
-      traefik.http.routers.n8n-external.rule: "Host(`{{ n8n_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.n8n-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.n8n-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.n8n-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.n8n-external.entrypoints: "web,web_secure"
-      traefik.http.routers.n8n-external.service: "n8n"
-{% endif %}
       homepage.group: "Applications"
       homepage.name: "N8N"
       homepage.icon: "n8n.png"
@@ -42,9 +34,9 @@ services:
       N8N_SMTP_SSL: "false"
       N8N_ENCRYPTION_KEY: "{{ n8n_encryption_key }}"
       N8N_SECURE_COOKIE: "false"
-      N8N_HOST: "{% if n8n_available_externally %}https://{{ n8n_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ n8n_port }}{% endif %}"
+      N8N_HOST: "http://{{ ansible_nas_ip }}:{{ n8n_port }}"
       N8N_PORT: 5678
-      N8N_PROTOCOL: "{% if n8n_available_externally %}https{% else %}http{% endif %}"
+      N8N_PROTOCOL: "http"
       NODE_ENV: development
-      WEBHOOK_URL: "{% if n8n_available_externally %}https://{{ n8n_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ n8n_port }}{% endif %}/"
+      WEBHOOK_URL: "http://{{ ansible_nas_ip }}:{{ n8n_port }}/"
       GENERIC_TIMEZONE: {{ ansible_nas_timezone }}

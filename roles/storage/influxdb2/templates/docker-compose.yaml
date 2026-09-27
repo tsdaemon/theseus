@@ -18,14 +18,6 @@ services:
       traefik.http.routers.influxdb2.rule: "Host(`{{ influxdb2_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.influxdb2.entrypoints: "web_local"
       traefik.http.services.influxdb2.loadbalancer.server.port: "8086"
-{% if influxdb2_available_externally %}
-      traefik.http.routers.influxdb2-external.rule: "Host(`{{ influxdb2_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.influxdb2-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.influxdb2-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.influxdb2-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.influxdb2-external.entrypoints: "web,web_secure"
-      traefik.http.routers.influxdb2-external.service: "influxdb2"
-{% endif %}
       homepage.group: Monitoring
       homepage.name: InfluxDB
       homepage.icon: influxdb

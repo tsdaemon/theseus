@@ -30,7 +30,9 @@ When adding/updating service `<service>`, touch only what is needed:
 - `web_secure` (`:443`): LAN HTTPS with a wildcard Let's Encrypt cert for the public domain (DNS-01 via Cloudflare). Names must be listed in `pihole_local_hostnames`.
 - `web_cloudflare` (`127.0.0.1:8081`): only for services published through the Cloudflare Tunnel. Never attach LAN-only routers to it.
 - LAN HTTPS for a service: follow `.agents/skills/local-https-access/SKILL.md`.
-- Nothing is published on the router or forwarded; there is no external port forward anymore.
+- Web interfaces are never exposed via router port forwarding; public HTTP(S) goes only through the Cloudflare Tunnel.
+- Router port forwards exist only for non-HTTP protocols that need inbound connections (e.g. WireGuard, Soulseek peer port). The current list lives on the router's Hardware page in Notion; update it and the service's Software page whenever a forward is added or removed.
+- Do not add `<svc>_available_externally` variables or `*-external` routers; public exposure is a deliberate per-service `web_cloudflare` router.
 
 ## Working rules
 

@@ -30,14 +30,6 @@ services:
       traefik.http.routers.wireguard.rule: "Host(`{{ wireguard_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.wireguard.entrypoints: "web_local"
       traefik.http.services.wireguard.loadbalancer.server.port: "51821"
-{% if wireguard_available_externally %}
-      traefik.http.routers.wireguard-external.rule: "Host(`{{ wireguard_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.wireguard-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.wireguard-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.wireguard-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.wireguard-external.entrypoints: "web,web_secure"
-      traefik.http.routers.wireguard-external.service: "wireguard"
-{% endif %}
       homepage.group: Networking
       homepage.name: WireGuard
       homepage.icon: wireguard

@@ -66,14 +66,6 @@ services:
       traefik.http.routers.grafana.rule: "Host(`{{ stats_grafana_domain }}.{{ ansible_nas_local_domain }}`) "
       traefik.http.routers.grafana.entrypoints: "web_local"
       traefik.http.services.grafana.loadbalancer.server.port: "3000"
-{% if stats_grafana_available_externally %}
-      traefik.http.routers.grafana-external.rule: "Host(`{{ stats_grafana_domain }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.grafana-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.grafana-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.grafana-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.grafana-external.entrypoints: "web,web_secure"
-      traefik.http.routers.grafana-external.service: "grafana"
-{% endif %}
       homepage.group: Monitoring
       homepage.name: Grafana
       homepage.icon: grafana
@@ -105,14 +97,6 @@ services:
       traefik.http.routers.prometheus.rule: "Host(`{{ stats_prometheus_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.prometheus.entrypoints: "web_local"
       traefik.http.services.prometheus.loadbalancer.server.port: "9090"
-{% if stats_prometheus_available_externally %}
-      traefik.http.routers.prometheus-external.rule: "Host(`{{ stats_prometheus_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.prometheus-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.prometheus-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.prometheus-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.prometheus-external.entrypoints: "web,web_secure"
-      traefik.http.routers.prometheus-external.service: "prometheus"
-{% endif %}
       homepage.group: Monitoring
       homepage.name: Prometheus
       homepage.icon: prometheus

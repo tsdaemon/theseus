@@ -1,6 +1,5 @@
 ---
 qbittorrent_enabled: false
-qbittorrent_available_externally: false
 
 # directories
 qbittorrent_directory: "{{ docker_home }}/qbittorrent"

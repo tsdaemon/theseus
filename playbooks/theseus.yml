@@ -195,6 +195,11 @@
         - lidarr
         - applications
 
+    - role: slskd
+      tags:
+        - slskd
+        - applications
+
     - role: flaresolverr
       tags:
         - flaresolverr

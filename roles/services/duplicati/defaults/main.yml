@@ -1,6 +1,5 @@
 ---
 duplicati_enabled: false
-duplicati_available_externally: false
 
 # directories
 duplicati_directory: "{{ docker_home }}/duplicati"

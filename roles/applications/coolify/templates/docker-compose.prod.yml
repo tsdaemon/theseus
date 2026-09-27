@@ -42,14 +42,6 @@ services:
       traefik.http.routers.coolify.rule: "Host(`{{ coolify_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.coolify.entrypoints: "web_local"
       traefik.http.services.coolify.loadbalancer.server.port: "8080"
-{% if coolify_available_externally %}
-      traefik.http.routers.coolify-external.rule: "Host(`{{ coolify_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.coolify-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.coolify-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.coolify-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.coolify-external.entrypoints: "web,web_secure"
-      traefik.http.routers.coolify-external.service: "coolify"
-{% endif %}
       homepage.group: "Applications"
       homepage.name: "Coolify"
       homepage.icon: "sh-coolify.png"

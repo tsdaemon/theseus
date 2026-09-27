@@ -1,6 +1,5 @@
 ---
 influxdb2_enabled: false
-influxdb2_available_externally: false
 
 # Directories
 influxdb2_directory: "{{ docker_home }}/influxdb2"

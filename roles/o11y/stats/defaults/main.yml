@@ -1,7 +1,5 @@
 ---
 stats_enabled: false
-stats_prometheus_available_externally: false
-stats_grafana_available_externally: false
 
 stats_grafana_domain: "grafana"
 stats_prometheus_domain: "prometheus"

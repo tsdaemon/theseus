@@ -35,16 +35,8 @@ services:
       traefik.http.routers.hermes.rule: "Host(`{{ hermes_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.hermes.entrypoints: "web_local"
       traefik.http.services.hermes.loadbalancer.server.port: "9119"
-{% if hermes_available_externally %}
-      traefik.http.routers.hermes-external.rule: "Host(`{{ hermes_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.hermes-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.hermes-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.hermes-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.hermes-external.entrypoints: "web,web_secure"
-      traefik.http.routers.hermes-external.service: "hermes"
-{% endif %}
       homepage.group: "Applications"
       homepage.name: "Hermes"
       homepage.icon: "mdi-robot"
-      homepage.href: "{% if hermes_available_externally %}https://{{ hermes_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ hermes_hostname }}.{{ ansible_nas_local_domain }}{% endif %}"
+      homepage.href: "http://{{ hermes_hostname }}.{{ ansible_nas_local_domain }}"
       homepage.description: "AI agent dashboard"

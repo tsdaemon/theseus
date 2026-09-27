@@ -1,6 +1,5 @@
 ---
 stash_enabled: false
-stash_available_externally: false
 
 # directories
 stash_directory: "{{ docker_home }}/stash"
@@ -28,7 +27,6 @@ stash_image_version: "latest"
 stash_memory: 2g
 
 # qbittorrent
-stash_qbittorrent_available_externally: false
 
 # directories
 stash_qbittorrent_config_directory: "{{ stash_directory }}/qbittorrent/config"

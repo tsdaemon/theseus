@@ -22,19 +22,10 @@ services:
       traefik.http.routers.lidarr.rule: "Host(`{{ lidarr_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.lidarr.entrypoints: "web_local"
       traefik.http.services.lidarr.loadbalancer.server.port: "8686"
-{% if lidarr_available_externally %}
-      traefik.http.routers.lidarr-external.rule: "Host(`{{ lidarr_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.lidarr-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.lidarr-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.lidarr-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.lidarr-external.entrypoints: "web,web_secure"
-      traefik.http.routers.lidarr-external.service: "lidarr"
-      traefik.http.routers.lidarr-external.middlewares: "auth@file"
-{% endif %}
       homepage.group: Arr
       homepage.name: Lidarr
       homepage.icon: lidarr
-      homepage.href: "{% if lidarr_available_externally %}https://{{ lidarr_hostname }}.{{ ansible_nas_domain }}{% else %}http://{{ ansible_nas_ip }}:{{ lidarr_port }}{% endif %}"
+      homepage.href: "http://{{ ansible_nas_ip }}:{{ lidarr_port }}"
       homepage.description: Music collection manager
 {% if lidarr_api_key %}
       homepage.widget.type: lidarr

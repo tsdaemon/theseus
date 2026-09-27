@@ -1,0 +1,51 @@
+---
+slskd_enabled: false
+
+# directories
+slskd_directory: "{{ docker_home }}/slskd"
+slskd_config_directory: "{{ slskd_directory }}/app"
+slskd_soularr_config_directory: "{{ slskd_directory }}/soularr"
+# Downloads must live under lidarr_downloads_directory so Lidarr can import
+# them from the same filesystem (see slskd_lidarr_downloads_directory).
+slskd_downloads_directory: "{{ media_root }}/soulseek/downloads"
+slskd_incomplete_directory: "{{ media_root }}/soulseek/incomplete"
+# Shared read-only back to the network; Soulseek users often ban leechers.
+slskd_shared_directory: "{{ music_root }}"
+# slskd_downloads_directory as seen from inside the Lidarr container.
+slskd_lidarr_downloads_directory: "{{ slskd_downloads_directory | regex_replace('^' ~ lidarr_downloads_directory, '/downloads') }}"
+
+# uid / gid
+slskd_user_id: "{{ ansible_nas_user_id }}"
+slskd_group_id: "{{ ansible_nas_group_id }}"
+
+# network
+slskd_hostname: "slskd"
+slskd_port_http: "5030"
+# Soulseek peer port. Not forwarded on the router, so inbound peer
+# connections fail and only outbound (passive) transfers work.
+slskd_port_listen: "50300"
+
+# docker
+slskd_container_name: "slskd"
+slskd_image_name: "slskd/slskd"
+slskd_image_version: "latest"
+
+# specs
+slskd_memory: "1g"
+
+# slskd_soulseek_username, slskd_soulseek_password (Soulseek network account,
+# registered on first login), slskd_web_password and slskd_api_key
+# (16+ chars) are set in secrets.yaml.
+slskd_web_username: "slskd"
+
+# soularr: feeds Lidarr "Wanted > Missing" into slskd and triggers imports.
+slskd_soularr_enabled: true
+slskd_soularr_container_name: "soularr"
+slskd_soularr_image_name: "mrusse08/soularr"
+slskd_soularr_image_version: "latest"
+slskd_soularr_memory: "512m"
+# Albums searched per run and seconds between runs. albums_per_run is what
+# keeps the 4k+ backlog from flooding the network; keep it low.
+slskd_soularr_albums_per_run: 5
+slskd_soularr_interval: 300
+slskd_soularr_allowed_filetypes: "flac 24/192,flac 16/44.1,flac,mp3 320"

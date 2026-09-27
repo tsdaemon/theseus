@@ -28,14 +28,6 @@ services:
       traefik.http.routers.duplicati.rule: "Host(`{{ duplicati_hostname }}.{{ ansible_nas_local_domain }}`)"
       traefik.http.routers.duplicati.entrypoints: "web_local"
       traefik.http.services.duplicati.loadbalancer.server.port: "8200"
-{% if duplicati_available_externally %}
-      traefik.http.routers.duplicati-external.rule: "Host(`{{ duplicati_hostname }}.{{ ansible_nas_domain }}`)"
-      traefik.http.routers.duplicati-external.tls.certresolver: "letsencrypt"
-      traefik.http.routers.duplicati-external.tls.domains[0].main: "{{ ansible_nas_domain }}"
-      traefik.http.routers.duplicati-external.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-      traefik.http.routers.duplicati-external.entrypoints: "web,web_secure"
-      traefik.http.routers.duplicati-external.service: "duplicati"
-{% endif %}
       homepage.group: Services
       homepage.name: Duplicati
       homepage.icon: duplicati.png

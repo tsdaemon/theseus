@@ -1,6 +1,5 @@
 ---
 pihole_enabled: false
-pihole_available_externally: false
 
 # directories
 pihole_directory: "{{ docker_home }}/pihole"

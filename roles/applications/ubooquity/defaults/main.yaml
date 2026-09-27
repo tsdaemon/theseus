@@ -1,6 +1,5 @@
 ---
 ubooquity_enabled: false
-ubooquity_available_externally: false
 
 # directories
 ubooquity_directory: "{{ docker_home }}/ubooquity"
