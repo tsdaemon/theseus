@@ -11,6 +11,24 @@
       with_items:
         - "{{ lidarr_directory }}"
         - "{{ lidarr_config_directory }}"
+        - "{{ lidarr_build_directory }}"
+
+    - name: Checkout lidarr source
+      ansible.builtin.git:
+        repo: "{{ lidarr_source_repo }}"
+        dest: "{{ lidarr_source_directory }}"
+        version: "{{ lidarr_source_version }}"
+        force: true
+      register: lidarr_source
+      when: lidarr_build_from_source
+
+    - name: Create lidarr Dockerfile
+      ansible.builtin.template:
+        src: Dockerfile
+        dest: "{{ lidarr_build_directory }}/Dockerfile"
+        mode: '0440'
+      register: lidarr_dockerfile
+      when: lidarr_build_from_source
 
     - name: Create docker-compose.yaml
       ansible.builtin.template:
@@ -18,9 +36,18 @@
         dest: "{{ lidarr_directory }}/docker-compose.yaml"
         mode: '0440'
 
+    - name: Install lidarr-fix-imports script
+      ansible.builtin.template:
+        src: lidarr-fix-imports.py
+        dest: "{{ lidarr_directory }}/lidarr-fix-imports.py"
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: '0750'
+
     - name: Start lidarr
       community.docker.docker_compose_v2:
         project_src: "{{ lidarr_directory }}"
+        build: "{{ 'always' if (lidarr_source is changed or lidarr_dockerfile is changed) else 'policy' }}"
   when: lidarr_enabled
 
 - name: Stop lidarr

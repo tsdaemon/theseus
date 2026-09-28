@@ -113,3 +113,23 @@ in line with the profiles in use.
 3. `docker logs -f soularr`: first run searches 5 albums and enqueues matches.
 4. Lidarr → Activity/History shows the imports. Files appear under `music_root`, and Navidrome picks them up on its next scan.
 5. Tune `slskd_soularr_albums_per_run` / `slskd_soularr_interval`.
+
+## Clearing "Import Failed"
+
+Lidarr can't import two kinds of torrent releases and leaves them stuck in the queue:
+
+- **Images**: a CUE image (one big `.flac`/`.ape` + `.cue`), or any release with a single `.flac`. Lidarr never splits them.
+- **Mixed FLAC + MP3** releases: Lidarr maps one format and fails the album instead of preferring the better one.
+
+The lidarr role installs `lidarr-fix-imports.py` into `lidarr_directory`. Run it on Theseus:
+
+```sh
+python3 /mnt/nvme/appdata_large/lidarr/lidarr-fix-imports.py            # dry run, report only
+python3 /mnt/nvme/appdata_large/lidarr/lidarr-fix-imports.py --apply    # act
+#   --only image|mixed   --limit N
+```
+
+- Images are removed from the queue and qBittorrent, the release is blocklisted, and Lidarr searches again.
+- For mixed releases, only the FLAC files are hardlinked
+  into a scratch folder and imported only if Lidarr matches every track cleanly. The torrent's files are left alone, so it keeps seeding.
+- Everything else is left for manual review.

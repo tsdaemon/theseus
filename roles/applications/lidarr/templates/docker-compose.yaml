@@ -4,8 +4,15 @@ name: "lidarr"
 services:
   lidarr:
     container_name: "{{ lidarr_container_name }}"
+{% if lidarr_build_from_source %}
+    image: "{{ lidarr_build_image_name }}"
+    build:
+      context: "{{ lidarr_source_directory }}"
+      dockerfile: "{{ lidarr_build_directory }}/Dockerfile"
+{% else %}
     image: "{{ lidarr_image_name }}:{{ lidarr_image_version }}"
     pull_policy: always
+{% endif %}
     volumes:
       - "{{ lidarr_config_directory }}:/config:rw"
       - "{{ lidarr_downloads_directory }}:/downloads:rw"

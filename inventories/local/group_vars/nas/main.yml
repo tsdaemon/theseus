@@ -165,6 +165,8 @@ lidarr_enabled: true
 lidarr_hostname: lidarr
 # Config/db only, not worth backing up.
 lidarr_directory: "{{ docker_home_large }}/lidarr"
+# A full "Rescan Folders" over the library OOMs at 1g and saves nothing.
+lidarr_memory: "4g"
 
 ## slskd
 slskd_enabled: true

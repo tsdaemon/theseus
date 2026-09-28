@@ -23,6 +23,17 @@ lidarr_container_name: "lidarr"
 lidarr_image_name: "linuxserver/lidarr"
 lidarr_image_version: "latest"
 
+# Build Lidarr from source (a fork) on theseus instead of using the stock
+# binaries. The linuxserver image stays the runtime base; only its
+# /app/lidarr/bin is replaced. Rebuilt when the checkout or Dockerfile changes.
+lidarr_build_from_source: false
+lidarr_source_repo: "https://github.com/tsdaemon/Lidarr.git"
+# Branch with the theseus patches, based on the release in use.
+lidarr_source_version: "stable"
+lidarr_source_directory: "{{ lidarr_directory }}/src"
+lidarr_build_directory: "{{ lidarr_directory }}/build"
+lidarr_build_image_name: "lidarr-theseus:local"
+
 # specs
 lidarr_memory: "1g"
 
