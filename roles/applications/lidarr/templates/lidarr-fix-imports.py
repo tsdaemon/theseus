@@ -2,9 +2,22 @@
 # {{ ansible_managed }}
 """Clear Lidarr queue items that Lidarr can't import by itself.
 
-Stuck queue items (importFailed / importBlocked, including unknown-artist ones):
+Queue items, including unknown-artist ones:
+- Complete: stuck or still downloading, but every album the download is for
+  already has all its tracks at or above the quality profile's cutoff (e.g.
+  filled by another release or by a rescan). Remove from queue and download
+  client, no blocklist, no new search. Lidarr never does this by itself.
+- Removed: no artist and no grab history, i.e. the artist was removed from
+  Lidarr (which deletes its history but leaves queue items behind as "Artist
+  name mismatch"), and none of its audio is in the library. Remove from queue
+  and download client, no blocklist, no new search.
+- Stalled: still downloading, but qBittorrent has seen no activity for
+  --stalled-days days (dead or metadata-less torrent). Remove, blocklist the
+  release, and let Lidarr search for another one.
+
+Stuck queue items (importFailed / importBlocked):
 - Image (a CUE image, or any release with a single .flac) and archive (only
-  .zip/.rar/.7z, no audio): remove from queue and download client, blocklist
+  .zip/.rar/.7z or video files like .avi, no audio): remove from queue and download client, blocklist
   the release, and let Lidarr search for another one.
 - Mixed FLAC + MP3 release: hardlink only the FLAC files into a scratch
   folder, let Lidarr match that, and import it against the original download.
@@ -15,10 +28,10 @@ Imports skip files Lidarr couldn't match to a track, ignore "missing" and
 "unmatched tracks", and skip the whole download on any other rejection
 (destination exists, not an upgrade, bad track match, ...).
 
---orphans: torrents in qBittorrent's "lidarr" category that Lidarr no longer
-tracks. Images and archives among them were never imported, so they're
-deleted together with their files, unless another torrent shares their
-folder. Other orphans are left alone.
+Orphans: torrents in qBittorrent's "lidarr" category that Lidarr no longer
+tracks (artist removed, album filled elsewhere, never imported). Deleted with
+their files when none of their audio is hardlinked into the library and no
+other torrent shares their folder.
 
 Dry run by default; pass --apply to act.
 """
@@ -43,8 +56,11 @@ CONTAINER_ROOT = "/downloads"
 SCRATCH_DIR = os.path.join(HOST_ROOT, "media", ".lidarr-fix-imports")
 
 AUDIO_EXTS = {".flac", ".mp3", ".ape", ".m4a", ".wv", ".ogg", ".opus", ".wav", ".aiff", ".dsf"}
-ARCHIVE_EXTS = {".zip", ".rar", ".7z"}
+# Not importable by Lidarr; a release with only these is treated as "archive".
+ARCHIVE_EXTS = {".zip", ".rar", ".7z", ".avi", ".mkv", ".mp4", ".m4v", ".mov", ".wmv", ".vob"}
 STUCK_STATES = {"importFailed", "importBlocked"}
+# qBittorrent states of a torrent that isn't getting data.
+STALLED_QBIT_STATES = {"stalledDL", "metaDL", "forcedMetaDL"}
 # Kinds removed + blocklisted from the queue, or deleted as orphans.
 JUNK_KINDS = ("image", "archive")
 ALBUM_MATCH_RE = re.compile(r"Album match is not close enough: ([\d.]+) %")
@@ -88,6 +104,16 @@ class Lidarr:
                 return records
             page += 1
 
+    def cutoff_unmet(self):
+        """Ids of albums whose files are below the quality profile's cutoff."""
+        ids, page = set(), 1
+        while True:
+            res = self.call("GET", "wanted/cutoff", {"page": page, "pageSize": 1000})
+            ids.update(a["id"] for a in res["records"])
+            if page * 1000 >= res["totalRecords"] or not res["records"]:
+                return ids
+            page += 1
+
 
 def to_host(path):
     return HOST_ROOT + path[len(CONTAINER_ROOT):] if path.startswith(CONTAINER_ROOT) else path
@@ -126,6 +152,39 @@ def classify(host_path):
     if {".flac", ".mp3"} <= exts:
         return "mixed"
     return "other"
+
+
+def album_complete(lidarr, album_ids, cache, cutoff_unmet):
+    for album_id in album_ids:
+        if album_id in cutoff_unmet:
+            return False
+        if album_id not in cache:
+            stats = lidarr.call("GET", f"album/{album_id}").get("statistics", {})
+            cache[album_id] = stats.get("trackCount", 0) > 0 and \
+                stats.get("trackFileCount", 0) >= stats["trackCount"]
+        if not cache[album_id]:
+            return False
+    return True
+
+
+def artist_removed(lidarr, recs):
+    if any(r.get("artistId") for r in recs):
+        return False
+    history = lidarr.call("GET", "history", {"downloadId": recs[0]["downloadId"], "pageSize": 10})
+    return not any(h["eventType"] == "grabbed" for h in history["records"])
+
+
+def remove_done(lidarr, kind, downloads, apply):
+    ids = [r["id"] for recs in downloads for r in recs]
+    for recs in downloads:
+        print(f"  {kind.upper():8} {recs[0]['title']}")
+    if not apply or not ids:
+        return
+    for i in range(0, len(ids), 50):
+        lidarr.call("DELETE", "queue/bulk",
+                    {"removeFromClient": "true", "blocklist": "false", "skipRedownload": "true"},
+                    {"ids": ids[i:i + 50]})
+    print(f"  removed {len(downloads)} {kind} downloads")
 
 
 def remove_and_research(lidarr, kind, downloads, apply):
@@ -232,15 +291,40 @@ def fix_queue(lidarr, records, args):
     for rec in records:
         if rec.get("downloadId"):
             downloads.setdefault(rec["downloadId"], []).append(rec)
-    stuck = [recs for recs in downloads.values()
-             if any(r.get("trackedDownloadState") in STUCK_STATES for r in recs)]
+    torrents = {t["hash"].lower(): t
+                for t in http("GET", f"{QBIT_URL}/torrents/info?category={QBIT_CATEGORY}") or []}
+    stalled_before = time.time() - args.stalled_days * 86400
+    cutoff_unmet = lidarr.cutoff_unmet()
 
-    kinds = {"image": [], "archive": [], "mixed": [], "other": [], "missing": []}
-    for recs in stuck:
-        kinds[classify(to_host(recs[0].get("outputPath") or ""))].append(recs)
-    print(f"stuck queue downloads: {len(stuck)} "
-          + ", ".join(f"{k}={len(v)}" for k, v in kinds.items()))
+    kinds = {"complete": [], "removed": [], "stalled": [], "image": [], "archive": [], "mixed": [],
+             "other": [], "missing": []}
+    cache = {}
+    for download_id, recs in downloads.items():
+        states = {r.get("trackedDownloadState") for r in recs}
+        stuck = bool(states & STUCK_STATES)
+        if not stuck and "downloading" not in states:
+            continue
+        album_ids = {r["albumId"] for r in recs if r.get("albumId")}
+        if album_ids and album_complete(lidarr, album_ids, cache, cutoff_unmet):
+            kinds["complete"].append(recs)
+        elif stuck and artist_removed(lidarr, recs):
+            if not in_library(to_host(recs[0].get("outputPath") or "")):
+                kinds["removed"].append(recs)
+        elif stuck:
+            kinds[classify(to_host(recs[0].get("outputPath") or ""))].append(recs)
+        else:
+            t = torrents.get(download_id.lower())
+            if t and t["state"] in STALLED_QBIT_STATES and \
+                    max(t["last_activity"], t["added_on"]) < stalled_before:
+                kinds["stalled"].append(recs)
+    print("queue downloads to handle: " + ", ".join(f"{k}={len(v)}" for k, v in kinds.items()))
 
+    if args.only in (None, "complete"):
+        remove_done(lidarr, "complete", kinds["complete"][:args.limit], args.apply)
+    if args.only in (None, "removed"):
+        remove_done(lidarr, "removed", kinds["removed"][:args.limit], args.apply)
+    if args.only in (None, "stalled"):
+        remove_and_research(lidarr, "stalled", kinds["stalled"][:args.limit], args.apply)
     for kind in JUNK_KINDS:
         if args.only in (None, kind):
             remove_and_research(lidarr, kind, kinds[kind][:args.limit], args.apply)
@@ -254,59 +338,65 @@ def fix_queue(lidarr, records, args):
                 print(f"          error: {e}")
 
 
+def in_library(host_path):
+    """True if any audio file of the download is hardlinked elsewhere, i.e.
+    Lidarr imported it and the library still uses it."""
+    audio, _, _ = scan(host_path)
+    return any(os.stat(f).st_nlink > 1 for f in audio)
+
+
 def fix_orphans(records, args):
     tracked = {r["downloadId"].lower() for r in records if r.get("downloadId")}
-    torrents = http("GET", f"{QBIT_URL}/torrents/info?category={QBIT_CATEGORY}") or []
-    orphans = [t for t in torrents if t["hash"].lower() not in tracked]
+    all_torrents = http("GET", f"{QBIT_URL}/torrents/info") or []
     # Several torrents can save into the same folder; deleting one "with
     # files" would wipe the others' files too.
     folder_users = {}
-    for t in http("GET", f"{QBIT_URL}/torrents/info") or []:
+    for t in all_torrents:
         folder_users[t["content_path"]] = folder_users.get(t["content_path"], 0) + 1
-    shared = [t for t in orphans if folder_users[t["content_path"]] > 1]
-    orphans = [t for t in orphans if folder_users[t["content_path"]] == 1]
 
-    junk = []
-    for t in orphans:
-        kind = classify(to_host(t["content_path"]))
-        if kind in JUNK_KINDS and args.only in (None, kind):
-            junk.append((kind, t))
-    junk = junk[:args.limit]
-    size = sum(t["size"] for _, t in junk)
-    print(f"orphan torrents: {len(orphans) + len(shared)} ({len(shared)} share a folder, kept), "
-          f"deletable images/archives: {len(junk)} "
-          f"({size / 1e9:.1f} GB)")
-    for kind, t in junk:
-        print(f"  {kind.upper():7} {t['name']}")
-    if not args.apply or not junk:
+    orphans = [t for t in all_torrents
+               if t["category"] == QBIT_CATEGORY and t["hash"].lower() not in tracked]
+    shared = [t for t in orphans if folder_users[t["content_path"]] > 1]
+    used = [t for t in orphans
+            if folder_users[t["content_path"]] == 1 and in_library(to_host(t["content_path"]))]
+    unused = [t for t in orphans if t not in shared and t not in used][:args.limit]
+
+    size = sum(t["size"] for t in unused)
+    print(f"orphan torrents: {len(orphans)}; kept: {len(used)} with files in the library, "
+          f"{len(shared)} sharing a folder; deletable: {len(unused)} ({size / 1e9:.1f} GB)")
+    for t in unused:
+        print(f"  ORPHAN  {t['name']}")
+    if not args.apply or not unused:
         return
-    hashes = [t["hash"] for _, t in junk]
+    hashes = [t["hash"] for t in unused]
     for i in range(0, len(hashes), 50):
         body = urllib.parse.urlencode({"hashes": "|".join(hashes[i:i + 50]), "deleteFiles": "true"})
         http("POST", f"{QBIT_URL}/torrents/delete", body.encode(),
              {"Content-Type": "application/x-www-form-urlencoded"})
-    print(f"  deleted {len(junk)} torrents with their files")
+    print(f"  deleted {len(unused)} torrents with their files")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--apply", action="store_true", help="act instead of just reporting")
-    parser.add_argument("--orphans", action="store_true",
-                        help="clean orphan torrents instead of the Lidarr queue")
-    parser.add_argument("--only", choices=["image", "archive", "mixed", "other"], help="handle only one kind")
+    parser.add_argument("--only", choices=["complete", "removed", "stalled", "image", "archive", "mixed", "other", "orphans"], help="handle only one kind")
     parser.add_argument("--limit", type=int, help="handle at most N downloads per kind")
     parser.add_argument("--min-match", type=float, default=70,
                         help="lowest album match %% to import (default 70; Lidarr uses 80)")
+    parser.add_argument("--stalled-days", type=float, default=7,
+                        help="days without qBittorrent activity before a download counts as stalled")
     args = parser.parse_args()
 
     lidarr = Lidarr()
     records = lidarr.queue()
     if not args.apply:
         print("dry run; pass --apply to act")
-    if args.orphans:
-        fix_orphans(records, args)
-    else:
+    if args.only != "orphans":
         fix_queue(lidarr, records, args)
+    if args.only in (None, "orphans"):
+        # Runs on the queue as it was before this run's removals; those
+        # torrents are gone from qBittorrent already.
+        fix_orphans(records, args)
 
 
 if __name__ == "__main__":
