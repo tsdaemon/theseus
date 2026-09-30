@@ -3,7 +3,8 @@ Description=Web Services Discovery for Samba
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/wsdd -n {{ samba_server_string | upper }}
+# LAN only; without -i it also binds every Docker bridge/veth and errors as containers come and go.
+ExecStart=/usr/bin/wsdd -n {{ samba_server_string | upper }} -i {{ ansible_default_ipv4.interface }}
 Restart=on-failure
 
 [Install]

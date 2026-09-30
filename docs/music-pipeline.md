@@ -131,10 +131,10 @@ python3 /mnt/nvme/appdata_large/lidarr/lidarr-fix-imports.py --apply    # act
 
 - `complete`: stuck or still-downloading items whose album already has all tracks at or above the profile cutoff (filled by another release or a rescan) are removed from the queue and qBittorrent, with no blocklist and no new search. Lidarr never does this by itself.
 - `removed`: queue items left behind by artists you removed from Lidarr (they show as "Artist name mismatch", with no artist and no grab history) are removed from the queue and qBittorrent with their files, unless their audio is in the library. No blocklist, no search.
-- `stalled`: downloads with no qBittorrent activity for `--stalled-days` (default 7) are removed, blocklisted, and searched again.
+- `stalled`: downloads added more than `--stalled-days` ago (default 7) where qBittorrent hasn't seen a peer with the complete files in that time (upload activity between partial holders doesn't count) are removed, blocklisted, and searched again.
 - Images are removed from the queue and qBittorrent, the release is blocklisted, and Lidarr searches again.
 - For mixed releases, only the FLAC files are hardlinked
   into a scratch folder and imported only if Lidarr matches every track cleanly. The torrent's files are left alone, so it keeps seeding.
-- Archives (only `.zip`/`.rar`/`.7z`, or only video like `.avi`/`.mkv`/`.mp4`) are treated like images.
+- Archives (only `.zip`/`.rar`/`.7z`/`.iso`, or only video like `.avi`/`.mkv`/`.mp4`/`.mpg`) are treated like images.
 - Everything else ("other") is imported if every rejection is soft (missing or unmatched tracks) or an album match of at least `--min-match` % (default 70). Otherwise it is left for manual review.
 - `orphans`: torrents in qBittorrent's `lidarr` category that Lidarr no longer tracks (removed artists, albums filled elsewhere) are deleted with their files, but only if none of their audio is hardlinked into the library and no other torrent shares their folder.

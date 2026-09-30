@@ -5,6 +5,9 @@ navidrome_enabled: false
 navidrome_directory: "{{ docker_home }}/navidrome"
 navidrome_data_directory: "{{ navidrome_directory }}/data"
 navidrome_music_directory: "{{ music_root }}"
+# Optional second library, mounted at /music-manual; add it in Navidrome under
+# Settings > Libraries.
+navidrome_music_manual_directory: ""
 
 # uid / gid
 navidrome_user_id: "{{ ansible_nas_user_id }}"

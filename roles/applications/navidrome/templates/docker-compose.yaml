@@ -10,6 +10,9 @@ services:
     volumes:
       - "{{ navidrome_data_directory }}:/data:rw"
       - "{{ navidrome_music_directory }}:/music:ro"
+{% if navidrome_music_manual_directory %}
+      - "{{ navidrome_music_manual_directory }}:/music-manual:ro"
+{% endif %}
     ports:
       - "{{ navidrome_port }}:4533"
     environment:

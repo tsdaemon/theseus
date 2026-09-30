@@ -13,6 +13,7 @@
     owner: root
     group: root
     mode: '0644'
+  register: wsdd_unit
 
 - name: Reload systemd
   command: systemctl daemon-reload
@@ -21,7 +22,7 @@
   systemd:
     name: wsdd
     enabled: yes
-    state: started
+    state: "{{ 'restarted' if wsdd_unit.changed else 'started' }}"
 
 - name: Allow WS-Discovery ports in UFW
   ufw:

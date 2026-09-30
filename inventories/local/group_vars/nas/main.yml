@@ -50,6 +50,8 @@ tv_root: "{{ media_root }}/tv"
 books_root: "{{ media_root }}/books"
 comics_root: "{{ media_root }}/comics"
 music_root: "{{ media_root }}/music"
+# Hand-managed music (Bandcamp etc.): not Lidarr-managed, not shared by slskd.
+music_manual_root: "{{ media_root }}/music-manual"
 photo_root: "{{ media_root }}/photo"
 archive_root: "{{ ansible_nas_data_root }}/archive"
 cameras_root: "{{ media_root }}/cameras"
@@ -95,6 +97,14 @@ samba_shares:
     writable: yes
     browseable: yes
     path: "{{ music_root }}"
+
+  - name: music-manual
+    comment: "Music (hand-managed)"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ music_manual_root }}"
 
   - name: photos
     comment: "Photos"
@@ -183,6 +193,7 @@ prowlarr_hostname: prowlarr
 
 ## navidrome
 navidrome_enabled: true
+navidrome_music_manual_directory: "{{ music_manual_root }}"
 navidrome_hostname: navidrome
 
 ## stash

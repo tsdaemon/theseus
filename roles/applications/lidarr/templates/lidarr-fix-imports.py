@@ -11,9 +11,10 @@ Queue items, including unknown-artist ones:
   Lidarr (which deletes its history but leaves queue items behind as "Artist
   name mismatch"), and none of its audio is in the library. Remove from queue
   and download client, no blocklist, no new search.
-- Stalled: still downloading, but qBittorrent has seen no activity for
-  --stalled-days days (dead or metadata-less torrent). Remove, blocklist the
-  release, and let Lidarr search for another one.
+- Stalled: still downloading, added more than --stalled-days days ago, and
+  qBittorrent hasn't seen a peer with the complete files in that time (or
+  ever). Partial holders trading pieces among themselves can't finish it.
+  Remove, blocklist the release, and let Lidarr search for another one.
 
 Stuck queue items (importFailed / importBlocked):
 - Image (a CUE image, or any release with a single .flac) and archive (only
@@ -57,7 +58,7 @@ SCRATCH_DIR = os.path.join(HOST_ROOT, "media", ".lidarr-fix-imports")
 
 AUDIO_EXTS = {".flac", ".mp3", ".ape", ".m4a", ".wv", ".ogg", ".opus", ".wav", ".aiff", ".dsf"}
 # Not importable by Lidarr; a release with only these is treated as "archive".
-ARCHIVE_EXTS = {".zip", ".rar", ".7z", ".avi", ".mkv", ".mp4", ".m4v", ".mov", ".wmv", ".vob"}
+ARCHIVE_EXTS = {".zip", ".rar", ".7z", ".iso", ".avi", ".mkv", ".mp4", ".m4v", ".mov", ".wmv", ".vob", ".mpg", ".mpeg"}
 STUCK_STATES = {"importFailed", "importBlocked"}
 # qBittorrent states of a torrent that isn't getting data.
 STALLED_QBIT_STATES = {"stalledDL", "metaDL", "forcedMetaDL"}
@@ -314,8 +315,9 @@ def fix_queue(lidarr, records, args):
             kinds[classify(to_host(recs[0].get("outputPath") or ""))].append(recs)
         else:
             t = torrents.get(download_id.lower())
-            if t and t["state"] in STALLED_QBIT_STATES and \
-                    max(t["last_activity"], t["added_on"]) < stalled_before:
+            # seen_complete is 0 (or negative) when no complete copy was ever seen.
+            if t and t["state"] in STALLED_QBIT_STATES and t["added_on"] < stalled_before \
+                    and t["seen_complete"] < stalled_before:
                 kinds["stalled"].append(recs)
     print("queue downloads to handle: " + ", ".join(f"{k}={len(v)}" for k, v in kinds.items()))
 
@@ -384,7 +386,7 @@ def main():
     parser.add_argument("--min-match", type=float, default=70,
                         help="lowest album match %% to import (default 70; Lidarr uses 80)")
     parser.add_argument("--stalled-days", type=float, default=7,
-                        help="days without qBittorrent activity before a download counts as stalled")
+                        help="days since added, and since a complete copy was last seen, before a download counts as stalled")
     args = parser.parse_args()
 
     lidarr = Lidarr()
