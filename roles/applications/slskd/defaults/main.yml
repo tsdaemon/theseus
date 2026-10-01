@@ -24,6 +24,10 @@ slskd_port_http: "5030"
 # Soulseek peer port; forwarded (TCP) on the router so firewalled peers can
 # connect to us.
 slskd_port_listen: "50300"
+# Distributed network: stay in it so our share still answers searches, but
+# don't accept children; relaying the network's searches to up to 25 children
+# opened thousands of peer connections (router NAT/conntrack load).
+slskd_distributed_children_disabled: true
 
 # docker
 slskd_container_name: "slskd"

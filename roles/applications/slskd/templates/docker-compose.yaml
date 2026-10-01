@@ -21,6 +21,7 @@ services:
       SLSKD_SLSK_USERNAME: "{{ slskd_soulseek_username }}"
       SLSKD_SLSK_PASSWORD: "{{ slskd_soulseek_password }}"
       SLSKD_SLSK_LISTEN_PORT: "50300"
+      SLSKD_SLSK_DNET_NO_CHILDREN: "{{ slskd_distributed_children_disabled | lower }}"
       SLSKD_USERNAME: "{{ slskd_web_username }}"
       SLSKD_PASSWORD: "{{ slskd_web_password }}"
       SLSKD_API_KEY: "{{ slskd_api_key }}"
