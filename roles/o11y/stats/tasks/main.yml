@@ -13,6 +13,7 @@
         - "{{ stats_directory }}"
         - "{{ stats_prometheus_data_directory }}"
         - "{{ stats_prometheus_config_directory }}"
+        - "{{ stats_prometheus_rules_directory }}"
         - "{{ stats_telegraf_config_directory }}"
         - "{{ stats_grafana_data_directory }}"
         - "{{ stats_grafana_config_directory }}"
@@ -40,6 +41,43 @@
         src: dashboards/wireguard.json
         dest: "{{ stats_grafana_config_directory }}/dashboards/wireguard.json"
       when: wireguard_enabled
+
+    - name: Copy Grafana Network dashboard
+      ansible.builtin.copy:
+        src: dashboards/network.json
+        dest: "{{ stats_grafana_config_directory }}/dashboards/network.json"
+      when: stats_ping_enabled
+
+    - name: Detect provider hop (ISP first hop past the router)
+      ansible.builtin.command: "ping -n -c 6 -W 1 -t 2 {{ stats_ping_provider_probe_host }}"
+      register: stats_ping_provider_probe
+      changed_when: false
+      failed_when: false
+      check_mode: false
+      when: stats_ping_enabled and not stats_ping_provider_targets
+
+    - name: Set network ping targets
+      ansible.builtin.set_fact:
+        stats_ping_all_targets: >-
+          {{ stats_ping_targets | combine({'provider': stats_ping_provider_targets}) if stats_ping_provider_targets
+             else stats_ping_targets | combine({'provider': [stats_ping_provider_detected]}) if stats_ping_provider_detected
+             else stats_ping_targets }}
+      vars:
+        stats_ping_provider_detected: >-
+          {{ (stats_ping_provider_probe.stdout | default('')
+              | regex_findall('From ([0-9.]+) .*Time to live exceeded') + [''])[0] }}
+      when: stats_ping_enabled
+
+    - name: Warn when provider hop was not detected
+      ansible.builtin.debug:
+        msg: "Provider hop not detected; set stats_ping_provider_targets to probe it."
+      when: stats_ping_enabled and 'provider' not in stats_ping_all_targets
+
+    - name: Template Prometheus network recording rules
+      ansible.builtin.template:
+        src: rules/network.yml.j2
+        dest: "{{ stats_prometheus_rules_directory }}/network.yml"
+      when: stats_ping_enabled
 
     - name: Template Prometheus config
       ansible.builtin.template:

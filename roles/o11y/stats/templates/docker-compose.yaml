@@ -84,6 +84,7 @@ services:
     pull_policy: always
     volumes:
       - "{{ stats_prometheus_config_directory }}/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+      - "{{ stats_prometheus_rules_directory }}:/etc/prometheus/rules:ro"
       - "{{ stats_prometheus_data_directory }}:/prometheus:rw"
       - "/etc/timezone:/etc/timezone:ro"
     ports:

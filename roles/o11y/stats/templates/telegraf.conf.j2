@@ -355,3 +355,20 @@
   ## Address and port to host InfluxDB listener on
   ## (Double check the port. Could be 9999 if using OSS Beta)
   service_address = ":8086"
+{% if stats_ping_enabled %}
+
+# Network path probes; recorded into network_* series by Prometheus rules (rules/network.yml)
+{% for group, hosts in stats_ping_all_targets.items() if hosts %}
+[[inputs.ping]]
+  interval = "{{ stats_ping_interval }}"
+  urls = {{ hosts | to_json }}
+  # exec (iputils ping) works unprivileged via ping_group_range; native needs CAP_NET_RAW
+  method = "exec"
+  count = {{ stats_ping_count }}
+  ping_interval = 1.0
+  timeout = 1.0
+  deadline = 12
+  [inputs.ping.tags]
+    target = "{{ group }}"
+{% endfor %}
+{% endif %}

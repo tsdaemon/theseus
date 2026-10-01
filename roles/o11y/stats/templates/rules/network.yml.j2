@@ -1,0 +1,19 @@
+---
+# Stable network connectivity series derived from Telegraf ping (ping_*), aggregated per target group.
+groups:
+  - name: network
+    rules:
+      - record: network_probe_success
+        expr: max by (target) (ping_percent_packet_loss < bool 100)
+      - record: network_rtt_ms
+        expr: avg by (target) (ping_average_response_ms > 0)
+      - record: network_jitter_ms
+        expr: avg by (target) (ping_standard_deviation_ms)
+      - record: network_packet_loss_ratio
+        expr: avg by (target) (avg_over_time(ping_percent_packet_loss[1m])) / 100
+        labels:
+          window: 1m
+      - record: network_packet_loss_ratio
+        expr: avg by (target) (avg_over_time(ping_percent_packet_loss[5m])) / 100
+        labels:
+          window: 5m

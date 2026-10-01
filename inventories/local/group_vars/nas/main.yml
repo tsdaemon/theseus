@@ -351,6 +351,15 @@ stats_prometheus_data_directory: "{{ ansible_nas_data_root }}/data/stats/prometh
 stats_grafana_data_directory: "{{ ansible_nas_data_root }}/data/stats/grafana"
 stats_telegraf_influxdb_port: "8186"
 stats_smartctl_docker_image_name: "tsdaemon/prometheus-smartctl"
+# Network path probes: router → provider (auto-detected) → internet
+stats_ping_targets:
+  router:
+    - 192.168.0.1 # Asus RT-AC88U (main router)
+  wifi:
+    - 192.168.0.30 # balcony camera (Frigate), always on
+  internet:
+    - 1.1.1.1
+    - 8.8.8.8
 
 ## watchtower
 watchtower_enabled: true
