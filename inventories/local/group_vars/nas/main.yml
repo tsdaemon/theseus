@@ -284,9 +284,10 @@ homepage_settings_yaml:
   showStats: true
   color: slate
   layout:
-    - Applications:
-        style: row
-        columns: 4
+    - Apps:
+      - Applications:
+          style: row
+          columns: 4
     - Monitoring:
     - Networking:
     - Services:

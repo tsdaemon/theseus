@@ -28,6 +28,12 @@ slskd_port_listen: "50300"
 # don't accept children; relaying the network's searches to up to 25 children
 # opened thousands of peer connections (router NAT/conntrack load).
 slskd_distributed_children_disabled: true
+# Incoming search throttling (slskd defaults 10 / 500 / 500): every search we
+# answer is a peer connection, and waves of distributed searches flood the
+# router's NAT table. Fewer in flight, drop the backlog, smaller responses.
+slskd_search_incoming_concurrency: 5
+slskd_search_incoming_circuit_breaker: 100
+slskd_search_incoming_response_file_limit: 100
 
 # docker
 slskd_container_name: "slskd"
