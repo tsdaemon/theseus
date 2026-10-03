@@ -137,6 +137,7 @@ services:
       HOST_VAR: "/hostfs/var"
       HOST_RUN: "/hostfs/run"
       HOST_MOUNT_PREFIX: "/hostfs"
+      NVIDIA_DRIVER_CAPABILITIES: "utility,compute"
     # NVIDIA GPU for inputs.nvidia_smi (nvidia-smi is injected by the container toolkit)
     deploy:
       resources:

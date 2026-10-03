@@ -354,6 +354,7 @@
 # NVIDIA GPU metrics (Quadro P400); nvidia-smi is provided by the nvidia container runtime
 [[inputs.nvidia_smi]]
   bin_path = "/usr/bin/nvidia-smi"
+  startup_error_behavior = "ignore"
   timeout = "5s"
 
 [[inputs.influxdb_v2_listener]]
