@@ -39,3 +39,22 @@ scrape_configs:
         target_label: level
       - source_labels: ["__journal_syslog_identifier"]
         target_label: syslog_identifier
+  # Router (ASUS) remote log: plain UDP syslog, timestamped on arrival.
+  - job_name: syslog_scrape
+    syslog:
+      listen_address: 0.0.0.0:514
+      listen_protocol: udp
+      # Asus firmware sends BSD syslog; the default rfc5424 parser rejects it
+      syslog_format: rfc3164
+      use_incoming_timestamp: false
+      labels:
+        job: syslog
+    relabel_configs:
+      - source_labels: ["__syslog_connection_ip_address"]
+        target_label: source_ip
+      - source_labels: ["__syslog_message_hostname"]
+        target_label: host
+      - source_labels: ["__syslog_message_severity"]
+        target_label: level
+      - source_labels: ["__syslog_message_app_name"]
+        target_label: syslog_identifier

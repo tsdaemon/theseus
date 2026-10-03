@@ -11,25 +11,16 @@
       with_items:
         - "{{ loki_data_directory }}"
         - "{{ loki_config_directory }}"
-        - "{{ loki_minio_data_directory }}/data"
         - "{{ loki_promtail_data_directory }}"
         - "{{ loki_promtail_config_directory }}"
-
-    - name: Create Minio buckets for Loki
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        owner: "{{ ansible_nas_user_id }}"
-        group: "{{ ansible_nas_group_id }}"
-        mode: "0770"
-      with_items:
-        - "{{ loki_minio_data_directory }}/data/loki-data"
-        - "{{ loki_minio_data_directory }}/data/loki-ruler"
 
     - name: Template Loki config
       ansible.builtin.template:
         src: config.yml
         dest: "{{ loki_config_directory }}/config.yml"
+        owner: "{{ ansible_nas_user_id }}"
+        group: "{{ ansible_nas_group_id }}"
+        mode: "0644"
       register: loki_config
 
     - name: Template Promtail config
@@ -47,6 +38,26 @@
     - name: Start Loki
       community.docker.docker_compose_v2:
         project_src: "{{ loki_directory }}"
+        # Removes containers of services dropped from the compose file (e.g. the old loki-minio).
+        remove_orphans: true
+
+    # Config files are bind-mounted, so compose does not notice when they change.
+    # Not skipped when compose changed: that may only mean an orphan was removed.
+    - name: Restart Loki after config change
+      community.docker.docker_compose_v2:
+        project_src: "{{ loki_directory }}"
+        services:
+          - loki
+        state: restarted
+      when: loki_config.changed
+
+    - name: Restart Promtail after config change
+      community.docker.docker_compose_v2:
+        project_src: "{{ loki_directory }}"
+        services:
+          - promtail
+        state: restarted
+      when: promtail_config.changed
 
     - name: Template Grafana Loki data source
       ansible.builtin.template:

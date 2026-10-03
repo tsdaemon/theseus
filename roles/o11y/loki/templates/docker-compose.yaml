@@ -6,7 +6,6 @@ services:
     command: "-config.file=/etc/loki/config.yml"
     ports:
       - "{{ loki_http_port }}:3100"
-      - "7946:7946"
       - "9095:9095"
     volumes:
       - "{{ loki_config_directory }}/config.yml:/etc/loki/config.yml"
@@ -20,23 +19,6 @@ services:
     networks:
       - "{{ o11y_network_name }}"
     user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
-
-  minio:
-    container_name: "{{ loki_minio_container_name }}"
-    image: "{{ loki_minio_image_name }}:{{ loki_minio_image_version }}"
-    pull_policy: always
-    command: 'server /data --console-address ":{{ loki_minio_console_port }}"'
-    volumes:
-      - "{{ loki_minio_data_directory }}/data:/data"
-    environment:
-      MINIO_ROOT_USER: "{{ loki_minio_admin_username }}"
-      MINIO_ROOT_PASSWORD: "{{ loki_minio_admin_password }}"
-      MINIO_PROMETHEUS_AUTH_TYPE: public
-    restart: unless-stopped
-    mem_limit: "{{ loki_minio_memory }}"
-    user: "{{ ansible_nas_user_id }}:{{ ansible_nas_group_id }}"
-    networks:
-      - "{{ o11y_network_name }}"
 
   promtail:
     container_name: "{{ loki_promtail_container_name }}"
@@ -59,6 +41,7 @@ services:
       - "{{ o11y_network_name }}"
     ports:
       - "{{ loki_promtail_port }}:9080"
+      - "{{ loki_promtail_syslog_port }}:514/udp"
 
 networks:
   "{{ o11y_network_name }}":

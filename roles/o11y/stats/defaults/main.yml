@@ -72,6 +72,11 @@ stats_ping_targets:
 stats_ping_provider_targets: []
 stats_ping_provider_probe_host: 1.1.1.1
 
+# router SNMP polling (Telegraf inputs.snmp → router_* metrics); needs SNMP enabled on the router
+stats_router_snmp_enabled: false
+stats_router_snmp_host: "192.168.0.1"
+stats_router_snmp_community: "public"
+
 # uncomment to scrape more hosts
 # stats_prometheus_additional_hosts:
 #  - 192.168.1.1:9100

@@ -99,6 +99,15 @@
     - name: Start Stats stack
       community.docker.docker_compose_v2:
         project_src: "{{ stats_directory }}"
+
+    # telegraf.conf is bind-mounted, so compose does not notice when it changes.
+    - name: Restart Telegraf after config change
+      community.docker.docker_compose_v2:
+        project_src: "{{ stats_directory }}"
+        services:
+          - telegraf
+        state: restarted
+      when: telegraf_config.changed
   when: stats_enabled
 
 - name: Stop Stats stack

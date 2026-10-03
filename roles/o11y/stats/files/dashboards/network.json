@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "Network path probes from Theseus: router, provider (ISP first hop), internet.",
+  "description": "Network path probes from Theseus (router, provider, internet) and router state over SNMP and syslog.",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -24,7 +24,7 @@
   "panels": [
     {
       "id": 1,
-      "type": "state-timeline",
+      "type": "stat",
       "title": "Fault location",
       "description": "WAN path: first failing stage Theseus → router → provider (ISP first hop) → internet. Wi-Fi: lossy while the router is clean, or down while the router is up.",
       "datasource": {
@@ -47,8 +47,8 @@
           "expr": "vector((1 - scalar(max(network_probe_success{target=\"router\"}))) * 3 + scalar(max(network_probe_success{target=\"router\"})) * (1 - scalar(max(network_probe_success{target=\"provider\"}) or vector(1))) * 2 + scalar(max(network_probe_success{target=\"router\"})) * scalar(max(network_probe_success{target=\"provider\"}) or vector(1)) * (1 - scalar(max(network_probe_success{target=\"internet\"}) or vector(1))) * 1)",
           "legendFormat": "WAN path",
           "refId": "A",
-          "instant": false,
-          "range": true
+          "instant": true,
+          "range": false
         },
         {
           "datasource": {
@@ -59,8 +59,8 @@
           "expr": "vector(scalar(max(network_probe_success{target=\"router\"})) * (1 - scalar(max(network_probe_success{target=\"wifi\"}) or vector(1))) * 2 + scalar(max(network_probe_success{target=\"router\"})) * scalar(max(network_probe_success{target=\"wifi\"}) or vector(1)) * (scalar(max(network_packet_loss_ratio{target=\"wifi\",window=\"1m\"}) > bool 0 or vector(0)) * (1 - scalar(max(network_packet_loss_ratio{target=\"router\",window=\"1m\"}) > bool 0 or vector(0)))))",
           "legendFormat": "Wi-Fi",
           "refId": "B",
-          "instant": false,
-          "range": true
+          "instant": true,
+          "range": false
         }
       ],
       "fieldConfig": {
@@ -103,10 +103,6 @@
                 "value": null
               }
             ]
-          },
-          "custom": {
-            "fillOpacity": 80,
-            "lineWidth": 0
           }
         },
         "overrides": [
@@ -146,24 +142,24 @@
         ]
       },
       "options": {
-        "showValue": "never",
-        "mergeValues": true,
-        "rowHeight": 0.9,
-        "alignValue": "left",
-        "legend": {
-          "showLegend": true,
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "wideLayout": true,
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         }
       }
     },
     {
       "id": 2,
-      "type": "state-timeline",
+      "type": "stat",
       "title": "Path status by target",
       "description": "Down: no replies in a probe window. Lossy: some loss over the last minute.",
       "datasource": {
@@ -172,7 +168,7 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 5,
+        "w": 4,
         "x": 5,
         "y": 0
       },
@@ -186,8 +182,8 @@
           "expr": "network_probe_success * on (target) (2 - (network_packet_loss_ratio{window=\"1m\"} > bool 0))",
           "legendFormat": "{{target}}",
           "refId": "A",
-          "instant": false,
-          "range": true
+          "instant": true,
+          "range": false
         }
       ],
       "fieldConfig": {
@@ -235,34 +231,30 @@
                 "value": null
               }
             ]
-          },
-          "custom": {
-            "fillOpacity": 80,
-            "lineWidth": 0
           }
         },
         "overrides": []
       },
       "options": {
-        "showValue": "never",
-        "mergeValues": true,
-        "rowHeight": 0.9,
-        "alignValue": "left",
-        "legend": {
-          "showLegend": true,
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "wideLayout": true,
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
         }
       }
     },
     {
       "id": 3,
       "type": "stat",
-      "title": "Availability 24h",
+      "title": "24h",
       "datasource": {
         "type": "prometheus",
         "uid": "ansible_nas"
@@ -270,7 +262,7 @@
       "gridPos": {
         "h": 5,
         "w": 2,
-        "x": 14,
+        "x": 13,
         "y": 0
       },
       "targets": [
@@ -335,7 +327,7 @@
     {
       "id": 4,
       "type": "stat",
-      "title": "Availability 7d",
+      "title": "7d",
       "datasource": {
         "type": "prometheus",
         "uid": "ansible_nas"
@@ -343,7 +335,7 @@
       "gridPos": {
         "h": 5,
         "w": 2,
-        "x": 12,
+        "x": 11,
         "y": 0
       },
       "targets": [
@@ -408,7 +400,7 @@
     {
       "id": 5,
       "type": "stat",
-      "title": "Availability 30d",
+      "title": "30d",
       "datasource": {
         "type": "prometheus",
         "uid": "ansible_nas"
@@ -416,7 +408,7 @@
       "gridPos": {
         "h": 5,
         "w": 2,
-        "x": 10,
+        "x": 9,
         "y": 0
       },
       "targets": [
@@ -917,16 +909,944 @@
           "sort": "none"
         }
       }
+    },
+    {
+      "id": 11,
+      "type": "stat",
+      "title": "Router links",
+      "description": "IF-MIB ifOperStatus on the router. WAN down with the router up points at the ISP side.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ansible_nas"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 3,
+        "x": 15,
+        "y": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "router_interface_oper_status{ifName=\"eth0\"}",
+          "legendFormat": "WAN",
+          "refId": "A",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "router_interface_oper_status{ifName=\"vlan1\"}",
+          "legendFormat": "LAN (wired)",
+          "refId": "B",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "router_interface_oper_status{ifName=\"eth1\"}",
+          "legendFormat": "Wi-Fi 2.4 GHz",
+          "refId": "C",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "router_interface_oper_status{ifName=\"eth2\"}",
+          "legendFormat": "Wi-Fi 5 GHz",
+          "refId": "D",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "1": {
+                  "text": "Up",
+                  "color": "green",
+                  "index": 0
+                },
+                "2": {
+                  "text": "Down",
+                  "color": "red",
+                  "index": 1
+                }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "textMode": "value_and_name",
+        "wideLayout": true,
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 12,
+      "type": "stat",
+      "title": "CPU",
+      "description": "Router. 100 − UCD ssCpuIdle.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ansible_nas"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 2,
+        "x": 18,
+        "y": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "100 - router_cpu_idle_percent",
+          "legendFormat": "",
+          "refId": "A",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "textMode": "value",
+        "wideLayout": true,
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 13,
+      "type": "stat",
+      "title": "RAM",
+      "description": "Router. Used = total − free − buffers − cached.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ansible_nas"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 2,
+        "x": 20,
+        "y": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "100 * (1 - (router_mem_avail_kb + router_mem_buffer_kb + router_mem_cached_kb) / router_mem_total_kb)",
+          "legendFormat": "",
+          "refId": "A",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 0,
+          "min": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 80
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "max": 100
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "textMode": "value",
+        "wideLayout": true,
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 14,
+      "type": "stat",
+      "title": "Load",
+      "description": "Router. UCD laLoadInt / 100. The router has 2 cores.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ansible_nas"
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 2,
+        "x": 22,
+        "y": 0
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "router_load1_x100 / 100",
+          "legendFormat": "",
+          "refId": "A",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 2,
+          "min": 0,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 2
+              },
+              {
+                "color": "red",
+                "value": 4
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "textMode": "value",
+        "wideLayout": true,
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      }
+    },
+    {
+      "id": 15,
+      "type": "timeseries",
+      "title": "WAN throughput",
+      "description": "eth0 (WAN). Upload is drawn below zero.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ansible_nas"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 21
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "rate(router_interface_in_octets{ifName=\"eth0\"}[$__rate_interval]) * 8",
+          "legendFormat": "Download",
+          "refId": "A",
+          "instant": false,
+          "range": true
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "rate(router_interface_out_octets{ifName=\"eth0\"}[$__rate_interval]) * 8",
+          "legendFormat": "Upload",
+          "refId": "B",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "bps",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": null
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Download"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Upload"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Upload"
+            },
+            "properties": [
+              {
+                "id": "custom.transform",
+                "value": "negative-Y"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Traffic by interface",
+      "description": "In + out per router interface.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ansible_nas"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 21
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "(rate(router_interface_in_octets{ifName=\"eth0\"}[$__rate_interval]) + rate(router_interface_out_octets{ifName=\"eth0\"}[$__rate_interval])) * 8",
+          "legendFormat": "WAN",
+          "refId": "A",
+          "instant": false,
+          "range": true
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "(rate(router_interface_in_octets{ifName=\"vlan1\"}[$__rate_interval]) + rate(router_interface_out_octets{ifName=\"vlan1\"}[$__rate_interval])) * 8",
+          "legendFormat": "LAN (wired)",
+          "refId": "B",
+          "instant": false,
+          "range": true
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "(rate(router_interface_in_octets{ifName=\"eth1\"}[$__rate_interval]) + rate(router_interface_out_octets{ifName=\"eth1\"}[$__rate_interval])) * 8",
+          "legendFormat": "Wi-Fi 2.4 GHz",
+          "refId": "C",
+          "instant": false,
+          "range": true
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "(rate(router_interface_in_octets{ifName=\"eth2\"}[$__rate_interval]) + rate(router_interface_out_octets{ifName=\"eth2\"}[$__rate_interval])) * 8",
+          "legendFormat": "Wi-Fi 5 GHz",
+          "refId": "D",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "bps",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": 0
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "WAN"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "LAN (wired)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Wi-Fi 2.4 GHz"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "green"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Wi-Fi 5 GHz"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "yellow"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 17,
+      "type": "timeseries",
+      "title": "Interface errors & discards",
+      "description": "Errors + discards, in and out. Sustained non-zero on Wi-Fi or WAN is worth a look.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ansible_nas"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 29
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "rate(router_interface_in_errors{ifName=\"eth0\"}[$__rate_interval]) + rate(router_interface_out_errors{ifName=\"eth0\"}[$__rate_interval]) + rate(router_interface_in_discards{ifName=\"eth0\"}[$__rate_interval]) + rate(router_interface_out_discards{ifName=\"eth0\"}[$__rate_interval])",
+          "legendFormat": "WAN",
+          "refId": "A",
+          "instant": false,
+          "range": true
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "rate(router_interface_in_errors{ifName=\"vlan1\"}[$__rate_interval]) + rate(router_interface_out_errors{ifName=\"vlan1\"}[$__rate_interval]) + rate(router_interface_in_discards{ifName=\"vlan1\"}[$__rate_interval]) + rate(router_interface_out_discards{ifName=\"vlan1\"}[$__rate_interval])",
+          "legendFormat": "LAN (wired)",
+          "refId": "B",
+          "instant": false,
+          "range": true
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "rate(router_interface_in_errors{ifName=\"eth1\"}[$__rate_interval]) + rate(router_interface_out_errors{ifName=\"eth1\"}[$__rate_interval]) + rate(router_interface_in_discards{ifName=\"eth1\"}[$__rate_interval]) + rate(router_interface_out_discards{ifName=\"eth1\"}[$__rate_interval])",
+          "legendFormat": "Wi-Fi 2.4 GHz",
+          "refId": "C",
+          "instant": false,
+          "range": true
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "rate(router_interface_in_errors{ifName=\"eth2\"}[$__rate_interval]) + rate(router_interface_out_errors{ifName=\"eth2\"}[$__rate_interval]) + rate(router_interface_in_discards{ifName=\"eth2\"}[$__rate_interval]) + rate(router_interface_out_discards{ifName=\"eth2\"}[$__rate_interval])",
+          "legendFormat": "Wi-Fi 5 GHz",
+          "refId": "D",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "pps",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": 0
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "WAN"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "orange"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "LAN (wired)"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Wi-Fi 2.4 GHz"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "green"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Wi-Fi 5 GHz"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "yellow"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "max",
+            "sum"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 18,
+      "type": "timeseries",
+      "title": "Router CPU & memory",
+      "description": "Both in percent of capacity.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "ansible_nas"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 29
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "100 - router_cpu_idle_percent",
+          "legendFormat": "CPU",
+          "refId": "A",
+          "instant": false,
+          "range": true
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "ansible_nas"
+          },
+          "editorMode": "code",
+          "expr": "100 * (1 - (router_mem_avail_kb + router_mem_buffer_kb + router_mem_cached_kb) / router_mem_total_kb)",
+          "legendFormat": "Memory",
+          "refId": "B",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "percent",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": false,
+            "axisSoftMin": 0,
+            "axisSoftMax": 100
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Memory"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "purple"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        }
+      }
+    },
+    {
+      "id": 19,
+      "type": "logs",
+      "title": "Router log",
+      "description": "Router syslog via Promtail (job=syslog).",
+      "datasource": {
+        "type": "loki",
+        "uid": "${loki}"
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 37
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "${loki}"
+          },
+          "editorMode": "code",
+          "expr": "{job=\"syslog\", source_ip=\"192.168.0.1\"}",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      }
     }
   ],
   "refresh": "30s",
   "schemaVersion": 39,
   "tags": [
     "prometheus",
+    "loki",
     "network"
   ],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "name": "loki",
+        "label": "Loki",
+        "type": "datasource",
+        "query": "loki",
+        "hide": 2,
+        "refresh": 1,
+        "current": {},
+        "options": [],
+        "regex": ""
+      }
+    ]
   },
   "time": {
     "from": "now-24h",

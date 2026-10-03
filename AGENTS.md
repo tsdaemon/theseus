@@ -41,6 +41,7 @@ When adding/updating service `<service>`, touch only what is needed:
 - Keep variable names and layout aligned with nearby service roles.
 - Do not modify secrets or credentials unless explicitly asked.
 - Run targeted validation only for touched files.
+- Grafana dashboards: top row is glanceable green/yellow/red indicators (stat tiles), then time series, then details and logs. Extend the existing layout instead of restructuring it; keep tile titles short (`24h`, not `Availability 24h`).
 
 ## Digital Home inventory (Notion)
 

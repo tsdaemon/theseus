@@ -3,17 +3,16 @@ server:
   http_listen_port: {{ loki_http_port }}
   log_level: {{ loki_log_level }}
 
-memberlist:
-
 limits_config:
   allow_structured_metadata: false
+  retention_period: {{ loki_log_retention }}
 
 schema_config:
   configs:
-    - from: 2021-08-01
-      store: boltdb-shipper
-      object_store: s3
-      schema: v11
+    - from: 2026-10-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
       index:
         prefix: index_
         period: 24h
@@ -22,22 +21,16 @@ common:
   path_prefix: /loki
   replication_factor: 1
   storage:
-    s3:
-      endpoint: "loki-minio:{{ loki_minio_api_port }}"
-      insecure: true
-      bucketnames: loki-data
-      access_key_id: "{{ loki_minio_admin_username }}"
-      secret_access_key: "{{ loki_minio_admin_password }}"
-      s3forcepathstyle: true
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  # Single-node Loki: an in-memory ring avoids memberlist entirely.
+  # An empty `memberlist:` block zeroes the ring KV defaults and crash-loops Loki.
   ring:
     kvstore:
-      store: memberlist
+      store: inmemory
 
-ruler:
-  storage:
-    s3:
-      bucketnames: loki-ruler
-
-table_manager:
-  retention_deletes_enabled: true
-  retention_period: {{ loki_log_retention }}
+compactor:
+  working_directory: /loki/compactor
+  retention_enabled: true
+  delete_request_store: filesystem

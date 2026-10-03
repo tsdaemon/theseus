@@ -342,7 +342,6 @@ portainer_enabled: true
 ## loki
 loki_enabled: true
 loki_data_directory: "{{ ansible_nas_data_root }}/data/loki"
-loki_minio_data_directory: "{{ ansible_nas_data_root }}/data/loki/minio"
 loki_promtail_data_directory: "{{ ansible_nas_data_root }}/data/loki/promtail"
 
 ## stats
@@ -361,6 +360,10 @@ stats_ping_targets:
   internet:
     - 1.1.1.1
     - 8.8.8.8
+# Router SNMP (Asus RT-AC88U, LAN only)
+stats_router_snmp_enabled: true
+stats_router_snmp_host: "192.168.0.1"
+stats_router_snmp_community: "{{ router_snmp_community_get }}"
 
 ## watchtower
 watchtower_enabled: true
