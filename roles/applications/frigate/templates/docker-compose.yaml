@@ -28,7 +28,8 @@ services:
       - "{{ frigate_port_webrtc }}:8555/tcp" # WebRTC over tcp
       - "{{ frigate_port_webrtc }}:8555/udp" # WebRTC over udp
     environment:
-      FRIGATE_RTSP_PASSWORD: "{{ frigate_rtsp_password }}"
+      FRIGATE_RTSP_USER: "{{ frigate_balcony_camera_user }}"
+      FRIGATE_RTSP_PASSWORD: "{{ frigate_balcony_camera_password }}"
       NVIDIA_DRIVER_CAPABILITIES: all
     labels:
       traefik.enable: "true"

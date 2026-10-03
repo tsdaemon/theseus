@@ -15,12 +15,26 @@ frigate_port_webrtc: "8555"
 # docker
 frigate_container_name: "frigate"
 frigate_image_name: "ghcr.io/blakeblackshear/frigate"
-frigate_image_version: "stable"
+frigate_image_version: "0.18.0-tensorrt" # pinned by tag (digest at pinning time: sha256:82d7475b..., == former stable-tensorrt); -tensorrt: CUDA ONNX detector
+
+# detector model (YOLOv9, ONNX, built once via the Frigate 0.18 docs recipe, see tasks/model.yaml)
+frigate_model_size: "s"
+frigate_model_img_size: "320"
+frigate_model_file: "yolov9-{{ frigate_model_size }}-{{ frigate_model_img_size }}.onnx"
+frigate_model_path: "{{ frigate_model_dir }}/{{ frigate_model_file }}"
+frigate_model_uv_version: "0.10.4"
+frigate_model_onnx_version: "1.18.0"
+frigate_model_yolov9_commit: "5b1ea9a8b3f0ffe4fe0e203ec6232d788bb3fcff" # WongKinYiu/yolov9 master at build time
+frigate_model_torch_version: "2.7.1"
+frigate_model_torchvision_version: "0.22.1"
+frigate_model_ort_version: "1.22.0"
+frigate_model_min_bytes: 1048576 # a valid s-320 model is tens of MiB; smaller means partial/empty
+frigate_model_dir: "{{ frigate_config_directory }}/model_cache"
 
 # specs
 frigate_shm_size: 400mb
 
-# GPU (NVDEC decode offload; detector stays CPU/openvino)
+# GPU (NVDEC decode offload; detector: ONNX on CUDA)
 # NVDEC decode, frames copied back to system memory. Do NOT use preset-nvidia-h264 / -hwaccel_output_format cuda:
 # with record+detect+audio on one input the filter graph breaks (cuda frames vs auto_scale) on Frigate 0.18.
 frigate_ffmpeg_hwaccel_args: "-hwaccel cuda"

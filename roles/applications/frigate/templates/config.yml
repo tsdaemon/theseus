@@ -7,24 +7,26 @@ tls:
 audio:
   enabled: true
 
-{% if frigate_ffmpeg_hwaccel_args %}
 ffmpeg:
+  retry_interval: 30 # pace ffmpeg restarts when the camera is unreachable (default 10s)
+{% if frigate_ffmpeg_hwaccel_args %}
   hwaccel_args: "{{ frigate_ffmpeg_hwaccel_args }}"
 {% endif %}
 
 go2rtc:
   streams:
     balcony:
-      - ffmpeg:rtsp://{{ frigate_balcony_camera_user }}:{{ frigate_balcony_camera_password }}@{{ frigate_balcony_camera_ip }}:554/stream1#video=copy#audio=aac # <- stream which supports video & aac audio.
+      - ffmpeg:rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@{{ frigate_balcony_camera_ip }}:554/stream1#video=copy#audio=aac # <- stream which supports video & aac audio.
+    balcony_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@{{ frigate_balcony_camera_ip }}:554/stream2 # 640x360 sub-stream for detect only
 
 snapshots:
   enabled: true
   timestamp: true
 
 detectors:
-  ov:
-    type: openvino
-    device: CPU
+  onnx:
+    type: onnx
 
 semantic_search:
   enabled: true
@@ -32,12 +34,13 @@ semantic_search:
   model_size: small
 
 model:
-  width: 300
-  height: 300
-  input_tensor: nhwc
-  input_pixel_format: bgr
-  path: /openvino-model/ssdlite_mobilenet_v2.xml
-  labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+  model_type: yolo-generic
+  width: {{ frigate_model_img_size }}
+  height: {{ frigate_model_img_size }}
+  input_tensor: nchw
+  input_dtype: float
+  path: /config/model_cache/{{ frigate_model_file }}
+  labelmap_path: /labelmap/coco-80.txt
 
 cameras:
   balcony:
@@ -49,8 +52,15 @@ cameras:
           input_args: preset-rtsp-restream
           roles:
             - record
-            - detect
             - audio
+        - path: rtsp://127.0.0.1:8554/balcony_sub
+          input_args: preset-rtsp-restream
+          roles:
+            - detect
+    detect:
+      width: 640
+      height: 360
+      fps: 5
     live:
       streams:
         balcony: balcony

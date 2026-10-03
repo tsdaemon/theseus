@@ -12,6 +12,9 @@
         - "{{ frigate_config_directory }}"
         - "{{ frigate_storage_directory }}"
 
+    - name: Provision detector model
+      ansible.builtin.include_tasks: model.yaml
+
     - name: Create docker-compose.yaml
       ansible.builtin.template:
         src: docker-compose.yaml

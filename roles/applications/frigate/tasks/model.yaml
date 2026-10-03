@@ -1,0 +1,77 @@
+---
+# Builds the YOLOv9 ONNX model once (recipe from the Frigate 0.18 docs, "YOLOv9" in object detectors), with pinned inputs.
+# Idempotent: rebuilt when the file is missing or smaller than frigate_model_min_bytes.
+# Requires docker + buildx + network (python:3.11, github, pypi).
+- name: Check detector model
+  ansible.builtin.stat:
+    path: "{{ frigate_model_path }}"
+  register: frigate_model_stat
+
+- name: Build detector model
+  when: not frigate_model_stat.stat.exists or frigate_model_stat.stat.size < frigate_model_min_bytes
+  block:
+    - name: Preflight docker buildx
+      ansible.builtin.command: docker buildx version
+      changed_when: false
+      register: frigate_model_buildx
+      failed_when: frigate_model_buildx.rc != 0
+    - name: Create model_cache directory
+      ansible.builtin.file:
+        path: "{{ frigate_model_dir }}"
+        state: directory
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: 0775
+
+    - name: Remove partial model file
+      ansible.builtin.file:
+        path: "{{ frigate_model_path }}"
+        state: absent
+
+    - name: Export YOLOv9 to ONNX (docker build)
+      ansible.builtin.shell:
+        cmd: |
+          set -e
+          docker build . --build-arg MODEL_SIZE={{ frigate_model_size }} --build-arg IMG_SIZE={{ frigate_model_img_size }} \
+            --output {{ frigate_model_dir }} -f- <<'EOF2'
+          FROM python:3.11 AS build
+          RUN apt-get update && apt-get install --no-install-recommends -y cmake libgl1 && rm -rf /var/lib/apt/lists/*
+          COPY --from=ghcr.io/astral-sh/uv:{{ frigate_model_uv_version }} /uv /bin/
+          WORKDIR /yolov9
+          ADD https://github.com/WongKinYiu/yolov9.git#{{ frigate_model_yolov9_commit }} .
+          RUN uv pip install --system torch=={{ frigate_model_torch_version }} torchvision=={{ frigate_model_torchvision_version }} --index-url https://download.pytorch.org/whl/cpu --extra-index-url https://pypi.org/simple --index-strategy unsafe-best-match
+          RUN uv pip install --system -r requirements.txt
+          RUN uv pip install --system onnx=={{ frigate_model_onnx_version }} onnxruntime=={{ frigate_model_ort_version }} "onnx-simplifier>=0.4.1" onnxscript
+          ARG MODEL_SIZE
+          ARG IMG_SIZE
+          ADD https://github.com/WongKinYiu/yolov9/releases/download/v0.1/yolov9-${MODEL_SIZE}-converted.pt yolov9-${MODEL_SIZE}.pt
+          RUN sed -i "s/ckpt = torch.load(attempt_download(w), map_location='cpu')/ckpt = torch.load(attempt_download(w), map_location='cpu', weights_only=False)/g" models/experimental.py \
+            && (grep -q "weights_only=False" models/experimental.py || { echo "weights_only patch did not apply" >&2; exit 1; })
+          RUN python3 export.py --weights ./yolov9-${MODEL_SIZE}.pt --imgsz ${IMG_SIZE} --simplify --include onnx
+          RUN python3 -c "import onnx; onnx.checker.check_model('yolov9-${MODEL_SIZE}.onnx')"
+          FROM scratch
+          ARG MODEL_SIZE
+          ARG IMG_SIZE
+          COPY --from=build /yolov9/yolov9-${MODEL_SIZE}.onnx /yolov9-${MODEL_SIZE}-${IMG_SIZE}.onnx
+          EOF2
+        executable: /bin/bash
+        chdir: /tmp
+
+    - name: Fix model ownership
+      ansible.builtin.file:
+        path: "{{ frigate_model_path }}"
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: 0644
+
+- name: Stat detector model
+  ansible.builtin.stat:
+    path: "{{ frigate_model_path }}"
+  register: frigate_model_final
+
+- name: Assert detector model valid
+  ansible.builtin.assert:
+    that:
+      - frigate_model_final.stat.exists
+      - frigate_model_final.stat.size >= frigate_model_min_bytes
+    fail_msg: "{{ frigate_model_path }} is missing or smaller than {{ frigate_model_min_bytes }} bytes"
