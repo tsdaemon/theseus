@@ -9,7 +9,7 @@ audio:
 
 {% if frigate_ffmpeg_hwaccel_args %}
 ffmpeg:
-  hwaccel_args: {{ frigate_ffmpeg_hwaccel_args }}
+  hwaccel_args: "{{ frigate_ffmpeg_hwaccel_args }}"
 {% endif %}
 
 go2rtc:

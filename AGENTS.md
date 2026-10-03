@@ -56,12 +56,13 @@ Read that page before any service change. It applies to every new or modified se
 
 ### Modeling
 
-- Separate tables, never merged: Hardware, Software, Systems, Signals, Maintenance, Repos, Projects, Tasks.
+- Separate tables, never merged: Hardware, Software, Systems, Maintenance, Repos, Projects, Tasks, plus the Ops sources (Sources, Dashboards, Alerts, Incidents).
 - Systems are logical "circuits" (not an enum); a device/service belongs to one system.
 - Repos is its own table, linked from Hardware and Software via the `Repos` relation. Do not use the legacy `Repo` URL field.
 - Maintenance links to Hardware and has its own table and board views.
 - Tasks (`Status`, `Due`, `Project`, `System`, `Hardware`, `Software`) is the planning database; Projects holds big initiatives, with context/design on the project page and tasks linked via `Project`.
-- Signals link to Software via `From (software)`.
+- Ops (shown as "Operations" on the Digital Home page): Sources = what is collected, how and where (metrics → Prometheus, logs → Loki; `Hardware`/`Software` is the data's origin, not Loki/Prometheus); Dashboards ↔ Sources; Alerts (formerly Signals) link to Software via `From (software)`; Incidents. Update Sources/Dashboards when collection or dashboards change.
+- Never trash a Notion data source via MCP (`in_trash`): in a multi-source database it trashes the whole database. Deletions are done by the user in the Notion UI.
 - Hardware fields: `IP`, `Hostname`, `Power`, `Powered by`, `Gateway`, `Connectivity`, `Depends on (software)`, `Location`, `Criticality`, `System`, `Repos`.
 - Software fields: `Runtime` (Local/Cloud/Hybrid), `Runs on`, `Service URL`, `Endpoint`, `Criticality`, `System`, `Repos`.
 
