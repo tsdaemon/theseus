@@ -4,7 +4,7 @@ name: mariadb
 services:
   mariadb:
     container_name: "{{ mariadb_container_name }}"
-    image: mariadb:latest
+    image: "{{ mariadb_image_name }}:{{ mariadb_image_version }}"
     restart: unless-stopped
     ports:
       - "{{ mariadb_tcp_port }}:3306"
@@ -18,9 +18,3 @@ services:
 {% else %}
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "true"
 {% endif %}
-    networks:
-      - "{{ docker_network_name }}"
-
-networks:
-  "{{ docker_network_name }}":
-    external: true

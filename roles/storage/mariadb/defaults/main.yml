@@ -10,6 +10,12 @@ mariadb_tcp_port: "3306"
 
 # docker
 mariadb_container_name: mariadb
+mariadb_image_name: "mariadb"
+# pinned: the datadir is 11.4; an unpinned `latest` jumped to 13.x via Watchtower
+mariadb_image_version: "11.4"
+# uid/gid of the mysql user inside the official image
+mariadb_mysql_uid: "999"
+mariadb_mysql_gid: "999"
 
 # Auth
 # If empty, the container is started with an empty root password.
@@ -29,5 +35,6 @@ mariadb_secrets_dir: "{{ playbook_dir }}/.secrets/mariadb"
 #     database: app_db
 #     host: "%"
 #     privileges: "ALL"
+#     update_password: "always"  # default on_create: an existing user's password is not changed
 mariadb_databases: []
 mariadb_users: []

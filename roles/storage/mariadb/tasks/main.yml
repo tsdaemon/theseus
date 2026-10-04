@@ -1,15 +1,23 @@
 ---
 - name: Start MariaDB
   block:
-    - name: Create MariaDB Directories
+    - name: Create MariaDB config directory
       ansible.builtin.file:
-        path: "{{ item }}"
+        path: "{{ mariadb_config_directory }}"
         state: directory
         owner: "{{ ansible_nas_user }}"
         group: "{{ ansible_nas_group }}"
         mode: "770"
+
+    # Owned by the image's mysql user: mariadbd must be able to traverse its datadir.
+    - name: Create MariaDB data directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ mariadb_mysql_uid }}"
+        group: "{{ mariadb_mysql_gid }}"
+        mode: "770"
       with_items:
-        - "{{ mariadb_config_directory }}"
         - "{{ mariadb_data_directory }}"
         - "{{ mariadb_data_directory }}/run"
 
@@ -88,7 +96,7 @@
         host: "{{ item.host | default('%') }}"
         priv: "{{ item.database }}.*:{{ item.privileges | default('ALL') }}"
         state: present
-        update_password: on_create
+        update_password: "{{ item.update_password | default('on_create') }}"
         login_unix_socket: "{{ mariadb_data_directory }}/run/mysqld.sock"
         login_user: root
         login_password: >-

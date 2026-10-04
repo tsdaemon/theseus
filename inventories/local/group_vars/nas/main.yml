@@ -232,12 +232,18 @@ influxdb2_data_directory: "{{ docker_home_large }}/influxdb2/data"
 
 ## mariadb
 mariadb_enabled: true
-mariadb_data_directory: "{{ ansible_nas_data_root }}/data/mariadb"
+# On the ext4 branch, not the mergerfs pool: mariadbd fails to start on mergerfs
+# ("mkdir: ... File exists" on /var/lib/mysql), see the 2026-09 MariaDB incident in Notion.
+mariadb_data_directory: "/mnt/disk1/data/mariadb"
+# Home Assistant recorder uses the `home_assistant` database (HA db_url); provisioning
+# `homeassistant` replaces the user's grants (likely why the recorder stopped on 2026-03-31).
 mariadb_databases:
-  - name: homeassistant
+  - name: home_assistant
 mariadb_users:
   - name: homeassistant
-    database: homeassistant
+    password: "{{ mariadb_homeassistant_password }}"
+    update_password: always
+    database: home_assistant
     host: "%"
     privileges: "ALL"
 
