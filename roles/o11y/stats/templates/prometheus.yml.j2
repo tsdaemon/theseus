@@ -48,3 +48,15 @@ scrape_configs:
       - targets:
           - '{{ ansible_nas_ip }}:{{ wireguard_ui_port }}'
 {% endif %}
+
+{% if stats_hass_long_lived_access_token is defined %}
+  - job_name: "homeassistant"
+    scrape_interval: 30s
+    metrics_path: /api/prometheus
+    authorization:
+      type: Bearer
+      credentials: "{{ stats_hass_long_lived_access_token }}"
+    static_configs:
+      - targets:
+          - '{{ stats_hass_host }}'
+{% endif %}

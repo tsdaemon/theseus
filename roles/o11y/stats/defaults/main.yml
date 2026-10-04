@@ -81,5 +81,7 @@ stats_router_snmp_community: "public"
 # stats_prometheus_additional_hosts:
 #  - 192.168.1.1:9100
 
-# uncomment to scrape metrics from HomeAssistant. You'll need to create a long lived access token.
+# HomeAssistant Prometheus scrape (/api/prometheus); enabled when the long lived access token is defined
+# (set stats_hass_long_lived_access_token in secrets.yaml)
+stats_hass_host: "192.168.0.100:80"
 # stats_hass_long_lived_access_token: addfasdfasdf

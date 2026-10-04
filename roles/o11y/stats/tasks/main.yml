@@ -48,6 +48,12 @@
         dest: "{{ stats_grafana_config_directory }}/dashboards/network.json"
       when: stats_ping_enabled
 
+    - name: Copy Grafana Home Assistant dashboard
+      ansible.builtin.copy:
+        src: dashboards/home-assistant.json
+        dest: "{{ stats_grafana_config_directory }}/dashboards/home-assistant.json"
+      when: stats_hass_long_lived_access_token is defined
+
     - name: Detect provider hop (ISP first hop past the router)
       ansible.builtin.command: "ping -n -c 6 -W 1 -t 2 {{ stats_ping_provider_probe_host }}"
       register: stats_ping_provider_probe
@@ -83,7 +89,10 @@
       ansible.builtin.template:
         src: prometheus.yml.j2
         dest: "{{ stats_prometheus_config_directory }}/prometheus.yml"
-      register: prometheus_config
+        owner: "{{ ansible_nas_user }}"
+        group: "{{ ansible_nas_group }}"
+        mode: "0640"
+      no_log: true
 
     - name: Template telegraf.conf
       ansible.builtin.template:
