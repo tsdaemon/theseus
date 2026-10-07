@@ -32,6 +32,7 @@ services:
     networks:
       - "{{ o11y_network_name }}"
 
+{% if stats_internet_speed_test_enabled %}
   speedtest-exporter:
     container_name: "{{ stats_speedtest_container_name }}"
     image: "{{ stats_speedtest_docker_image_name }}:{{ stats_speedtest_docker_image_version }}"
@@ -44,6 +45,7 @@ services:
       - "{{ o11y_network_name }}"
     volumes:
       - speedtest_config:/.config
+{% endif %}
 
   grafana:
     container_name: "{{ stats_grafana_container_name }}"

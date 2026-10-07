@@ -2197,224 +2197,6 @@
         "x": 0,
         "y": 105
       },
-      "id": 100,
-      "panels": [],
-      "title": "Internet Connectivity",
-      "type": "row"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "ansible_nas"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 9,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "stepAfter",
-            "lineStyle": {
-              "fill": "solid"
-            },
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": true,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "bps"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 106
-      },
-      "id": 102,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "ansible_nas"
-          },
-          "editorMode": "code",
-          "exemplar": false,
-          "expr": "speedtest_download_bits_per_second",
-          "instant": false,
-          "interval": "",
-          "legendFormat": "Download",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "ansible_nas"
-          },
-          "editorMode": "code",
-          "expr": "speedtest_upload_bits_per_second",
-          "hide": false,
-          "legendFormat": "Upload",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "Internet Speed",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "ansible_nas"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "stepAfter",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": true,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "ms"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 106
-      },
-      "id": 103,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "ansible_nas"
-          },
-          "editorMode": "code",
-          "expr": "speedtest_ping_latency_milliseconds",
-          "hide": false,
-          "legendFormat": "Latency",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "Internet Latency",
-      "type": "timeseries"
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 114
-      },
       "id": 110,
       "panels": [],
       "title": "GPU",
@@ -2484,7 +2266,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 115
+        "y": 106
       },
       "id": 111,
       "options": {
@@ -2590,7 +2372,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 115
+        "y": 106
       },
       "id": 112,
       "options": {
@@ -2691,7 +2473,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 123
+        "y": 114
       },
       "id": 113,
       "options": {
@@ -2799,7 +2581,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 123
+        "y": 114
       },
       "id": 114,
       "options": {
@@ -2900,7 +2682,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 131
+        "y": 122
       },
       "id": 115,
       "options": {
@@ -3012,7 +2794,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 131
+        "y": 122
       },
       "id": 116,
       "options": {

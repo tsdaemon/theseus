@@ -108,6 +108,7 @@
     - name: Start Stats stack
       community.docker.docker_compose_v2:
         project_src: "{{ stats_directory }}"
+        remove_orphans: true
 
     # telegraf.conf is bind-mounted, so compose does not notice when it changes.
     - name: Restart Telegraf after config change

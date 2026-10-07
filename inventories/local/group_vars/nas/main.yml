@@ -352,7 +352,7 @@ loki_promtail_data_directory: "{{ ansible_nas_data_root }}/data/loki/promtail"
 
 ## stats
 stats_enabled: true
-stats_internet_speed_test_enabled: true
+stats_internet_speed_test_enabled: false
 stats_prometheus_data_directory: "{{ ansible_nas_data_root }}/data/stats/prometheus"
 stats_grafana_data_directory: "{{ ansible_nas_data_root }}/data/stats/grafana"
 stats_telegraf_influxdb_port: "8186"
