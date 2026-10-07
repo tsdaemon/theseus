@@ -78,6 +78,10 @@ stats_router_snmp_enabled: false
 stats_router_snmp_host: "192.168.0.1"
 stats_router_snmp_community: "public"
 
+# UPS status (Telegraf inputs.file → nut_* metrics); the line file is written on the host by the nut role
+stats_ups_enabled: false
+stats_ups_metrics_file: "/run/nut-metrics/ups.influx"
+
 # uncomment to scrape more hosts
 # stats_prometheus_additional_hosts:
 #  - 192.168.1.1:9100

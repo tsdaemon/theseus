@@ -1,0 +1,74 @@
+---
+- name: Install NUT
+  ansible.builtin.apt:
+    name:
+      - nut-server
+      - nut-client
+    state: present
+    update_cache: true
+
+- name: Allow the nut user to access the UPS USB device
+  ansible.builtin.template:
+    src: 90-nut-ups.rules
+    dest: /etc/udev/rules.d/90-nut-ups.rules
+    owner: root
+    group: root
+    mode: "0644"
+  register: nut_udev_rule
+
+- name: Apply udev rules
+  ansible.builtin.shell: udevadm control --reload-rules && udevadm trigger --subsystem-match=usb
+  when: nut_udev_rule.changed
+
+- name: Deploy NUT config
+  ansible.builtin.template:
+    src: "{{ item.name }}"
+    dest: "/etc/nut/{{ item.name }}"
+    owner: root
+    group: nut
+    mode: "{{ item.mode }}"
+  loop:
+    - { name: nut.conf, mode: "0640" }
+    - { name: ups.conf, mode: "0640" }
+    - { name: upsd.conf, mode: "0640" }
+    - { name: upsd.users, mode: "0640" }
+    - { name: upsmon.conf, mode: "0640" }
+    - { name: upssched.conf, mode: "0640" }
+    - { name: upssched-cmd, mode: "0750" }
+  notify: Restart NUT
+
+- name: Enable NUT services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - nut-server
+    - nut-monitor
+
+- name: Deploy NUT metrics script
+  ansible.builtin.template:
+    src: nut-metrics.sh
+    dest: /usr/local/bin/nut-metrics
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Deploy NUT metrics systemd units
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - nut-metrics.service
+    - nut-metrics.timer
+  register: nut_metrics_units
+
+- name: Enable NUT metrics timer
+  ansible.builtin.systemd:
+    name: nut-metrics.timer
+    enabled: true
+    state: "{{ 'restarted' if nut_metrics_units.changed else 'started' }}"
+    daemon_reload: "{{ nut_metrics_units.changed }}"

@@ -1,0 +1,10 @@
+[Unit]
+Description=Dump NUT UPS status for telegraf every {{ nut_metrics_interval }}
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec={{ nut_metrics_interval }}
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target

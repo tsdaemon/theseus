@@ -445,3 +445,10 @@
       name = "out_discards"
       oid = "1.3.6.1.2.1.2.2.1.19"
 {% endif %}
+{% if stats_ups_enabled %}
+
+# UPS (NUT): one Influx line dumped from upsc by the nut role's nut-metrics.timer
+[[inputs.file]]
+  files = ["/hostfs{{ stats_ups_metrics_file }}"]
+  data_format = "influx"
+{% endif %}

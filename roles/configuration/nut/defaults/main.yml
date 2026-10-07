@@ -1,0 +1,23 @@
+---
+# LogicPower LP-U800VA-3PS on USB. Not a standard HID Power Device (0001:0000,
+# MEC0003 chip); verified with nutdrv_qx + hunnox protocol, NUT 2.8.1, 2026-10-07.
+nut_ups_name: ups
+nut_ups_description: "LogicPower LP-U800VA-3PS"
+nut_ups_vendorid: "0001"
+nut_ups_productid: "0000"
+nut_ups_battery_voltage_high: "13.70"
+nut_ups_battery_voltage_low: "10.40"
+
+# Shut theseus down after this long on battery (or immediately on low battery).
+nut_onbattery_shutdown_seconds: 300
+
+nut_upsd_port: 3493
+nut_admin_user: admin
+nut_admin_password: "{{ nut_admin_password_secret }}"
+nut_upsmon_user: upsmon
+nut_upsmon_password: "{{ nut_upsmon_password_secret }}"
+
+# upsc snapshot as an Influx line, read by telegraf (stats_ups_enabled).
+nut_metrics_dir: /run/nut-metrics
+nut_metrics_file: "{{ nut_metrics_dir }}/ups.influx"
+nut_metrics_interval: 10s

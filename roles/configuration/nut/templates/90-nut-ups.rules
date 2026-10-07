@@ -1,0 +1,1 @@
+SUBSYSTEM=="usb", ATTR{idVendor}=="{{ nut_ups_vendorid }}", ATTR{idProduct}=="{{ nut_ups_productid }}", MODE="0664", GROUP="nut"

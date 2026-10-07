@@ -370,6 +370,7 @@ stats_ping_targets:
 stats_router_snmp_enabled: true
 stats_router_snmp_host: "192.168.0.1"
 stats_router_snmp_community: "{{ router_snmp_community_get }}"
+stats_ups_enabled: true
 
 ## watchtower
 watchtower_enabled: true

@@ -1,0 +1,10 @@
+#!/bin/sh
+case "$1" in
+  onbatt-shutdown)
+    logger -t upssched "On battery for {{ nut_onbattery_shutdown_seconds }}s, forcing shutdown"
+    /sbin/upsmon -c fsd
+    ;;
+  *)
+    logger -t upssched "Unknown timer: $1"
+    ;;
+esac

@@ -1,0 +1,8 @@
+[{{ nut_admin_user }}]
+  password = {{ nut_admin_password }}
+  actions = SET
+  instcmds = ALL
+
+[{{ nut_upsmon_user }}]
+  password = {{ nut_upsmon_password }}
+  upsmon primary

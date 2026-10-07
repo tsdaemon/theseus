@@ -48,6 +48,12 @@
         dest: "{{ stats_grafana_config_directory }}/dashboards/network.json"
       when: stats_ping_enabled
 
+    - name: Copy Grafana UPS dashboard
+      ansible.builtin.copy:
+        src: dashboards/ups.json
+        dest: "{{ stats_grafana_config_directory }}/dashboards/ups.json"
+      when: stats_ups_enabled
+
     - name: Copy Grafana Home Assistant dashboard
       ansible.builtin.copy:
         src: dashboards/home-assistant.json

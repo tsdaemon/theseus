@@ -1,0 +1,5 @@
+---
+- name: Restart NUT
+  ansible.builtin.shell: >-
+    upsdrvsvcctl resync &&
+    systemctl restart nut-driver.target nut-server nut-monitor

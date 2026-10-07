@@ -74,6 +74,11 @@
         - nvidia
         - configuration
 
+    - role: nut
+      tags:
+        - nut
+        - configuration
+
     ###
     ### Storage
     ###
