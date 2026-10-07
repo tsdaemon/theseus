@@ -18,3 +18,7 @@ docker_daemon_json_extra: {}
 docker_daemon_json: "{{ {'data-root': docker_image_directory, 'storage-driver': docker_storage_driver} | combine(docker_daemon_json_extra) }}"
 
 docker_network_name: "main"
+
+# Weekly cleanup of dangling images and build cache older than docker_prune_until.
+docker_prune_enabled: true
+docker_prune_until: "168h"

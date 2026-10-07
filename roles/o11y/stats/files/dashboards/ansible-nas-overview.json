@@ -456,7 +456,8 @@
       "id": 30,
       "links": [],
       "options": {
-        "orientation": "auto",
+        "displayMode": "basic",
+        "orientation": "horizontal",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -464,8 +465,7 @@
           "fields": "",
           "values": false
         },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
+        "showUnfilled": true
       },
       "pluginVersion": "9.1.0",
       "targets": [
@@ -476,14 +476,15 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "disk_used_percent{host=\"$server\",path=\"/\"}",
+          "expr": "disk_used_percent{host=\"$server\",fstype=~\"ext4|xfs|zfs|btrfs\",path!~\"/boot.*|/home|/appdata|/var/lib/docker\"}",
           "instant": false,
+          "legendFormat": "{{path}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "RootFS used",
-      "type": "gauge"
+      "title": "Disks",
+      "type": "bargauge"
     },
     {
       "datasource": {

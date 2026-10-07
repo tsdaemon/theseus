@@ -22,3 +22,14 @@
     name: docker
     state: restarted
   when: docker_config.changed
+
+- name: Schedule Docker prune
+  ansible.builtin.cron:
+    name: docker-prune
+    weekday: "0"
+    minute: "0"
+    hour: "4"
+    job: >-
+      docker image prune -f > /dev/null
+      && docker builder prune -f --filter until={{ docker_prune_until }} > /dev/null
+    state: "{{ 'present' if docker_prune_enabled else 'absent' }}"
